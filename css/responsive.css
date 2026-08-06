@@ -1,0 +1,104 @@
+/* ===================================================
+   Yui Portfolio - responsive.css
+   モバイルファースト：768px（タブレット）/ 1024px（PC）で上書き
+   =================================================== */
+
+/* ---------- タブレット（768px〜） ---------- */
+@media (min-width: 768px) {
+  :root {
+    --section-pad-y: 96px;
+    --section-pad-x: 32px;
+  }
+
+  .nav-list {
+    display: flex;
+  }
+
+  .nav-toggle,
+  .nav-mobile,
+  .nav-overlay {
+    display: none;
+  }
+
+  .about__grid {
+    grid-template-columns: 1fr 1.2fr;
+    text-align: left;
+  }
+
+  .about__photo {
+    margin: 0;
+  }
+
+  .skills__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .work-item {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+
+  .work-item__meta {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .flow__steps {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .hero__copy {
+    text-align: left;
+    max-width: 640px;
+    margin: 0;
+    padding-left: clamp(32px, 6vw, 90px);
+  }
+
+  .hero__cta {
+    justify-content: flex-start;
+  }
+
+  .contact__links {
+    justify-content: center;
+  }
+}
+
+/* ---------- デスクトップ（1024px〜） ---------- */
+@media (min-width: 1024px) {
+  :root {
+    --section-pad-y: 140px;
+    --section-pad-x: 40px;
+  }
+
+  .skills__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .flow__steps {
+    grid-template-columns: repeat(7, 1fr);
+  }
+
+  .flow-step {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+    padding: 18px 10px;
+  }
+
+  /* 作品ごとの左右交互レイアウト（6-7） */
+  .work-item[data-align="reverse"] .work-item__media {
+    order: 2;
+  }
+
+  .work-item[data-align="reverse"] .work-item__info {
+    order: 1;
+  }
+
+  .hero {
+    align-items: center;
+    min-height: 90svh;
+  }
+
+  .hero__copy {
+    padding-bottom: 0;
+  }
+}

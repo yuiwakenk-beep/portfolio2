@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 【要確認】title・descriptionは指示書の仮案です。確定後に差し替えてください -->
+<title>Yui Portfolio | Web Design & Development</title>
+<meta name="description" content="LP・ホームページのデザイン、HTML/CSS実装、画像制作、文章改善、サーバー公開まで対応するYuiのポートフォリオです。">
+<meta property="og:title" content="Yui Portfolio | Web Design & Development">
+<meta property="og:description" content="LP・ホームページのデザイン、HTML/CSS実装、画像制作、文章改善、サーバー公開まで対応するYuiのポートフォリオです。">
+<meta property="og:type" content="website">
+<!-- 【要確認】OGP画像は未設定です。assets/images/decoration/ 配下に用意後、og:image を追加してください -->
+<link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Shippori+Mincho:wght@500;700&family=Klee+One:wght@600&family=Noto+Sans+JP:wght@400;500;700&family=Parisienne&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/animation.css">
+<link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">本文へスキップ</a>
+
+<!-- ========== ヘッダー・ナビゲーション（6-1） ========== -->
+<header class="site-header" id="siteHeader">
+  <a href="#hero" class="site-logo">Yui</a>
+
+  <nav class="nav-list" aria-label="メインナビゲーション">
+    <a href="#about">About</a>
+    <a href="#skills">Skills</a>
+    <a href="#works">Works</a>
+    <a href="#flow">Flow</a>
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <button class="nav-toggle" id="navToggle" aria-label="メニューを開く" aria-expanded="false" aria-controls="navMobile">
+    <svg class="icon-open" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    <svg class="icon-close" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+</header>
+
+<div class="nav-overlay" id="navOverlay"></div>
+
+<nav class="nav-mobile" id="navMobile" aria-label="モバイルメニュー">
+  <a href="#about">About</a>
+  <a href="#skills">Skills</a>
+  <a href="#works">Works</a>
+  <a href="#flow">Flow</a>
+  <a href="#contact">Contact</a>
+</nav>
+
+<main id="main">
+
+  <!-- ========== ファーストビュー（6-2） ========== -->
+  <section class="hero" id="hero">
+    <div class="wave-layer-track wave-layer--back" aria-hidden="true">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,70 C120,95 240,45 360,70 C480,95 600,45 720,70 C840,95 960,45 1080,70 C1200,95 1320,45 1440,70 L1440,120 L0,120 Z" fill="var(--color-sea-light)"/></svg>
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,70 C120,95 240,45 360,70 C480,95 600,45 720,70 C840,95 960,45 1080,70 C1200,95 1320,45 1440,70 L1440,120 L0,120 Z" fill="var(--color-sea-light)"/></svg>
+    </div>
+    <div class="wave-layer-track wave-layer--mid" aria-hidden="true">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,60 C160,30 320,90 480,60 C640,30 800,90 960,60 C1120,30 1280,90 1440,60 L1440,120 L0,120 Z" fill="var(--color-sea)"/></svg>
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,60 C160,30 320,90 480,60 C640,30 800,90 960,60 C1120,30 1280,90 1440,60 L1440,120 L0,120 Z" fill="var(--color-sea)"/></svg>
+    </div>
+    <div class="wave-layer-track wave-layer--front" aria-hidden="true">
+      <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,50 C100,80 200,20 300,50 C400,80 500,20 600,50 C700,80 800,20 900,50 C1000,80 1100,20 1200,50 C1300,80 1400,20 1440,50 L1440,100 L0,100 Z" fill="var(--color-sea-deep)"/></svg>
+      <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,50 C100,80 200,20 300,50 C400,80 500,20 600,50 C700,80 800,20 900,50 C1000,80 1100,20 1200,50 C1300,80 1400,20 1440,50 L1440,100 L0,100 Z" fill="var(--color-sea-deep)"/></svg>
+    </div>
+    <div class="hero__overlay" aria-hidden="true"></div>
+
+    <div class="hero__copy">
+      <p class="hero__role fade-up-in">Yui / Web Creator</p>
+      <h1 class="hero__title fade-up-in fade-up-in--delay1">海のように、心地よく届くデザインを。</h1>
+      <p class="hero__subtitle fade-up-in fade-up-in--delay2">デザイン・実装・画像制作・文章改善・公開まで、ひとつずつ丁寧にお手伝いします。</p>
+      <div class="hero__cta fade-up-in fade-up-in--delay3">
+        <a href="#works" class="btn btn--primary">制作実績を見る</a>
+        <a href="#contact" class="btn btn--ghost">お問い合わせ</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== コンセプト・大切にしていること（6-3） ========== -->
+  <div class="wave-divider" aria-hidden="true"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,30 C120,55 240,5 360,30 C480,55 600,5 720,30 C840,55 960,5 1080,30 C1200,55 1320,5 1440,30 L1440,60 L0,60 Z" fill="var(--color-sand)"/></svg></div>
+
+  <section class="concept" id="concept">
+    <div class="section-inner">
+      <div class="section-heading reveal">
+        <span class="section-heading__en">My Philosophy</span>
+        <h2 class="section-heading__jp">大切にしていること</h2>
+      </div>
+      <div class="concept__card cloud-card cloud-card--panel float-a reveal">
+        <div class="cloud-card__inner">
+          <p class="concept__body">[ここに、制作で大切にしている考え方を記載します。]</p>
+          <div class="concept__keywords">
+            <span class="tag">丁寧に話を聞く</span>
+            <span class="tag">初めての方にも分かりやすく</span>
+            <span class="tag">見た目だけでなく目的を考える</span>
+            <span class="tag">伝わりやすさを大切にする</span>
+            <span class="tag">AIを活用しながら人の温度を残す</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 自己紹介（6-4） ========== -->
+  <div class="wave-divider" aria-hidden="true"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,30 C120,5 240,55 360,30 C480,5 600,55 720,30 C840,5 960,55 1080,30 C1200,5 1320,55 1440,30 L1440,60 L0,60 Z" fill="var(--color-sky)"/></svg></div>
+
+  <section class="about" id="about">
+    <div class="section-inner">
+      <div class="section-heading reveal">
+        <span class="section-heading__en">About Me</span>
+        <h2 class="section-heading__jp">自己紹介</h2>
+      </div>
+      <div class="about__grid reveal">
+        <div class="about__photo">
+          <div class="img-placeholder" style="height:100%;">
+            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            <span class="img-placeholder__label">本人写真<br>（差し替え予定）</span>
+          </div>
+        </div>
+        <div>
+          <h3 class="about__name">Yui</h3>
+          <p class="about__role">Web Creator</p>
+          <!-- 【要確認】自己紹介の本文は未確定です。内容をご確認ください -->
+          <p class="about__text">[要確認：自己紹介文をここに記載します。]</p>
+          <div class="about__tags">
+            <span class="tag">雑貨店</span>
+            <span class="tag">カフェ・飲食</span>
+            <span class="tag">リゾートバイト</span>
+            <span class="tag">海が好き</span>
+          </div>
+          <div class="about__more">
+            <p class="about__more-item">得意な業種：[得意な業種を記載]</p>
+            <p class="about__more-item">好きなデザインテイスト：[好きなデザインテイストを記載]</p>
+            <p class="about__more-item">仕事で活かせる経験：[仕事で活かせる経験を記載]</p>
+            <p class="about__more-item">今後目指していること：[今後目指していることを記載]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 対応できること（6-5） ========== -->
+  <div class="wave-divider" aria-hidden="true"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,30 C120,55 240,5 360,30 C480,55 600,5 720,30 C840,55 960,5 1080,30 C1200,55 1320,5 1440,30 L1440,60 L0,60 Z" fill="var(--color-sand)"/></svg></div>
+
+  <section class="skills" id="skills">
+    <div class="section-inner">
+      <div class="section-heading reveal">
+        <span class="section-heading__en">Services &amp; Skills</span>
+        <h2 class="section-heading__jp">対応できること</h2>
+      </div>
+
+      <div class="skills__grid reveal-group">
+        <div class="skill-card reveal">
+          <div class="skill-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-sea-deep)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div>
+          <p class="skill-card__title">Webデザイン</p>
+          <p class="skill-card__desc">[対応できる内容を記載]</p>
+          <span class="skill-card__scope">[対応範囲]</span>
+        </div>
+        <div class="skill-card reveal">
+          <div class="skill-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-sea-deep)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+          <p class="skill-card__title">LP・ホームページ制作</p>
+          <p class="skill-card__desc">[対応できる内容を記載]</p>
+          <span class="skill-card__scope">[対応範囲]</span>
+        </div>
+        <div class="skill-card reveal">
+          <div class="skill-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-sea-deep)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg></div>
+          <p class="skill-card__title">HTML / CSS実装</p>
+          <p class="skill-card__desc">[対応できる内容を記載]</p>
+          <span class="skill-card__scope">[対応範囲]</span>
+        </div>
+        <div class="skill-card reveal">
+          <div class="skill-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-sea-deep)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg></div>
+          <p class="skill-card__title">レスポンシブ対応</p>
+          <p class="skill-card__desc">[対応できる内容を記載]</p>
+          <span class="skill-card__scope">[対応範囲]</span>
+        </div>
+        <div class="skill-card reveal">
+          <div class="skill-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-sea-deep)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 15l-5-4-6 5"/></svg></div>
+          <p class="skill-card__title">画像制作</p>
+          <p class="skill-card__desc">[対応できる内容を記載]</p>
+          <span class="skill-card__scope">[対応範囲]</span>
+        </div>
+        <div class="skill-card reveal">
+          <div class="skill-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-sea-deep)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></div>
+          <p class="skill-card__title">AIを活用した制作</p>
+          <p class="skill-card__desc">[対応できる内容を記載]</p>
+          <span class="skill-card__scope">[対応範囲]</span>
+        </div>
+        <div class="skill-card reveal">
+          <div class="skill-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-sea-deep)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1 10-10-3-3L5 16l-1 4z"/></svg></div>
+          <p class="skill-card__title">文章改善</p>
+          <p class="skill-card__desc">[対応できる内容を記載]</p>
+          <span class="skill-card__scope">[対応範囲]</span>
+        </div>
+        <div class="skill-card reveal">
+          <div class="skill-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-sea-deep)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 18a4 4 0 010-8 5 5 0 019.6-1.5A4 4 0 0117 18H7z"/><path d="M12 12v6M9.5 15.5L12 13l2.5 2.5"/></svg></div>
+          <p class="skill-card__title">サーバー公開</p>
+          <p class="skill-card__desc">[対応できる内容を記載]</p>
+          <span class="skill-card__scope">[対応範囲]</span>
+        </div>
+        <div class="skill-card reveal">
+          <div class="skill-card__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-sea-deep)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.4 8.4 0 01-9 8.3 8.5 8.5 0 01-3.8-.9L3 20l1.1-3.2A8.4 8.4 0 0112 3.5a8.4 8.4 0 019 8z"/></svg></div>
+          <p class="skill-card__title">ヒアリング・構成整理</p>
+          <p class="skill-card__desc">[対応できる内容を記載]</p>
+          <span class="skill-card__scope">[対応範囲]</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== 使用ツール・制作環境（6-6） ========== -->
+  <div class="wave-divider" aria-hidden="true"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,30 C120,5 240,55 360,30 C480,5 600,55 720,30 C840,5 960,55 1080,30 C1200,5 1320,55 1440,30 L1440,60 L0,60 Z" fill="var(--color-sky)"/></svg></div>
+
+  <section class="tools" id="tools">
+    <div class="section-inner">
+      <div class="section-heading reveal">
+        <span class="section-heading__en">Tools</span>
+        <h2 class="section-heading__jp">使用ツール・制作環境</h2>
+      </div>
+
+      <div class="tools__list reveal-group">
+        <div class="tool-chip-wrap reveal">
+          <span class="tool-chip"><span>HTML</span><span class="tool-chip__status">[状態]</span></span>
+          <p class="tool-caption">用途：[何に使用しているか]</p>
+        </div>
+        <div class="tool-chip-wrap reveal">
+          <span class="tool-chip"><span>CSS</span><span class="tool-chip__status">[状態]</span></span>
+          <p class="tool-caption">用途：[何に使用しているか]</p>
+        </div>
+        <div class="tool-chip-wrap reveal">
+          <span class="tool-chip"><span>Claude Code</span><span class="tool-chip__status">[状態]</span></span>
+          <p class="tool-caption">用途：[何に使用しているか]</p>
+        </div>
+        <div class="tool-chip-wrap reveal">
+          <span class="tool-chip"><span>ChatGPT</span><span class="tool-chip__status">[状態]</span></span>
+          <p class="tool-caption">用途：[何に使用しているか]</p>
+        </div>
+        <div class="tool-chip-wrap reveal">
+          <span class="tool-chip"><span>Canva</span><span class="tool-chip__status">[状態]</span></span>
+          <p class="tool-caption">用途：[何に使用しているか]</p>
+        </div>
+        <div class="tool-chip-wrap reveal">
+          <span class="tool-chip"><span>Git</span><span class="tool-chip__status">[状態]</span></span>
+          <p class="tool-caption">用途：[何に使用しているか]</p>
+        </div>
+        <div class="tool-chip-wrap reveal">
+          <span class="tool-chip"><span>GitHub</span><span class="tool-chip__status">[状態]</span></span>
+          <p class="tool-caption">用途：[何に使用しているか]</p>
+        </div>
+        <div class="tool-chip-wrap reveal">
+          <span class="tool-chip"><span>Xserver</span><span class="tool-chip__status">[状態]</span></span>
+          <p class="tool-caption">用途：[何に使用しているか]</p>
+        </div>
+      </div>
+      <p class="tools__legend">状態・用途は【要確認】です。「使用可能 / 学習中 / 今後習得予定」などをご記入ください。</p>
+    </div>
+  </section>
+
+  <!-- ========== 制作実績（6-7） ========== -->
+  <div class="wave-divider" aria-hidden="true"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,30 C120,55 240,5 360,30 C480,55 600,5 720,30 C840,55 960,5 1080,30 C1200,55 1320,5 1440,30 L1440,60 L0,60 Z" fill="var(--color-sand)"/></svg></div>
+
+  <section class="works" id="works">
+    <div class="section-inner">
+      <div class="section-heading reveal">
+        <span class="section-heading__en">Selected Works</span>
+        <h2 class="section-heading__jp">制作実績</h2>
+      </div>
+
+      <!-- WORK 01 -->
+      <article class="work-item reveal">
+        <div class="work-item__media">
+          <div class="img-placeholder work-item__shot">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 20h8M12 18v2"/></svg>
+            <span class="img-placeholder__label">PC画面（差し替え予定）</span>
+          </div>
+          <div class="img-placeholder work-item__shot work-item__shot--mobile">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+            <span class="img-placeholder__label">スマホ画面<br>（差し替え予定）</span>
+          </div>
+        </div>
+        <div class="work-item__info">
+          <p class="work-item__number">WORK 01</p>
+          <h3 class="work-item__title">[作品名]</h3>
+          <dl class="work-item__meta">
+            <div><dt>種別</dt><dd>[LP / HP / その他]</dd></div>
+            <div><dt>案件区分</dt><dd>[自主制作 / 架空案件 / 実案件]</dd></div>
+            <div><dt>業種</dt><dd>[業種]</dd></div>
+            <div><dt>ターゲット</dt><dd>[ここに記載]</dd></div>
+            <div><dt>担当範囲</dt><dd>[ここに記載]</dd></div>
+            <div><dt>使用ツール</dt><dd>[ここに記載]</dd></div>
+            <div><dt>制作期間</dt><dd>約[　]週間</dd></div>
+          </dl>
+          <p class="work-item__desc">制作目的：[ここに記載]<br>工夫したポイント：[ここに記載]</p>
+          <div class="work-item__actions">
+            <span class="btn btn--ghost btn--disabled" aria-disabled="true">サイトを見る<span class="visually-hidden">（公開URLは未設定です）</span></span>
+            <a href="works/work-01.html" class="btn btn--primary">詳細を見る</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- WORK 02（PCでは画像・情報を左右反転） -->
+      <article class="work-item reveal" data-align="reverse">
+        <div class="work-item__media">
+          <div class="img-placeholder work-item__shot">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 20h8M12 18v2"/></svg>
+            <span class="img-placeholder__label">PC画面（差し替え予定）</span>
+          </div>
+          <div class="img-placeholder work-item__shot work-item__shot--mobile">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+            <span class="img-placeholder__label">スマホ画面<br>（差し替え予定）</span>
+          </div>
+        </div>
+        <div class="work-item__info">
+          <p class="work-item__number">WORK 02</p>
+          <h3 class="work-item__title">[作品名]</h3>
+          <dl class="work-item__meta">
+            <div><dt>種別</dt><dd>[LP / HP / その他]</dd></div>
+            <div><dt>案件区分</dt><dd>[自主制作 / 架空案件 / 実案件]</dd></div>
+            <div><dt>業種</dt><dd>[業種]</dd></div>
+            <div><dt>ターゲット</dt><dd>[ここに記載]</dd></div>
+            <div><dt>担当範囲</dt><dd>[ここに記載]</dd></div>
+            <div><dt>使用ツール</dt><dd>[ここに記載]</dd></div>
+            <div><dt>制作期間</dt><dd>約[　]週間</dd></div>
+          </dl>
+          <p class="work-item__desc">制作目的：[ここに記載]<br>工夫したポイント：[ここに記載]</p>
+          <div class="work-item__actions">
+            <span class="btn btn--ghost btn--disabled" aria-disabled="true">サイトを見る<span class="visually-hidden">（公開URLは未設定です）</span></span>
+            <a href="works/work-02.html" class="btn btn--primary">詳細を見る</a>
+          </div>
+        </div>
+      </article>
+
+      <!-- WORK 03 -->
+      <article class="work-item reveal">
+        <div class="work-item__media">
+          <div class="img-placeholder work-item__shot">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 20h8M12 18v2"/></svg>
+            <span class="img-placeholder__label">PC画面（差し替え予定）</span>
+          </div>
+          <div class="img-placeholder work-item__shot work-item__shot--mobile">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+            <span class="img-placeholder__label">スマホ画面<br>（差し替え予定）</span>
+          </div>
+        </div>
+        <div class="work-item__info">
+          <p class="work-item__number">WORK 03</p>
+          <h3 class="work-item__title">[作品名]</h3>
+          <dl class="work-item__meta">
+            <div><dt>種別</dt><dd>[LP / HP / その他]</dd></div>
+            <div><dt>案件区分</dt><dd>[自主制作 / 架空案件 / 実案件]</dd></div>
+            <div><dt>業種</dt><dd>[業種]</dd></div>
+            <div><dt>ターゲット</dt><dd>[ここに記載]</dd></div>
+            <div><dt>担当範囲</dt><dd>[ここに記載]</dd></div>
+            <div><dt>使用ツール</dt><dd>[ここに記載]</dd></div>
+            <div><dt>制作期間</dt><dd>約[　]週間</dd></div>
+          </dl>
+          <p class="work-item__desc">制作目的：[ここに記載]<br>工夫したポイント：[ここに記載]</p>
+          <div class="work-item__actions">
+            <span class="btn btn--ghost btn--disabled" aria-disabled="true">サイトを見る<span class="visually-hidden">（公開URLは未設定です）</span></span>
+            <a href="works/work-03.html" class="btn btn--primary">詳細を見る</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ========== 制作の流れ（6-8） ========== -->
+  <div class="wave-divider" aria-hidden="true"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,30 C120,5 240,55 360,30 C480,5 600,55 720,30 C840,5 960,55 1080,30 C1200,5 1320,55 1440,30 L1440,60 L0,60 Z" fill="var(--color-sky)"/></svg></div>
+
+  <section class="flow" id="flow">
+    <div class="section-inner">
+      <div class="section-heading reveal">
+        <span class="section-heading__en">Workflow</span>
+        <h2 class="section-heading__jp">制作の流れ</h2>
+      </div>
+
+      <div class="flow__route" aria-hidden="true">
+        <svg viewBox="0 0 1200 60" preserveAspectRatio="none">
+          <path id="flowRoutePath" class="flow__route-path" d="M0,30 C100,5 200,55 300,30 C400,5 500,55 600,30 C700,5 800,55 900,30 C1000,5 1100,55 1200,30"/>
+        </svg>
+      </div>
+
+      <ol class="flow__steps reveal-group">
+        <li class="flow-step reveal"><span class="flow-step__num">1</span><span class="flow-step__label">お問い合わせ</span></li>
+        <li class="flow-step reveal"><span class="flow-step__num">2</span><span class="flow-step__label">ヒアリング</span></li>
+        <li class="flow-step reveal"><span class="flow-step__num">3</span><span class="flow-step__label">内容・方向性の整理</span></li>
+        <li class="flow-step reveal"><span class="flow-step__num">4</span><span class="flow-step__label">デザイン制作</span></li>
+        <li class="flow-step reveal"><span class="flow-step__num">5</span><span class="flow-step__label">実装</span></li>
+        <li class="flow-step reveal"><span class="flow-step__num">6</span><span class="flow-step__label">確認・修正</span></li>
+        <li class="flow-step reveal"><span class="flow-step__num">7</span><span class="flow-step__label">納品・公開</span></li>
+      </ol>
+
+      <p class="flow__note">※ 案件内容によって工程は変わります。デザインのみのご依頼の場合、実装工程を省略することも可能です。</p>
+    </div>
+  </section>
+
+  <!-- ========== お問い合わせ（6-9） ========== -->
+  <div class="wave-divider" aria-hidden="true"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,30 C120,55 240,5 360,30 C480,55 600,5 720,30 C840,55 960,5 1080,30 C1200,55 1320,5 1440,30 L1440,60 L0,60 Z" fill="var(--color-sand)"/></svg></div>
+
+  <section class="contact" id="contact">
+    <div class="section-inner contact__inner">
+      <div class="section-heading reveal">
+        <span class="section-heading__en">Contact</span>
+        <h2 class="section-heading__jp">お問い合わせ</h2>
+      </div>
+      <p class="contact__message reveal">「こんなサイトを作りたい」「何から始めればよいか分からない」など、どんな小さなことでもお気軽にご相談ください。</p>
+
+      <div class="contact__card cloud-card cloud-card--panel float-b reveal">
+        <div class="contact__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-sea-deep)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 6 10-6"/></svg></div>
+        <a href="mailto:nk-sun_yui_@outlook.jp" class="contact__email">nk-sun_yui_@outlook.jp</a>
+        <a href="mailto:nk-sun_yui_@outlook.jp" class="btn btn--primary">メールを送る</a>
+      </div>
+
+      <!-- 連絡手段の追加：hrefを設定し data-empty="true" を削除すると表示されます -->
+      <div class="contact__links reveal">
+        <a class="contact-link" data-empty="true" href="#" target="_blank" rel="noopener">クラウドワークス</a>
+        <a class="contact-link" data-empty="true" href="#" target="_blank" rel="noopener">ランサーズ</a>
+        <a class="contact-link" data-empty="true" href="#" target="_blank" rel="noopener">SNS</a>
+        <a class="contact-link" data-empty="true" href="#" target="_blank" rel="noopener">お問い合わせフォーム</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ========== フッター（6-10） ========== -->
+<div class="wave-divider" aria-hidden="true"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,30 C120,55 240,5 360,30 C480,55 600,5 720,30 C840,55 960,5 1080,30 C1200,55 1320,5 1440,30 L1440,60 L0,60 Z" fill="var(--color-footer)"/></svg></div>
+<footer class="site-footer">
+  <p class="site-footer__logo">Yui</p>
+  <p class="site-footer__role">Web Creator</p>
+  <nav class="site-footer__nav" aria-label="フッターナビゲーション">
+    <a href="#about">About</a>
+    <a href="#skills">Skills</a>
+    <a href="#works">Works</a>
+    <a href="#flow">Flow</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <p class="site-footer__copyright">&copy; 2026 Yui. All Rights Reserved.</p>
+</footer>
+
+<a href="#hero" class="to-top" id="toTop" aria-label="ページの先頭へ戻る">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</a>
+
+<script src="js/main.js" defer></script>
+<script src="js/animation.js" defer></script>
+</body>
+</html>

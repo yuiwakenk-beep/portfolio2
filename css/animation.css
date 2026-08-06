@@ -1,0 +1,165 @@
+/* ===================================================
+   Yui Portfolio - animation.css
+   波 / 雲の浮遊 / スクロールフェードアップ / reduced-motion
+   =================================================== */
+
+/* ---------- 波アニメーション（ファーストビュー背景） ---------- */
+.wave-layer-track {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  width: 200%;
+  line-height: 0;
+  will-change: transform;
+}
+
+.wave-layer-track svg {
+  width: 50%;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.wave-layer--back {
+  bottom: 40px;
+  opacity: 0.55;
+  animation: waveDriftSlow 22s linear infinite;
+}
+
+.wave-layer--mid {
+  bottom: 16px;
+  opacity: 0.75;
+  animation: waveDriftSlow 15s linear infinite reverse;
+}
+
+.wave-layer--front {
+  bottom: -2px;
+  opacity: 1;
+  animation: waveDriftSlow 10s linear infinite;
+}
+
+@keyframes waveDriftSlow {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ---------- 雲カードの浮遊（上下2〜6px / 6〜12秒） ---------- */
+.float-a {
+  animation: cloudFloat 8s ease-in-out infinite;
+}
+
+.float-b {
+  animation: cloudFloat 10.5s ease-in-out infinite;
+  animation-delay: -2.4s;
+}
+
+.float-c {
+  animation: cloudFloat 6.5s ease-in-out infinite;
+  animation-delay: -4s;
+}
+
+.float-d {
+  animation: cloudFloat 11.5s ease-in-out infinite;
+  animation-delay: -6s;
+}
+
+@keyframes cloudFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* 長文カードは浮遊を弱める（指示書 第10章） */
+.cloud-card--panel.float-a,
+.cloud-card--panel.float-b,
+.cloud-card--panel.float-c,
+.cloud-card--panel.float-d {
+  animation-duration: 12s;
+}
+
+/* ---------- スクロールフェードアップ（第11章） ---------- */
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s cubic-bezier(0.2, 0.7, 0.2, 1), transform 0.8s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* グループ内は 0.08〜0.12秒ずつ遅延 */
+.reveal-group > *:nth-child(1) {
+  transition-delay: 0s;
+}
+.reveal-group > *:nth-child(2) {
+  transition-delay: 0.09s;
+}
+.reveal-group > *:nth-child(3) {
+  transition-delay: 0.18s;
+}
+.reveal-group > *:nth-child(4) {
+  transition-delay: 0.27s;
+}
+.reveal-group > *:nth-child(5) {
+  transition-delay: 0.36s;
+}
+.reveal-group > *:nth-child(6) {
+  transition-delay: 0.45s;
+}
+.reveal-group > *:nth-child(7) {
+  transition-delay: 0.54s;
+}
+.reveal-group > *:nth-child(8) {
+  transition-delay: 0.63s;
+}
+.reveal-group > *:nth-child(9) {
+  transition-delay: 0.72s;
+}
+
+/* ---------- 読み込み時フェードアップ（ヒーロー） ---------- */
+.fade-up-in {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: fadeUpIn 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+
+.fade-up-in--delay1 {
+  animation-delay: 0.15s;
+}
+
+.fade-up-in--delay2 {
+  animation-delay: 0.3s;
+}
+
+.fade-up-in--delay3 {
+  animation-delay: 0.55s;
+}
+
+@keyframes fadeUpIn {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- アクセシビリティ：動きを減らす設定（第12章） ---------- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
