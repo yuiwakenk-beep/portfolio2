@@ -96,4 +96,9 @@
   .hero__copy {
     padding-bottom: 40px;
   }
+
+  /* ---------- 8-2. PC版：ファーストビュー以外の背景をhaikei.pngに差し替え ---------- */
+  .section-photo-flow {
+    --bg-photo-flow-image: url('../sozai/haikei.png');
+  }
 }

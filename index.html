@@ -97,15 +97,22 @@
     <div class="hero__copy">
       <h1 class="visually-hidden">Yui / Web Creator - 海のように、心地よく届くデザインを。</h1>
       <div class="hero__cta fade-up-in">
-        <a href="#works" class="btn btn--primary">制作実績を見る</a>
-        <a href="#contact" class="btn btn--ghost">お問い合わせ</a>
+        <a href="#works" class="hero-cta hero-cta--works">
+          <img class="hero-cta__charm" src="sozai/glass1.png" alt="" aria-hidden="true">
+          制作実績を見る
+        </a>
+        <a href="#contact" class="hero-cta hero-cta--contact">
+          <img class="hero-cta__charm" src="sozai/shell2.png" alt="" aria-hidden="true">
+          お問い合わせ
+        </a>
       </div>
     </div>
   </section>
 
-  <!-- ========== コンセプト・大切にしていること（6-3） ========== -->
-  <div class="wave-divider" aria-hidden="true"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,30 C120,55 240,5 360,30 C480,55 600,5 720,30 C840,55 960,5 1080,30 C1200,55 1320,5 1440,30 L1440,60 L0,60 Z" fill="var(--color-sand)"/></svg></div>
+  <!-- concept〜contactの背景を1枚の写真で通しにする（スマホ版=haikei2.png、PC版=haikei.png。レスポンシブ 8-2） -->
+  <div class="section-photo-flow" id="sectionPhotoFlow">
 
+  <!-- ========== コンセプト・大切にしていること（6-3） ========== -->
   <section class="concept" id="concept">
     <div class="section-inner">
       <div class="section-heading reveal">
@@ -128,8 +135,6 @@
   </section>
 
   <!-- ========== 自己紹介（6-4） ========== -->
-  <div class="wave-divider" aria-hidden="true"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,30 C120,5 240,55 360,30 C480,5 600,55 720,30 C840,5 960,55 1080,30 C1200,5 1320,55 1440,30 L1440,60 L0,60 Z" fill="var(--color-sky)"/></svg></div>
-
   <section class="about" id="about">
     <div class="section-inner">
       <div class="section-heading reveal">
@@ -166,8 +171,6 @@
   </section>
 
   <!-- ========== 対応できること（6-5） ========== -->
-  <div class="wave-divider" aria-hidden="true"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,30 C120,55 240,5 360,30 C480,55 600,5 720,30 C840,55 960,5 1080,30 C1200,55 1320,5 1440,30 L1440,60 L0,60 Z" fill="var(--color-sand)"/></svg></div>
-
   <section class="skills" id="skills">
     <div class="section-inner">
       <div class="section-heading reveal">
@@ -235,8 +238,6 @@
   </section>
 
   <!-- ========== 使用ツール・制作環境（6-6） ========== -->
-  <div class="wave-divider" aria-hidden="true"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,30 C120,5 240,55 360,30 C480,5 600,55 720,30 C840,5 960,55 1080,30 C1200,5 1320,55 1440,30 L1440,60 L0,60 Z" fill="var(--color-sky)"/></svg></div>
-
   <section class="tools" id="tools">
     <div class="section-inner">
       <div class="section-heading reveal">
@@ -283,8 +284,6 @@
   </section>
 
   <!-- ========== 制作実績（6-7） ========== -->
-  <div class="wave-divider" aria-hidden="true"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,30 C120,55 240,5 360,30 C480,55 600,5 720,30 C840,55 960,5 1080,30 C1200,55 1320,5 1440,30 L1440,60 L0,60 Z" fill="var(--color-sand)"/></svg></div>
-
   <section class="works" id="works">
     <div class="section-inner">
       <div class="section-heading reveal">
@@ -391,8 +390,6 @@
   </section>
 
   <!-- ========== 制作の流れ（6-8） ========== -->
-  <div class="wave-divider" aria-hidden="true"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,30 C120,5 240,55 360,30 C480,5 600,55 720,30 C840,5 960,55 1080,30 C1200,5 1320,55 1440,30 L1440,60 L0,60 Z" fill="var(--color-sky)"/></svg></div>
-
   <section class="flow" id="flow">
     <div class="section-inner">
       <div class="section-heading reveal">
@@ -421,8 +418,6 @@
   </section>
 
   <!-- ========== お問い合わせ（6-9） ========== -->
-  <div class="wave-divider" aria-hidden="true"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,30 C120,55 240,5 360,30 C480,55 600,5 720,30 C840,55 960,5 1080,30 C1200,55 1320,5 1440,30 L1440,60 L0,60 Z" fill="var(--color-sand)"/></svg></div>
-
   <section class="contact" id="contact">
     <div class="section-inner contact__inner">
       <div class="section-heading reveal">
@@ -447,10 +442,15 @@
     </div>
   </section>
 
+  <!-- ========== フッター（6-10） ========== -->
+  <!-- section-photo-flow内に置くことで、波の曲線より上の余白も背景写真と繋がるようにする -->
+  <div class="wave-divider" aria-hidden="true"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,30 C120,55 240,5 360,30 C480,55 600,5 720,30 C840,55 960,5 1080,30 C1200,55 1320,5 1440,30 L1440,60 L0,60 Z" fill="var(--color-footer)"/></svg></div>
+
+  </div>
+  <!-- /.section-photo-flow -->
+
 </main>
 
-<!-- ========== フッター（6-10） ========== -->
-<div class="wave-divider" aria-hidden="true"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,30 C120,55 240,5 360,30 C480,55 600,5 720,30 C840,55 960,5 1080,30 C1200,55 1320,5 1440,30 L1440,60 L0,60 Z" fill="var(--color-footer)"/></svg></div>
 <footer class="site-footer">
   <p class="site-footer__logo">Yui</p>
   <p class="site-footer__role">Web Creator</p>

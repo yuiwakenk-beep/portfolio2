@@ -75,6 +75,9 @@ ul {
   --font-en: 'Cormorant Garamond', serif;
   --font-logo: 'Parisienne', cursive;
   --font-heading-hero: 'AsWinterBegins', var(--font-heading-jp);
+
+  /* セクション背景写真に重ねる共通ティント（全セクションで統一し、繋がりを持たせる） */
+  --bg-photo-tint: color-mix(in srgb, var(--color-sand) 45%, transparent);
 }
 
 /* ---------- ベース ---------- */
@@ -525,7 +528,75 @@ button:focus-visible {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 12px;
+  align-items: center;
+  gap: 22px;
+  padding: 16px;
+}
+
+/* ---------- ヒーローCTA：海辺で拾った小さな宝物をボタンの横に添えたガラス片ボタン ---------- */
+.hero-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  padding: 13px 28px 13px 38px;
+  border-radius: 999px;
+  background: rgba(255, 252, 246, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid transparent;
+  box-shadow: 0 8px 20px rgba(40, 80, 95, 0.12);
+  color: var(--color-accent);
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
+    background 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
+    border-color 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.hero-cta--works {
+  border-color: rgba(99, 188, 208, 0.45);
+}
+
+.hero-cta--contact {
+  border-color: rgba(221, 201, 170, 0.5);
+}
+
+.hero-cta__charm {
+  position: absolute;
+  top: -14px;
+  left: -12px;
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  transform: rotate(-8deg) scale(1);
+  filter: drop-shadow(0 3px 6px rgba(40, 80, 95, 0.18));
+  pointer-events: none;
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
+    filter 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+.hero-cta:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.hero-cta--works:hover {
+  border-color: rgba(99, 188, 208, 0.75);
+}
+
+.hero-cta--contact:hover {
+  border-color: rgba(221, 201, 170, 0.8);
+}
+
+.hero-cta:hover .hero-cta__charm {
+  transform: rotate(-3deg) scale(1.06);
+  filter: brightness(1.06) drop-shadow(0 4px 8px rgba(78, 190, 207, 0.28));
 }
 
 .hero__overlay {
@@ -553,7 +624,6 @@ button:focus-visible {
 /* ---------- コンセプト（6-3） ---------- */
 .concept {
   position: relative;
-  background: var(--color-sand);
   padding-top: 20px;
 }
 
@@ -590,10 +660,6 @@ button:focus-visible {
 }
 
 /* ---------- 自己紹介（6-4） ---------- */
-.about {
-  background: var(--color-sky);
-}
-
 .about__grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -649,9 +715,6 @@ button:focus-visible {
 }
 
 /* ---------- 対応できること（6-5） ---------- */
-.skills {
-  background: var(--color-sand);
-}
 
 .skills__grid {
   display: grid;
@@ -701,10 +764,6 @@ button:focus-visible {
 }
 
 /* ---------- 使用ツール（6-6） ---------- */
-.tools {
-  background: var(--color-sky);
-}
-
 .tools__list {
   display: flex;
   flex-wrap: wrap;
@@ -745,10 +804,6 @@ button:focus-visible {
 }
 
 /* ---------- 制作実績（6-7） ---------- */
-.works {
-  background: var(--color-sand);
-}
-
 .work-item {
   display: grid;
   grid-template-columns: 1fr;
@@ -828,7 +883,6 @@ button:focus-visible {
 
 /* ---------- 制作の流れ（6-8） ---------- */
 .flow {
-  background: var(--color-sky);
   position: relative;
   overflow: hidden;
 }
@@ -905,7 +959,6 @@ button:focus-visible {
 
 /* ---------- お問い合わせ（6-9） ---------- */
 .contact {
-  background: linear-gradient(180deg, var(--color-sand) 0%, var(--color-sunset-pink) 130%);
   position: relative;
   overflow: hidden;
 }
@@ -1030,6 +1083,26 @@ button:focus-visible {
   width: 100%;
   height: clamp(32px, 6vw, 58px);
   display: block;
+}
+
+/* ---------- concept〜contact背景（1枚の写真で通しにする。スマホ版=haikei2.png、PC版はresponsive.cssでhaikei.pngに差し替え） ---------- */
+.section-photo-flow {
+  position: relative;
+  --bg-photo-flow-image: url('../sozai/haikei2.png');
+  background-image: linear-gradient(var(--bg-photo-tint), var(--bg-photo-tint)), var(--bg-photo-flow-image);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: top center;
+}
+
+.concept,
+.about,
+.skills,
+.tools,
+.works,
+.flow,
+.contact {
+  background: none;
 }
 
 /* ---------- スキップリンク / スクリーンリーダー用 ---------- */
