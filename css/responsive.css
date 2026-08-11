@@ -20,15 +20,6 @@
     display: none;
   }
 
-  .about__grid {
-    grid-template-columns: 1fr 1.2fr;
-    text-align: left;
-  }
-
-  .about__photo {
-    margin: 0;
-  }
-
   .skills__grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -95,6 +86,30 @@
 
   .hero__copy {
     padding-bottom: 40px;
+  }
+
+  /* ---------- 自己紹介・大切にしていることを横並びに（自己紹介=左、大切にしていること=右） ---------- */
+  .concept-about-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    gap: 40px;
+  }
+
+  /* カラム幅に合わせて雲を縮小（vw基準の92vwだと画面幅基準のままカラムからはみ出すため） */
+  .concept__cloud-wrap {
+    width: 480px;
+    max-width: 100%;
+  }
+
+  .about__cloud-wrap {
+    width: 520px;
+    max-width: 100%;
+  }
+
+  /* 自己紹介と少し高さをずらし、単調な横並びにならないようにする */
+  .concept {
+    margin-top: -32px;
   }
 
   /* ---------- 8-2. PC版：ファーストビュー以外の背景をhaikei.pngに差し替え ---------- */

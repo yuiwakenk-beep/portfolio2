@@ -112,16 +112,52 @@
   <!-- concept〜contactの背景を1枚の写真で通しにする（スマホ版=haikei2.png、PC版=haikei.png。レスポンシブ 8-2） -->
   <div class="section-photo-flow" id="sectionPhotoFlow">
 
-  <!-- ========== コンセプト・大切にしていること（6-3） ========== -->
+  <!-- ========== 自己紹介（6-4）・コンセプト（6-3）横並び ========== -->
+  <div class="concept-about-row">
+
+  <!-- 自己紹介：左 -->
+  <section class="about" id="about">
+    <div class="section-inner">
+      <div class="about__cloud-wrap">
+        <img class="about__cloud about__cloud--a" src="sozai/kumo2.png" alt="" aria-hidden="true">
+        <img class="about__cloud about__cloud--b" src="sozai/kumo2.png" alt="" aria-hidden="true">
+        <div class="about__cloud-content reveal">
+          <div class="section-heading">
+            <span class="section-heading__en">About Me</span>
+            <h2 class="section-heading__jp">自己紹介</h2>
+          </div>
+          <div class="about__body">
+            <div class="about__photo">
+              <img src="sozai/yui.png" alt="Yui">
+            </div>
+            <div class="about__info">
+              <h3 class="about__name">Yui</h3>
+              <p class="about__role">Web Creator</p>
+              <!-- 【要確認】自己紹介の本文は未確定です。内容をご確認ください -->
+              <p class="about__text">[要確認：自己紹介文をここに記載します。]</p>
+            </div>
+          </div>
+          <div class="about__tags">
+            <span class="tag">雑貨店</span>
+            <span class="tag">カフェ・飲食</span>
+            <span class="tag">リゾートバイト</span>
+            <span class="tag">海が好き</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 大切にしていること：右 -->
   <section class="concept" id="concept">
     <div class="section-inner">
-      <div class="section-heading reveal">
-        <span class="section-heading__en">My Philosophy</span>
-        <h2 class="section-heading__jp">大切にしていること</h2>
-      </div>
-      <div class="concept__card cloud-card cloud-card--panel float-a reveal">
-        <div class="cloud-card__inner">
-          <p class="concept__body">[ここに、制作で大切にしている考え方を記載します。]</p>
+      <div class="concept__cloud-wrap">
+        <img class="concept__cloud" src="sozai/kumo.png" alt="" aria-hidden="true">
+        <div class="concept__cloud-content reveal">
+          <div class="section-heading">
+            <span class="section-heading__en">My Philosophy</span>
+            <h2 class="section-heading__jp">大切にしていること</h2>
+          </div>
           <div class="concept__keywords">
             <span class="tag">丁寧に話を聞く</span>
             <span class="tag">初めての方にも分かりやすく</span>
@@ -134,41 +170,8 @@
     </div>
   </section>
 
-  <!-- ========== 自己紹介（6-4） ========== -->
-  <section class="about" id="about">
-    <div class="section-inner">
-      <div class="section-heading reveal">
-        <span class="section-heading__en">About Me</span>
-        <h2 class="section-heading__jp">自己紹介</h2>
-      </div>
-      <div class="about__grid reveal">
-        <div class="about__photo">
-          <div class="img-placeholder" style="height:100%;">
-            <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>
-            <span class="img-placeholder__label">本人写真<br>（差し替え予定）</span>
-          </div>
-        </div>
-        <div>
-          <h3 class="about__name">Yui</h3>
-          <p class="about__role">Web Creator</p>
-          <!-- 【要確認】自己紹介の本文は未確定です。内容をご確認ください -->
-          <p class="about__text">[要確認：自己紹介文をここに記載します。]</p>
-          <div class="about__tags">
-            <span class="tag">雑貨店</span>
-            <span class="tag">カフェ・飲食</span>
-            <span class="tag">リゾートバイト</span>
-            <span class="tag">海が好き</span>
-          </div>
-          <div class="about__more">
-            <p class="about__more-item">得意な業種：[得意な業種を記載]</p>
-            <p class="about__more-item">好きなデザインテイスト：[好きなデザインテイストを記載]</p>
-            <p class="about__more-item">仕事で活かせる経験：[仕事で活かせる経験を記載]</p>
-            <p class="about__more-item">今後目指していること：[今後目指していることを記載]</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+  </div>
+  <!-- /.concept-about-row -->
 
   <!-- ========== 対応できること（6-5） ========== -->
   <section class="skills" id="skills">
