@@ -3,6 +3,13 @@
    変数 / リセット / タイポグラフィ / レイアウト / コンポーネント
    =================================================== */
 
+/* ヒーロー見出し用の装飾フォント（和のカリグラフィ風） */
+@font-face {
+  font-family: 'AsWinterBegins';
+  src: url('../AsWinterBegins.otf') format('opentype');
+  font-display: swap;
+}
+
 /* ---------- リセット ---------- */
 * {
   box-sizing: border-box;
@@ -67,6 +74,7 @@ ul {
   --font-ui: 'Klee One', cursive;
   --font-en: 'Cormorant Garamond', serif;
   --font-logo: 'Parisienne', cursive;
+  --font-heading-hero: 'AsWinterBegins', var(--font-heading-jp);
 }
 
 /* ---------- ベース ---------- */
@@ -278,9 +286,10 @@ button:focus-visible {
 
 .site-logo {
   font-family: var(--font-logo);
-  font-size: 28px;
+  font-size: clamp(16px, 4.6vw, 26px);
   color: var(--color-sea-deep);
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .nav-list {
@@ -382,11 +391,102 @@ button:focus-visible {
 /* ---------- ファーストビュー（6-2） ---------- */
 .hero {
   position: relative;
-  min-height: 85svh;
+  width: 100%;
+  /* 写真（new.png）の比率に固定し、object-fit:coverでのトリミングでノートPCや余白が欠けないようにする */
+  aspect-ratio: 1536 / 1024;
+  max-height: 92vh;
   display: flex;
   align-items: flex-end;
   overflow: hidden;
   background: linear-gradient(180deg, var(--color-sky) 0%, var(--color-sea-light) 55%, var(--color-sea) 100%);
+}
+
+/* 背景写真（デスクから海を望む構図。人物なし） */
+.hero__photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ヒーロー見出し（js/hero.js が写真に合わせて位置を制御） */
+.hero__headline-svg {
+  position: absolute;
+  z-index: 1;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.hero__headline-text {
+  font-family: var(--font-heading-hero);
+  fill: var(--color-accent);
+}
+
+/* 万年筆で書くような手書きテキストのアニメーション（js/hero.js が位置とクリップを制御） */
+.hero__pen-svg {
+  position: absolute;
+  z-index: 1;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.hero__pen-text {
+  font-family: var(--font-logo);
+  fill: var(--color-accent);
+  stroke: var(--color-accent);
+  stroke-width: 0.7;
+}
+
+.hero__pen-icon {
+  position: absolute;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  display: block;
+  pointer-events: none;
+}
+
+/* 写真内のノートPC画面に実績スクリーンショットを射影変換で嵌め込む */
+.hero__laptop-mask {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 495px;
+  height: 360px;
+  overflow: hidden;
+  transform-origin: 0 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hero__laptop-mask img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.hero__laptop-glare {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    115deg,
+    rgba(255, 255, 255, 0.34) 0%,
+    rgba(255, 255, 255, 0.08) 20%,
+    rgba(255, 255, 255, 0) 38%,
+    rgba(255, 255, 255, 0) 66%,
+    rgba(255, 255, 255, 0.18) 85%,
+    rgba(255, 255, 255, 0.04) 100%
+  );
+  mix-blend-mode: screen;
 }
 
 .hero__copy {
@@ -398,7 +498,8 @@ button:focus-visible {
 }
 
 .hero__title {
-  font-size: clamp(24px, 6.4vw, 40px);
+  font-family: var(--font-heading-hero);
+  font-size: clamp(26px, 7vw, 44px);
   font-weight: 700;
   color: var(--color-accent);
   text-shadow: 0 2px 20px rgba(255, 255, 255, 0.6);

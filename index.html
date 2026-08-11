@@ -24,7 +24,7 @@
 
 <!-- ========== ヘッダー・ナビゲーション（6-1） ========== -->
 <header class="site-header" id="siteHeader">
-  <a href="#hero" class="site-logo">Yui</a>
+  <a href="#hero" class="site-logo">Yui / Web Creator</a>
 
   <nav class="nav-list" aria-label="メインナビゲーション">
     <a href="#about">About</a>
@@ -54,6 +54,32 @@
 
   <!-- ========== ファーストビュー（6-2） ========== -->
   <section class="hero" id="hero">
+    <!-- 背景写真：海を望むデスクでのワークシーン（人物なし） -->
+    <img id="heroPhoto" class="hero__photo" src="sozai/new.png" alt="">
+
+    <!-- 写真内のノートPC画面に実績スクリーンショットを射影変換で嵌め込む（js/hero.jsが位置を計算） -->
+    <div id="heroLaptopMask" class="hero__laptop-mask" aria-hidden="true">
+      <img src="sozai/lp_full_desktop.png" alt="制作実績サイトのスクリーンショット">
+      <div class="hero__laptop-glare"></div>
+    </div>
+
+    <!-- 見出し：写真の余白（英文コピーの真上）に1行で配置 -->
+    <svg id="heroHeadlineSvg" class="hero__headline-svg fade-up-in" viewBox="0 0 800 100" preserveAspectRatio="none" aria-hidden="true">
+      <text class="hero__headline-text" x="25" y="72" font-size="72" textLength="750" lengthAdjust="spacingAndGlyphs">海のように、心地よく届くデザインを。</text>
+    </svg>
+
+    <!-- 万年筆でなぞるように現れる手書き風コピー（js/hero.jsがペン先とテキストの表示を同期） -->
+    <svg id="heroPenSvg" class="hero__pen-svg" viewBox="0 0 685 118" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <clipPath id="penRevealClip">
+          <rect id="penRevealRect" x="0" y="0" width="0" height="118"/>
+        </clipPath>
+      </defs>
+      <path id="penGuidePath" d="M2,78 C45,68 85,88 128,78 S211,68 254,78 S337,88 380,78 S463,68 506,78 S589,88 636,78" fill="none" stroke="none"/>
+      <text id="penText" class="hero__pen-text" x="8" y="78" font-size="50" textLength="630" lengthAdjust="spacingAndGlyphs" clip-path="url(#penRevealClip)">Design that connects and inspires</text>
+    </svg>
+    <img id="penIcon" class="hero__pen-icon" src="sozai/pen_quill.png" alt="">
+
     <div class="wave-layer-track wave-layer--back" aria-hidden="true">
       <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,70 C120,95 240,45 360,70 C480,95 600,45 720,70 C840,95 960,45 1080,70 C1200,95 1320,45 1440,70 L1440,120 L0,120 Z" fill="var(--color-sea-light)"/></svg>
       <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,70 C120,95 240,45 360,70 C480,95 600,45 720,70 C840,95 960,45 1080,70 C1200,95 1320,45 1440,70 L1440,120 L0,120 Z" fill="var(--color-sea-light)"/></svg>
@@ -69,10 +95,8 @@
     <div class="hero__overlay" aria-hidden="true"></div>
 
     <div class="hero__copy">
-      <p class="hero__role fade-up-in">Yui / Web Creator</p>
-      <h1 class="hero__title fade-up-in fade-up-in--delay1">海のように、心地よく届くデザインを。</h1>
-      <p class="hero__subtitle fade-up-in fade-up-in--delay2">デザイン・実装・画像制作・文章改善・公開まで、ひとつずつ丁寧にお手伝いします。</p>
-      <div class="hero__cta fade-up-in fade-up-in--delay3">
+      <h1 class="visually-hidden">Yui / Web Creator - 海のように、心地よく届くデザインを。</h1>
+      <div class="hero__cta fade-up-in">
         <a href="#works" class="btn btn--primary">制作実績を見る</a>
         <a href="#contact" class="btn btn--ghost">お問い合わせ</a>
       </div>
@@ -446,5 +470,6 @@
 
 <script src="js/main.js" defer></script>
 <script src="js/animation.js" defer></script>
+<script src="js/hero.js" defer></script>
 </body>
 </html>

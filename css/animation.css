@@ -23,19 +23,19 @@
 .wave-layer--back {
   bottom: 40px;
   opacity: 0.55;
-  animation: waveDriftSlow 22s linear infinite;
+  animation: waveDriftSlow 35s linear infinite reverse;
 }
 
 .wave-layer--mid {
   bottom: 16px;
   opacity: 0.75;
-  animation: waveDriftSlow 15s linear infinite reverse;
+  animation: waveDriftSlow 24s linear infinite;
 }
 
 .wave-layer--front {
   bottom: -2px;
   opacity: 1;
-  animation: waveDriftSlow 10s linear infinite;
+  animation: waveDriftSlow 16s linear infinite reverse;
 }
 
 @keyframes waveDriftSlow {

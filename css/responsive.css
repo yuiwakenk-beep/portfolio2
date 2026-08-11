@@ -93,12 +93,7 @@
     order: 1;
   }
 
-  .hero {
-    align-items: center;
-    min-height: 90svh;
-  }
-
   .hero__copy {
-    padding-bottom: 0;
+    padding-bottom: 40px;
   }
 }
