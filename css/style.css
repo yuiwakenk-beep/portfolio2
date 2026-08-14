@@ -293,7 +293,8 @@ button:focus-visible {
 
 .site-logo {
   font-family: var(--font-logo);
-  font-size: clamp(16px, 4.6vw, 26px);
+  font-size: clamp(14px, 4vw, 22px);
+  line-height: 1.15;
   color: var(--color-sea-deep);
   text-decoration: none;
   white-space: nowrap;
@@ -472,6 +473,8 @@ button:focus-visible {
   pointer-events: none;
 }
 
+/* 実績サイトの縦長フルページ画像(1440x7783)を、PC画面の枠(360px)の中で
+   ゆっくり上下にスクロールさせ、実際に閲覧しているように見せる */
 .hero__laptop-mask img {
   position: absolute;
   top: 0;
@@ -479,6 +482,22 @@ button:focus-visible {
   width: 100%;
   height: auto;
   display: block;
+  animation: heroLaptopScroll 26s ease-in-out infinite;
+}
+
+@keyframes heroLaptopScroll {
+  0%,
+  8% {
+    transform: translateY(0);
+  }
+  42%,
+  58% {
+    transform: translateY(-2315px);
+  }
+  92%,
+  100% {
+    transform: translateY(0);
+  }
 }
 
 .hero__laptop-glare {
@@ -552,7 +571,7 @@ button:focus-visible {
   border: 1px solid transparent;
   box-shadow: 0 8px 20px rgba(40, 80, 95, 0.12);
   color: var(--color-accent);
-  font-family: var(--font-ui);
+  font-family: var(--font-heading-jp);
   font-weight: 600;
   font-size: 14px;
   text-decoration: none;
@@ -836,20 +855,18 @@ button:focus-visible {
   text-align: left;
 }
 
+/* シーグラス風プレートが焼き込まれた画像アイコンをそのまま使うため、
+   背景円は持たせずサイズだけ指定する */
 .skill-card__icon {
   flex-shrink: 0;
-  width: 54px;
-  height: 54px;
-  border-radius: 50%;
-  background: var(--color-sky);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 80px;
+  height: 80px;
 }
 
-.skill-card__icon svg {
-  width: 27px;
-  height: 27px;
+.skill-card__icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .skill-card__body {
@@ -903,6 +920,12 @@ button:focus-visible {
   box-shadow: var(--shadow-cloud-sm);
   font-family: var(--font-ui);
   font-size: 12px;
+}
+
+.tool-chip__icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
 }
 
 .tool-chip__status {
