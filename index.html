@@ -54,8 +54,10 @@
 
   <!-- ========== ファーストビュー（6-2） ========== -->
   <section class="hero" id="hero">
-    <!-- 背景写真：海を望むデスクでのワークシーン（人物なし） -->
-    <img id="heroPhoto" class="hero__photo" src="sozai/new.png" alt="">
+    <!-- 背景動画：海を望むデスクでのワークシーン（人物なし）。窓の外の海だけが動く演出のため、
+         hero_touka.png（窓部分だけ透過した写真）を上に重ねる -->
+    <video id="heroPhoto" class="hero__photo" src="sozai/hero_bg.mp4" poster="sozai/new.png" autoplay muted loop playsinline preload="auto"></video>
+    <img class="hero__touka" src="sozai/hero_touka.png" alt="">
 
     <!-- 写真内のノートPC画面に実績スクリーンショットを射影変換で嵌め込む（js/hero.jsが位置を計算） -->
     <div id="heroLaptopMask" class="hero__laptop-mask" aria-hidden="true">

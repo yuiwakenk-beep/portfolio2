@@ -11,6 +11,14 @@
 
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  // 背景は動画（heroPhoto）だが、動画は naturalWidth/complete/load 等のimg専用APIを持たないため、
+  // new.png・hero_touka.pngと共通の基準キャンバスサイズを定数として持つ
+  var REF_W = 1536, REF_H = 1024;
+
+  if (reduceMotion && heroPhoto.pause) {
+    heroPhoto.pause();
+  }
+
   // 写真は object-fit:cover で表示されるため、実際の表示上のトリミング量を計算して
   // オーバーレイ（見出し・手書きテキスト・PC画面）の位置を写真に正確に合わせる
   var heroRects = {
@@ -22,7 +30,7 @@
   // ノートPC画面の実際の4隅（写真のピクセル座標）。長方形の素材をこの4点にぴったり合わせる射影変換をかけることで、
   // PC本体の角度・遠近感と中身の見え方を一致させる（クリップだけだと中身が正面向きのまま浮いて見えるため）
   var laptopCorners = {
-    tl: [796, 350], tr: [1256, 360], br: [1219, 709], bl: [755, 663]
+    tl: [791, 296], tr: [1251, 306], br: [1218, 580], bl: [765, 578]
   };
   var laptopLocalW = 495, laptopLocalH = 360;
 
@@ -40,17 +48,15 @@
   }
 
   function currentScale() {
-    var natW = heroPhoto.naturalWidth, natH = heroPhoto.naturalHeight;
     var cTop = heroPhoto.parentElement;
     var contW = cTop.clientWidth, contH = cTop.clientHeight;
-    var scale = Math.max(contW / natW, contH / natH);
-    var offX = (contW - natW * scale) / 2;
-    var offY = (contH - natH * scale) / 2;
+    var scale = Math.max(contW / REF_W, contH / REF_H);
+    var offX = (contW - REF_W * scale) / 2;
+    var offY = (contH - REF_H * scale) / 2;
     return { scale: scale, offX: offX, offY: offY };
   }
 
   function positionHeroOverlays() {
-    if (!heroPhoto.naturalWidth || !heroPhoto.naturalHeight) return;
     var s = currentScale();
     Object.keys(heroRects).forEach(function (id) {
       var el = document.getElementById(id);
@@ -73,7 +79,7 @@
       m.c + ',' + m.f + ',0,1)';
     document.getElementById('heroLaptopMask').style.transform = matrix3d;
   }
-  if (heroPhoto.complete) { positionHeroOverlays(); } else { heroPhoto.addEventListener('load', positionHeroOverlays); }
+  positionHeroOverlays();
   window.addEventListener('resize', positionHeroOverlays);
 
   // 万年筆が筆記体をなぞって書いているアニメーション。文字は左から右へ育つ矩形クリップで段階的に見せ、

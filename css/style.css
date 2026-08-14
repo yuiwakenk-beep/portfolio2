@@ -420,6 +420,18 @@ button:focus-visible {
   display: block;
 }
 
+/* 動画の上に重ねる写真フレーム（空〜海の「窓」部分だけ透過しており、そこから背景動画が見える） */
+.hero__touka {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+}
+
 /* ヒーロー見出し（js/hero.js が写真に合わせて位置を制御） */
 .hero__headline-svg {
   position: absolute;
