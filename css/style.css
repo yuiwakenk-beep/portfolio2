@@ -68,13 +68,17 @@ ul {
   --section-pad-y: 72px;
   --section-pad-x: 18px;
 
-  /* フォント */
+  /* フォント：見出し=Shippori Mincho、本文・UI・タグ=Noto Sans JPの2種類に統一。
+     font-ui/font-en/font-logoは旧フォント（Klee One/Cormorant Garamond）の名残りだが、
+     使用箇所を書き換えずに済むようエイリアスとして残し、統一後の書体を指すようにしている */
   --font-heading-jp: 'Shippori Mincho', serif;
   --font-body: 'Noto Sans JP', sans-serif;
-  --font-ui: 'Klee One', cursive;
-  --font-en: 'Cormorant Garamond', serif;
-  --font-logo: 'Parisienne', cursive;
+  --font-ui: var(--font-body);
+  --font-en: var(--font-heading-jp);
+  --font-logo: var(--font-heading-jp);
   --font-heading-hero: 'AsWinterBegins', var(--font-heading-jp);
+  /* ヒーローの万年筆アニメーションのみ、手書きに見せるため筆記体を維持（統一の対象外） */
+  --font-pen-script: 'Parisienne', cursive;
 
   /* セクション背景写真に重ねる共通ティント（全セクションで統一し、繋がりを持たせる） */
   --bg-photo-tint: color-mix(in srgb, var(--color-sand) 45%, transparent);
@@ -437,7 +441,7 @@ button:focus-visible {
 }
 
 .hero__pen-text {
-  font-family: var(--font-logo);
+  font-family: var(--font-pen-script);
   fill: var(--color-accent);
   stroke: var(--color-accent);
   stroke-width: 0.7;
@@ -599,11 +603,15 @@ button:focus-visible {
   filter: brightness(1.06) drop-shadow(0 4px 8px rgba(78, 190, 207, 0.28));
 }
 
+/* 帯にせず、ヘッダー分だけごく薄い影を上に重ねてロゴ・ナビの視認性を確保する
+   （下側の白フェードとは別レイヤーとして重ね、写真の見え方はそのまま保つ） */
 .hero__overlay {
   position: absolute;
   inset: 0;
   z-index: 1;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.55) 78%, rgba(247, 243, 233, 0.92) 100%);
+  background:
+    linear-gradient(180deg, rgba(255, 252, 246, 0.6) 0%, rgba(255, 252, 246, 0) 140px),
+    linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.55) 78%, rgba(247, 243, 233, 0.92) 100%);
 }
 
 .hero__waves {
@@ -628,20 +636,26 @@ button:focus-visible {
   padding: 20px 0 40px;
 }
 
-/* 見出し・タグを雲の中に収め、雲ごとゆっくり上下・左右にただよわせる */
+/* 見出し・タグを雲の中に収め、雲ごとゆっくり上下・左右にただよわせる。
+   kumo-concept.pngは正方形素材のため、旧kumo.png(1536:1024=3:2)と同じ見た目の大きさになるよう
+   wrap側にaspect-ratioを固定し、画像はobject-fit:coverで中央をトリミングして敷く */
 .concept__cloud-wrap {
   position: relative;
   width: 780px;
   max-width: 92vw;
+  aspect-ratio: 3 / 2;
   margin: 0 auto;
   animation: conceptCloudFloat 13s ease-in-out infinite;
 }
 
 .concept__cloud {
-  display: block;
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
   opacity: 0.95;
+  filter: saturate(35%) brightness(1.16);
   pointer-events: none;
 }
 
@@ -670,11 +684,13 @@ button:focus-visible {
   }
 }
 
+/* タグ4つを常に横2個×縦2段で並べる（幅が狭くても縦1列に崩れないようgridで固定） */
 .concept__keywords {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  justify-items: center;
+  align-items: center;
+  gap: 10px 12px;
 }
 
 .tag {
@@ -689,15 +705,21 @@ button:focus-visible {
   font-size: 12.5px;
 }
 
+/* 大切にしていることのタグは2列のまま、文字を折り返さず1行に。
+   横並びの枠からはみ出すのは許容し、代わりに文字を少し小さくして収まりやすくする */
+.concept__keywords .tag {
+  white-space: nowrap;
+  font-size: 11px;
+}
+
 /* ---------- 自己紹介（6-4） ---------- */
 .about {
   position: relative;
 }
 
-/* kumo2.pngは元が横長(1536x1024)の素材。90度回転すると必ず縦長になってしまうため、
-   横長を保つには回転させず、素材本来の向きのまま使う。
-   写真+本文+タグを1枚では収めきれないため、2枚を大きさ・位置・不透明度をずらして重ね、
-   自然な雲の塊として内側に収める */
+/* kumo-about.pngは正方形素材。写真+本文+タグの高さは.about__cloud-content側で決まるため、
+   雲画像はobject-fit:coverで幅いっぱいに敷き、外周にわずかににじみ出す量だけinsetをマイナスにする。
+   1枚で足りる素材なので、以前のような2枚重ねは行わない */
 .about__cloud-wrap {
   position: relative;
   width: 560px;
@@ -705,49 +727,28 @@ button:focus-visible {
   margin: 60px auto 50px;
 }
 
+/* imgなど置換要素はinsetだけでは自動サイズが決まらないため、
+   top/left/width/heightを明示してinset相当のはみ出し量を作る */
 .about__cloud {
   position: absolute;
-  left: 50%;
-  width: 96%;
-  height: auto;
-  object-fit: contain;
+  top: -6%;
+  left: -4%;
+  width: 108%;
+  height: 112%;
+  object-fit: cover;
+  opacity: 0.95;
   pointer-events: none;
   z-index: 0;
+  animation: aboutCloudFloat 14s ease-in-out infinite;
 }
 
-.about__cloud--a {
-  top: -34px;
-  translate: -54% 0;
-  opacity: 0.85;
-  animation: aboutCloudFloatA 15s ease-in-out infinite;
-}
-
-.about__cloud--b {
-  bottom: -34px;
-  width: 88%;
-  translate: -46% 0;
-  opacity: 0.95;
-  animation: aboutCloudFloatB 12s ease-in-out infinite;
-  animation-delay: -5s;
-}
-
-@keyframes aboutCloudFloatA {
+@keyframes aboutCloudFloat {
   0%,
   100% {
-    translate: -54% 0;
+    translate: 0 0;
   }
   50% {
-    translate: -58% -14px;
-  }
-}
-
-@keyframes aboutCloudFloatB {
-  0%,
-  100% {
-    translate: -46% 0;
-  }
-  50% {
-    translate: -42% 12px;
+    translate: 4px -12px;
   }
 }
 
@@ -767,14 +768,17 @@ button:focus-visible {
   margin-bottom: 20px;
 }
 
-/* 本人写真は卵型のまま、本文の横に添える */
+/* 本人写真：正方形+overflow hiddenをベースに、border-radiusで円に近いやわらかい非対称形に。
+   左上だけわずかにふくらませ、右上を少し引き締めた上品な有機的シルエット（勾玉のニュアンス） */
+/* 写真だけ雲の輪郭からわずかにはみ出させ、視覚的なアクセントにする */
 .about__photo {
   flex-shrink: 0;
-  width: 104px;
-  aspect-ratio: 4 / 5;
-  border-radius: 50% 50% 46% 46% / 55% 55% 45% 45%;
+  width: 148px;
+  aspect-ratio: 1 / 1;
+  margin: -14px 0 -14px -28px;
+  border-radius: 60% 40% 50% 50% / 55% 45% 55% 45%;
   overflow: hidden;
-  box-shadow: 0 16px 36px rgba(122, 99, 66, 0.18);
+  box-shadow: 0 18px 40px rgba(122, 99, 66, 0.22);
 }
 
 .about__photo img {
@@ -801,6 +805,8 @@ button:focus-visible {
 
 .about__text {
   color: var(--color-text-sub);
+  font-size: 13px;
+  line-height: 1.8;
 }
 
 .about__tags {
@@ -818,23 +824,36 @@ button:focus-visible {
   gap: 16px;
 }
 
+/* アイコン=左、文章=右の横並び。中央揃えの縦積みより高さを抑えられる */
 .skill-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
   background: var(--cloud-bg);
   border-radius: var(--radius-card-sm);
   box-shadow: var(--shadow-cloud-sm);
-  padding: 28px 22px;
-  text-align: center;
+  padding: 16px 20px;
+  text-align: left;
 }
 
 .skill-card__icon {
-  width: 52px;
-  height: 52px;
-  margin: 0 auto 14px;
+  flex-shrink: 0;
+  width: 54px;
+  height: 54px;
   border-radius: 50%;
   background: var(--color-sky);
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.skill-card__icon svg {
+  width: 27px;
+  height: 27px;
+}
+
+.skill-card__body {
+  min-width: 0;
 }
 
 .skill-card__title {
@@ -860,23 +879,30 @@ button:focus-visible {
 }
 
 /* ---------- 使用ツール（6-6） ---------- */
+/* 折り返さず常に1列。全部は収まらない画面幅では横スクロールで見せる */
 .tools__list {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 12px;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 4px 10px;
+  margin: -4px -4px 0;
 }
+
 
 .tool-chip {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 10px 18px;
+  justify-content: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 8px 14px;
   border-radius: 50px;
   background: var(--cloud-bg);
   box-shadow: var(--shadow-cloud-sm);
   font-family: var(--font-ui);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .tool-chip__status {
@@ -1234,8 +1260,9 @@ button:focus-visible {
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex-shrink: 0;
   gap: 5px;
-  max-width: 140px;
+  width: 124px;
 }
 
 .tool-caption {
