@@ -33,8 +33,45 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
+  /* 作品写真に、海辺にそっと置かれたような小さな傾き・自然なズレ・小物装飾を付ける（スマホでは崩さない） */
+  .work-item:nth-of-type(1) .work-item__media {
+    transform: rotate(-1.5deg);
+  }
+
+  .work-item:nth-of-type(2) .work-item__media {
+    transform: rotate(1.2deg);
+  }
+
+  .work-item:nth-of-type(3) .work-item__media {
+    transform: rotate(-0.5deg);
+  }
+
+  .work-item:nth-of-type(1) {
+    margin-top: -6px;
+  }
+
+  .work-item:nth-of-type(2) {
+    margin-top: 16px;
+  }
+
+  .work-item:nth-of-type(3) {
+    margin-top: 4px;
+  }
+
+  .work-item__deco {
+    display: block;
+  }
+
   .flow__steps {
     grid-template-columns: repeat(4, 1fr);
+  }
+
+  .flow__route-svg--vertical {
+    display: none;
+  }
+
+  .flow__route-svg--horizontal {
+    display: block;
   }
 
   .hero__copy {

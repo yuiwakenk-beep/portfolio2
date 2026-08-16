@@ -30,26 +30,68 @@
     });
   }
 
-  // ---------- 制作の流れ：航路ラインの描画 ----------
-  const routePath = document.getElementById('flowRoutePath');
+  // ---------- 制作の流れ：ステップをつなぐ波線をスクロール量に連動して描画 ----------
+  // 進捗の計算（getFlowScrollProgress）と、パスへの反映（applyFlowLineProgress）を分離している。
+  // 将来GSAP ScrollTriggerに差し替える場合は、下のscroll/resizeリスナー（ドライバ部分）だけを
+  // ScrollTrigger({ trigger: flowSection, scrub: true, onUpdate: self => applyFlowLineProgress(self.progress) })
+  // に置き換えれば、applyFlowLineProgress以降のロジックはそのまま使える。
+  const flowSection = document.querySelector('.flow');
+  const flowPaths = document.querySelectorAll('.flow__route-path');
 
-  if (routePath) {
+  if (flowSection && flowPaths.length) {
+    const pathLengths = new Map();
+
+    function getPathLength(path) {
+      if (!pathLengths.has(path)) {
+        let length = 0;
+        try {
+          length = path.getTotalLength();
+        } catch (e) {
+          length = 0;
+        }
+        pathLengths.set(path, length);
+        path.style.strokeDasharray = String(length);
+      }
+      return pathLengths.get(path);
+    }
+
+    // 768px境界でCSS表示が横/縦パスに切り替わるため、実際に表示されている方を都度判定する
+    function activeFlowPath() {
+      for (let i = 0; i < flowPaths.length; i++) {
+        if (flowPaths[i].getClientRects().length) return flowPaths[i];
+      }
+      return null;
+    }
+
+    function applyFlowLineProgress(progress) {
+      const path = activeFlowPath();
+      if (!path) return;
+      const length = getPathLength(path);
+      path.style.strokeDashoffset = String(length * (1 - progress));
+    }
+
+    function getFlowScrollProgress() {
+      const rect = flowSection.getBoundingClientRect();
+      const vh = window.innerHeight || document.documentElement.clientHeight;
+      const raw = (vh - rect.top) / vh;
+      return Math.min(1, Math.max(0, raw));
+    }
+
     if (reduceMotion) {
-      routePath.classList.add('is-drawn');
-    } else if ('IntersectionObserver' in window) {
-      const routeObserver = new IntersectionObserver(
-        function (entries) {
-          entries.forEach(function (entry) {
-            if (!entry.isIntersecting) return;
-            routePath.classList.add('is-drawn');
-            routeObserver.unobserve(entry.target);
-          });
-        },
-        { threshold: 0.3 }
-      );
-      routeObserver.observe(routePath);
+      applyFlowLineProgress(1);
     } else {
-      routePath.classList.add('is-drawn');
+      let flowTicking = false;
+      const onFlowScroll = function () {
+        if (flowTicking) return;
+        flowTicking = true;
+        requestAnimationFrame(function () {
+          applyFlowLineProgress(getFlowScrollProgress());
+          flowTicking = false;
+        });
+      };
+      window.addEventListener('scroll', onFlowScroll, { passive: true });
+      window.addEventListener('resize', onFlowScroll);
+      onFlowScroll();
     }
   }
 })();

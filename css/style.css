@@ -396,6 +396,104 @@ button:focus-visible {
   visibility: visible;
 }
 
+/* ---------- 読み込み時イントロ（海鳥の手紙） ----------
+   デフォルトでは非表示・pointer-events:noneのまま＝JS/GSAPが動かない場合や
+   prefers-reduced-motion時、js/intro.js側の判定でis-activeが付かず、
+   本編（header以降）がそのまま通常表示になるPEフォールバック */
+.intro-gate {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: max(14vh, 90px);
+  background: linear-gradient(180deg, var(--color-sky) 0%, var(--color-sea-light) 55%, var(--color-sea) 100%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.6s ease, visibility 0.6s;
+}
+
+.intro-gate.is-active {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.intro-gate[data-state="opening"],
+.intro-gate[data-state="opened"] {
+  pointer-events: none;
+}
+
+/* 背景の波：.wave-layer-track/.wave-layer--*（animation.css）をHeroと共通で流用。
+   200%幅のドリフトがゲート外へはみ出さないようoverflow:hiddenでクリップする */
+.intro-scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* 水平線側をわずかに明るくし、奥行き・光の柔らかさを足す（動画なしの静的グラデーションのみ） */
+.intro-scene::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 90% 42% at 50% 38%, rgba(255, 255, 255, 0.22), transparent 70%);
+  pointer-events: none;
+}
+
+/* 波打ち際の押し寄せ：js/intro.jsが瓶の各拍（押す/戻る）に同期してscaleY/opacityを動かす。
+   transform-origin:bottomで渚から立ち上がるように見せる */
+.intro-wave-pulse {
+  position: absolute;
+  left: -10%;
+  right: -10%;
+  bottom: 21%;
+  height: 90px;
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.55) 55%, rgba(255, 255, 255, 0.18));
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+  transform: scaleY(0.3);
+  transform-origin: 50% 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* 砂浜：.works::beforeと同じノイズ・グラデーション技法を流用した軽量な砂質感 */
+.intro-shore {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 24%;
+  min-height: 96px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"),
+    radial-gradient(circle at 25% 20%, rgba(255, 255, 255, 0.35), transparent 45%),
+    linear-gradient(180deg, rgba(240, 224, 196, 0.55) 0%, var(--color-sand) 60%);
+  background-size: 160px 160px, auto, auto;
+  border-radius: 50% 50% 0 0 / 22px 22px 0 0;
+}
+
+.intro-skip {
+  position: absolute;
+  right: max(20px, env(safe-area-inset-right));
+  bottom: max(20px, env(safe-area-inset-bottom));
+  font-family: var(--font-ui);
+  font-size: 14px;
+  color: #fff;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  opacity: 0.85;
+  padding: 8px 4px;
+}
+
+.intro-skip:hover,
+.intro-skip:focus-visible {
+  opacity: 1;
+}
+
 /* ---------- ファーストビュー（6-2） ---------- */
 .hero {
   position: relative;
@@ -418,18 +516,6 @@ button:focus-visible {
   height: 100%;
   object-fit: cover;
   display: block;
-}
-
-/* 動画の上に重ねる写真フレーム（空〜海の「窓」部分だけ透過しており、そこから背景動画が見える） */
-.hero__touka {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  pointer-events: none;
 }
 
 /* ヒーロー見出し（js/hero.js が写真に合わせて位置を制御） */
@@ -591,7 +677,8 @@ button:focus-visible {
   transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
     background 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
     border-color 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
-    box-shadow 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
+    box-shadow 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
+    background-position 0.65s ease-out;
 }
 
 .hero-cta--works {
@@ -616,8 +703,8 @@ button:focus-visible {
     filter 0.35s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
+/* 浮き上がり・反射光は animation.css の .seaglass-hover が担当するため、ここでは背景色のみ変更 */
 .hero-cta:hover {
-  transform: translateY(-2px);
   background: rgba(255, 255, 255, 0.72);
 }
 
@@ -630,19 +717,8 @@ button:focus-visible {
 }
 
 .hero-cta:hover .hero-cta__charm {
-  transform: rotate(-3deg) scale(1.06);
+  transform: rotate(-3deg) scale(1.02);
   filter: brightness(1.06) drop-shadow(0 4px 8px rgba(78, 190, 207, 0.28));
-}
-
-/* 帯にせず、ヘッダー分だけごく薄い影を上に重ねてロゴ・ナビの視認性を確保する
-   （下側の白フェードとは別レイヤーとして重ね、写真の見え方はそのまま保つ） */
-.hero__overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background:
-    linear-gradient(180deg, rgba(255, 252, 246, 0.6) 0%, rgba(255, 252, 246, 0) 140px),
-    linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.55) 78%, rgba(247, 243, 233, 0.92) 100%);
 }
 
 .hero__waves {
@@ -676,7 +752,7 @@ button:focus-visible {
   max-width: 92vw;
   aspect-ratio: 3 / 2;
   margin: 0 auto;
-  animation: conceptCloudFloat 13s ease-in-out infinite;
+  animation: conceptCloudFloat 11s ease-in-out infinite -3s;
 }
 
 .concept__cloud {
@@ -686,7 +762,6 @@ button:focus-visible {
   height: 100%;
   object-fit: cover;
   opacity: 0.95;
-  filter: saturate(35%) brightness(1.16);
   pointer-events: none;
 }
 
@@ -711,7 +786,7 @@ button:focus-visible {
     translate: 0 0;
   }
   50% {
-    translate: 6px -18px;
+    translate: 0 -3px;
   }
 }
 
@@ -762,15 +837,14 @@ button:focus-visible {
    top/left/width/heightを明示してinset相当のはみ出し量を作る */
 .about__cloud {
   position: absolute;
-  top: -6%;
-  left: -4%;
-  width: 108%;
-  height: 112%;
-  object-fit: cover;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
   opacity: 0.95;
   pointer-events: none;
   z-index: 0;
-  animation: aboutCloudFloat 14s ease-in-out infinite;
+  animation: aboutCloudFloat 9s ease-in-out infinite;
 }
 
 @keyframes aboutCloudFloat {
@@ -779,7 +853,7 @@ button:focus-visible {
     translate: 0 0;
   }
   50% {
-    translate: 4px -12px;
+    translate: 0 -4px;
   }
 }
 
@@ -932,6 +1006,7 @@ button:focus-visible {
   box-shadow: var(--shadow-cloud-sm);
   font-family: var(--font-ui);
   font-size: 12px;
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1), background-position 0.65s ease-out;
 }
 
 .tool-chip__icon {
@@ -962,6 +1037,7 @@ button:focus-visible {
 
 /* ---------- 制作実績（6-7） ---------- */
 .work-item {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px;
@@ -973,14 +1049,57 @@ button:focus-visible {
   border-bottom: none;
 }
 
+/* 「制作実績カード」ではなく「白いフチを持った作品写真」に見せる。
+   傾き（nth-of-type）はresponsive.cssの768px以上でのみ付与し、スマホは崩さない */
 .work-item__media {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 12px;
+  background: linear-gradient(180deg, #fffdf8 0%, #fbf4e6 100%);
+  padding: 14px 14px 26px;
+  border-radius: 10px;
+  box-shadow: 0 18px 28px -16px rgba(120, 96, 64, 0.32), 0 3px 8px rgba(120, 96, 64, 0.1);
 }
 
 .work-item__shot {
   aspect-ratio: 16 / 10;
+}
+
+/* 作品写真まわりの小さな海辺の小物（多用しない。1枚につき1個程度） */
+.work-item__deco {
+  position: absolute;
+  z-index: 3;
+  width: 26px;
+  height: auto;
+  pointer-events: none;
+  filter: drop-shadow(0 3px 5px rgba(90, 74, 50, 0.18));
+  display: none;
+}
+
+.work-item__deco--shell {
+  bottom: -9px;
+  left: 18px;
+  width: 24px;
+  transform: rotate(-12deg);
+}
+
+.work-item__deco--glass {
+  bottom: -10px;
+  right: 16px;
+  width: 22px;
+  transform: rotate(14deg);
+}
+
+/* 画像素材がないためCSSのみの小石。他の.work-item__decoと違いimgではなくspan */
+.work-item__deco--pebble {
+  bottom: -6px;
+  right: 26%;
+  width: 14px;
+  height: 10px;
+  border-radius: 50%;
+  background: linear-gradient(155deg, #e9dfd0, #c7bca8);
+  box-shadow: inset -2px -2px 3px rgba(110, 94, 68, 0.35), inset 1px 1px 2px rgba(255, 255, 255, 0.6);
 }
 
 .work-item__shot--mobile {
@@ -1028,6 +1147,7 @@ button:focus-visible {
 
 .work-item__desc {
   font-size: 13px;
+  line-height: 1.75;
   color: var(--color-text-sub);
   margin-bottom: 18px;
 }
@@ -1038,38 +1158,76 @@ button:focus-visible {
   gap: 10px;
 }
 
+/* 背景一面を砂浜写真にはせず、既存の海の背景の上にごく薄い砂の質感だけを重ねる。
+   .works自体のbackgroundは他セクションと共有のためstyle.css内の共通ルール（background:none）は変更しない */
+.works {
+  position: relative;
+}
+
+.works::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"),
+    radial-gradient(circle at 18% 25%, rgba(255, 255, 255, 0.4), transparent 42%),
+    radial-gradient(circle at 82% 75%, rgba(255, 255, 255, 0.28), transparent 46%),
+    linear-gradient(180deg, rgba(247, 238, 221, 0.3) 0%, rgba(240, 224, 196, 0.45) 100%);
+  background-size: 160px 160px, auto, auto, auto;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.works .section-inner {
+  position: relative;
+  z-index: 1;
+}
+
 /* ---------- 制作の流れ（6-8） ---------- */
 .flow {
   position: relative;
   overflow: hidden;
 }
 
-.flow__route {
+/* 波線はステップ一覧と重ねて敷き、スクロール量に応じてjs/animation.jsがstroke-dashoffsetを直接更新する
+   （読了時間に依存しないよう、CSS transitionではなくスクロール位置と都度同期させる） */
+.flow__route-wrap {
   position: relative;
   margin-top: 20px;
 }
 
-.flow__route svg {
+.flow__route {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.flow__route-svg {
   width: 100%;
-  height: auto;
+  height: 100%;
+  display: none;
+}
+
+/* モバイルは縦積みパスを表示（横並びパスは768px以上でresponsive.cssが切替） */
+.flow__route-svg--vertical {
   display: block;
 }
 
 .flow__route-path {
   fill: none;
-  stroke: var(--color-sea);
+  stroke: var(--color-text-sub);
   stroke-width: 2.5;
   stroke-linecap: round;
-  stroke-dasharray: 1600;
-  stroke-dashoffset: 1600;
-}
-
-.flow__route-path.is-drawn {
-  stroke-dashoffset: 0;
-  transition: stroke-dashoffset 1.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+  opacity: 0.6;
+  /* JSがgetTotalLength()を基に実寸のstroke-dasharray/dashoffsetを設定するまでの初期値 */
+  stroke-dasharray: 3000;
+  stroke-dashoffset: 3000;
 }
 
 .flow__steps {
+  position: relative;
+  z-index: 1;
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;

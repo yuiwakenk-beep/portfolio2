@@ -20,6 +20,39 @@
 </head>
 <body>
 
+<!-- 読み込み時イントロ：波に流されて瓶に入った手紙が砂浜に流れ着き、開封すると本編が現れる。
+     JS/GSAP不通・prefers-reduced-motion・2回目以降の訪問（sessionStorage）では
+     js/intro.js側の判定でこのゲート自体を起動しない＝本編がデフォルトのまま見える -->
+<div class="intro-gate" id="introGate" role="dialog" aria-modal="true" aria-label="サイトへようこそ" aria-hidden="true">
+  <!-- 背景の波：Heroと同じレイヤー・キーフレームを流用（動画は使わずCSS/SVGのみ） -->
+  <div class="intro-scene" aria-hidden="true">
+    <div class="wave-layer-track wave-layer--back">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,70 C120,95 240,45 360,70 C480,95 600,45 720,70 C840,95 960,45 1080,70 C1200,95 1320,45 1440,70 L1440,120 L0,120 Z" fill="var(--color-sea-light)"/></svg>
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,70 C120,95 240,45 360,70 C480,95 600,45 720,70 C840,95 960,45 1080,70 C1200,95 1320,45 1440,70 L1440,120 L0,120 Z" fill="var(--color-sea-light)"/></svg>
+    </div>
+    <div class="wave-layer-track wave-layer--mid">
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,60 C160,30 320,90 480,60 C640,30 800,90 960,60 C1120,30 1280,90 1440,60 L1440,120 L0,120 Z" fill="var(--color-sea)"/></svg>
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,60 C160,30 320,90 480,60 C640,30 800,90 960,60 C1120,30 1280,90 1440,60 L1440,120 L0,120 Z" fill="var(--color-sea)"/></svg>
+    </div>
+    <!-- 波打ち際の「押し寄せ」：js/intro.jsが瓶の各拍（押す/戻る）に同期してscaleY/opacityを動かす -->
+    <div class="intro-wave-pulse" id="introWavePulse"></div>
+    <div class="intro-shore"></div>
+  </div>
+  <!-- disabled既定＝JS/GSAP不通時も含め、漂着（arrived）するまでクリック不可を保証するPEフォールバック -->
+  <button type="button" class="intro-bottle" id="introBottle" data-state="waiting" aria-label="瓶の中の手紙を開いてサイトを見る" disabled>
+    <span class="intro-bottle__shadow" aria-hidden="true"></span>
+    <span class="intro-bottle__foam" aria-hidden="true"></span>
+    <img class="intro-bottle__frame intro-bottle__frame--closed is-visible" src="sozai/bottle-closed.png" alt="">
+    <span class="intro-bottle__shine" aria-hidden="true"></span>
+    <img class="intro-bottle__frame intro-bottle__frame--open" src="sozai/bottle-open.png" alt="">
+    <span class="intro-bottle__body">
+      <span class="intro-bottle__eyebrow">A Letter from the Sea</span>
+      <span class="intro-bottle__label">瓶を開く</span>
+    </span>
+  </button>
+  <a href="#main" class="intro-skip" id="introSkip">スキップして本編へ</a>
+</div>
+
 <a class="skip-link" href="#main">本文へスキップ</a>
 
 <!-- ========== ヘッダー・ナビゲーション（6-1） ========== -->
@@ -54,10 +87,8 @@
 
   <!-- ========== ファーストビュー（6-2） ========== -->
   <section class="hero" id="hero">
-    <!-- 背景動画：海を望むデスクでのワークシーン（人物なし）。窓の外の海だけが動く演出のため、
-         hero_touka.png（窓部分だけ透過した写真）を上に重ねる -->
-    <video id="heroPhoto" class="hero__photo" src="sozai/hero_bg.mp4" poster="sozai/new.png" autoplay muted loop playsinline preload="auto"></video>
-    <img class="hero__touka" src="sozai/hero_touka.png" alt="">
+    <!-- 背景写真：海を望むデスクでのワークシーン（人物なし）。動画演出は廃止し、静止画1枚のみ -->
+    <img id="heroPhoto" class="hero__photo" src="sozai/new.png" alt="">
 
     <!-- 写真内のノートPC画面に実績スクリーンショットを射影変換で嵌め込む（js/hero.jsが位置を計算） -->
     <div id="heroLaptopMask" class="hero__laptop-mask" aria-hidden="true">
@@ -94,16 +125,14 @@
       <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,50 C100,80 200,20 300,50 C400,80 500,20 600,50 C700,80 800,20 900,50 C1000,80 1100,20 1200,50 C1300,80 1400,20 1440,50 L1440,100 L0,100 Z" fill="var(--color-sea-deep)"/></svg>
       <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,50 C100,80 200,20 300,50 C400,80 500,20 600,50 C700,80 800,20 900,50 C1000,80 1100,20 1200,50 C1300,80 1400,20 1440,50 L1440,100 L0,100 Z" fill="var(--color-sea-deep)"/></svg>
     </div>
-    <div class="hero__overlay" aria-hidden="true"></div>
-
     <div class="hero__copy">
       <h1 class="visually-hidden">Yui / Web Creator - 海のように、心地よく届くデザインを。</h1>
       <div class="hero__cta fade-up-in">
-        <a href="#works" class="hero-cta hero-cta--works">
+        <a href="#works" class="hero-cta hero-cta--works seaglass-hover">
           <img class="hero-cta__charm" src="sozai/glass1.png" alt="" aria-hidden="true">
           制作実績を見る
         </a>
-        <a href="#contact" class="hero-cta hero-cta--contact">
+        <a href="#contact" class="hero-cta hero-cta--contact seaglass-hover">
           <img class="hero-cta__charm" src="sozai/shell2.png" alt="" aria-hidden="true">
           お問い合わせ
         </a>
@@ -267,35 +296,35 @@
 
       <div class="tools__list reveal-group">
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip"><img class="tool-chip__icon" src="sozai/tool-html.png" alt=""><span>HTML</span><span class="tool-chip__status">[状態]</span></span>
+          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-html.png" alt=""><span>HTML</span><span class="tool-chip__status">[状態]</span></span>
           <p class="tool-caption">用途：[何に使用しているか]</p>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip"><img class="tool-chip__icon" src="sozai/tool-css.png" alt=""><span>CSS</span><span class="tool-chip__status">[状態]</span></span>
+          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-css.png" alt=""><span>CSS</span><span class="tool-chip__status">[状態]</span></span>
           <p class="tool-caption">用途：[何に使用しているか]</p>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip"><img class="tool-chip__icon" src="sozai/tool-claude-code.png" alt=""><span>Claude Code</span><span class="tool-chip__status">[状態]</span></span>
+          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-claude-code.png" alt=""><span>Claude Code</span><span class="tool-chip__status">[状態]</span></span>
           <p class="tool-caption">用途：[何に使用しているか]</p>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip"><img class="tool-chip__icon" src="sozai/tool-chatgpt.png" alt=""><span>ChatGPT</span><span class="tool-chip__status">[状態]</span></span>
+          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-chatgpt.png" alt=""><span>ChatGPT</span><span class="tool-chip__status">[状態]</span></span>
           <p class="tool-caption">用途：[何に使用しているか]</p>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip"><img class="tool-chip__icon" src="sozai/tool-canva.png" alt=""><span>Canva</span><span class="tool-chip__status">[状態]</span></span>
+          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-canva.png" alt=""><span>Canva</span><span class="tool-chip__status">[状態]</span></span>
           <p class="tool-caption">用途：[何に使用しているか]</p>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip"><img class="tool-chip__icon" src="sozai/tool-git.png" alt=""><span>Git</span><span class="tool-chip__status">[状態]</span></span>
+          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-git.png" alt=""><span>Git</span><span class="tool-chip__status">[状態]</span></span>
           <p class="tool-caption">用途：[何に使用しているか]</p>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip"><img class="tool-chip__icon" src="sozai/tool-github.png" alt=""><span>GitHub</span><span class="tool-chip__status">[状態]</span></span>
+          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-github.png" alt=""><span>GitHub</span><span class="tool-chip__status">[状態]</span></span>
           <p class="tool-caption">用途：[何に使用しているか]</p>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip"><img class="tool-chip__icon" src="sozai/tool-xserver.png" alt=""><span>Xserver</span><span class="tool-chip__status">[状態]</span></span>
+          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-xserver.png" alt=""><span>Xserver</span><span class="tool-chip__status">[状態]</span></span>
           <p class="tool-caption">用途：[何に使用しているか]</p>
         </div>
       </div>
@@ -314,6 +343,7 @@
       <!-- WORK 01 -->
       <article class="work-item reveal">
         <div class="work-item__media">
+          <img class="work-item__deco work-item__deco--shell" src="sozai/shell2.png" alt="" aria-hidden="true">
           <div class="img-placeholder work-item__shot">
             <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 20h8M12 18v2"/></svg>
             <span class="img-placeholder__label">PC画面（差し替え予定）</span>
@@ -346,6 +376,7 @@
       <!-- WORK 02（PCでは画像・情報を左右反転） -->
       <article class="work-item reveal" data-align="reverse">
         <div class="work-item__media">
+          <img class="work-item__deco work-item__deco--glass" src="sozai/glass1.png" alt="" aria-hidden="true">
           <div class="img-placeholder work-item__shot">
             <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 20h8M12 18v2"/></svg>
             <span class="img-placeholder__label">PC画面（差し替え予定）</span>
@@ -378,6 +409,7 @@
       <!-- WORK 03 -->
       <article class="work-item reveal">
         <div class="work-item__media">
+          <span class="work-item__deco work-item__deco--pebble" aria-hidden="true"></span>
           <div class="img-placeholder work-item__shot">
             <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 20h8M12 18v2"/></svg>
             <span class="img-placeholder__label">PC画面（差し替え予定）</span>
@@ -417,21 +449,27 @@
         <h2 class="section-heading__jp">制作の流れ</h2>
       </div>
 
-      <div class="flow__route" aria-hidden="true">
-        <svg viewBox="0 0 1200 60" preserveAspectRatio="none">
-          <path id="flowRoutePath" class="flow__route-path" d="M0,30 C100,5 200,55 300,30 C400,5 500,55 600,30 C700,5 800,55 900,30 C1000,5 1100,55 1200,30"/>
-        </svg>
-      </div>
+      <!-- ステップをつなぐ波線。PC/タブレットは横一列用、スマホは縦積み用のパスをCSSで切替表示する -->
+      <div class="flow__route-wrap">
+        <div class="flow__route" aria-hidden="true">
+          <svg class="flow__route-svg flow__route-svg--horizontal" viewBox="0 0 1200 100" preserveAspectRatio="none">
+            <path id="flowRoutePathH" class="flow__route-path" d="M85,50 C130,20 213,20 257,50 C300,80 385,80 428,50 C470,20 556,20 600,50 C642,80 728,80 771,50 C813,20 899,20 943,50 C985,80 1071,80 1114,50"/>
+          </svg>
+          <svg class="flow__route-svg flow__route-svg--vertical" viewBox="0 0 200 1400" preserveAspectRatio="none">
+            <path id="flowRoutePathV" class="flow__route-path" d="M100,100 C140,140 140,220 100,300 C60,340 60,420 100,500 C140,540 140,620 100,700 C60,740 60,820 100,900 C140,940 140,1020 100,1100 C60,1140 60,1220 100,1300"/>
+          </svg>
+        </div>
 
-      <ol class="flow__steps reveal-group">
-        <li class="flow-step reveal"><span class="flow-step__num">1</span><span class="flow-step__label">お問い合わせ</span></li>
-        <li class="flow-step reveal"><span class="flow-step__num">2</span><span class="flow-step__label">ヒアリング</span></li>
-        <li class="flow-step reveal"><span class="flow-step__num">3</span><span class="flow-step__label">内容・方向性の整理</span></li>
-        <li class="flow-step reveal"><span class="flow-step__num">4</span><span class="flow-step__label">デザイン制作</span></li>
-        <li class="flow-step reveal"><span class="flow-step__num">5</span><span class="flow-step__label">実装</span></li>
-        <li class="flow-step reveal"><span class="flow-step__num">6</span><span class="flow-step__label">確認・修正</span></li>
-        <li class="flow-step reveal"><span class="flow-step__num">7</span><span class="flow-step__label">納品・公開</span></li>
-      </ol>
+        <ol class="flow__steps reveal-group">
+          <li class="flow-step reveal"><span class="flow-step__num">1</span><span class="flow-step__label">お問い合わせ</span></li>
+          <li class="flow-step reveal"><span class="flow-step__num">2</span><span class="flow-step__label">ヒアリング</span></li>
+          <li class="flow-step reveal"><span class="flow-step__num">3</span><span class="flow-step__label">内容・方向性の整理</span></li>
+          <li class="flow-step reveal"><span class="flow-step__num">4</span><span class="flow-step__label">デザイン制作</span></li>
+          <li class="flow-step reveal"><span class="flow-step__num">5</span><span class="flow-step__label">実装</span></li>
+          <li class="flow-step reveal"><span class="flow-step__num">6</span><span class="flow-step__label">確認・修正</span></li>
+          <li class="flow-step reveal"><span class="flow-step__num">7</span><span class="flow-step__label">納品・公開</span></li>
+        </ol>
+      </div>
 
       <p class="flow__note">※ 案件内容によって工程は変わります。デザインのみのご依頼の場合、実装工程を省略することも可能です。</p>
     </div>
@@ -488,8 +526,22 @@
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
 </a>
 
+<!-- 海鳥ナビゲーション（Hero/About/Flowの案内役）：overflow:hiddenのセクションに影響されないよう、どのsectionの子要素にもしない -->
+<div class="seagull" id="seagull" aria-hidden="true">
+  <img class="seagull__frame seagull__frame--glide is-visible" src="sozai/seagull-glide.png" alt="">
+  <img class="seagull__frame seagull__frame--flap" src="sozai/seagull-flap.png" alt="">
+</div>
+
 <script src="js/main.js" defer></script>
 <script src="js/animation.js" defer></script>
 <script src="js/hero.js" defer></script>
+<!-- 海鳥の飛行ルート（MotionPath）用。海鳥の演出のみで使用し、他の演出は引き続きvanilla JS/CSS -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/MotionPathPlugin.min.js" defer></script>
+<script src="js/seagull.js" defer></script>
+<script src="js/intro.js" defer></script>
+<script src="js/water-fx.js" defer></script>
+<script src="js/cta-splash.js" defer></script>
 </body>
 </html>

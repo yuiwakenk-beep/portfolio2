@@ -85,6 +85,23 @@
   animation-duration: 12s;
 }
 
+/* ---------- シーグラスhover（CTAボタン・使用ツールアイコン共通） ----------
+   浮き上がり・拡大は対象要素（.hero-cta / .tool-chip）側のtransitionで動かすため、
+   ここではtransformの値と反射光のグラデーションのみを持つ。
+   反射光はbackground-imageのため、対象のborder-radiusに沿って自然にクリップされ、
+   .hero-cta__charmのようなはみ出す装飾があってもoverflow:hiddenを付けずに済む */
+.seaglass-hover {
+  background-image: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.65) 48%, transparent 62%);
+  background-repeat: no-repeat;
+  background-size: 250% 250%;
+  background-position: -150% -150%;
+}
+
+.seaglass-hover:hover {
+  transform: translateY(-4px) scale(1.03);
+  background-position: 150% 150%;
+}
+
 /* ---------- スクロールフェードアップ（第11章） ---------- */
 .reveal {
   opacity: 0;
@@ -150,6 +167,252 @@
     opacity: 1;
     transform: none;
   }
+}
+
+/* ---------- 海鳥ナビゲーション ----------
+   左右移動・わずかな回転はjs/seagull.js（GSAP）がtransformで直接制御するため、
+   ここでは「表示位置の基準（ドキュメント座標のposition:absolute）」「表示/非表示のフェード」
+   「羽ばたきフレームのクロスフェード」のみを担当する。
+   どのsectionの子要素でもないため、.hero/.concept/.flow/.contactのoverflow:hiddenの影響を受けない */
+.seagull {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  width: 112px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease;
+}
+
+.seagull.is-active {
+  opacity: 1;
+}
+
+.seagull__frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: auto;
+  opacity: 0;
+  transition: opacity 0.15s ease-out;
+}
+
+.seagull__frame.is-visible {
+  opacity: 1;
+}
+
+/* ---------- 水しぶき共通パーツ（js/water-fx.jsが生成・削除する。CTA・Works共通） ----------
+   見た目のみここで定義し、飛散・拡大のtransform/opacityはJS(GSAP)側で個別に制御する */
+.water-droplet {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(170, 215, 235, 0.7);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+.water-streak {
+  position: absolute;
+  width: 3px;
+  border-radius: 50% / 60%;
+  background: linear-gradient(180deg, rgba(210, 235, 245, 0.9), rgba(160, 210, 230, 0.05));
+  pointer-events: none;
+  will-change: transform, opacity;
+  transform-origin: 50% 100%;
+}
+
+.water-ripple {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  margin: -6px 0 0 -6px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: rgba(170, 215, 235, 0.18);
+  pointer-events: none;
+  will-change: transform, opacity;
+}
+
+/* Works水面突破時の横方向の波紋（円形ではなく横に平たい） */
+.water-ripple--wide {
+  width: 46px;
+  height: 10px;
+  margin: -5px 0 0 -23px;
+}
+
+/* ---------- 海からの手紙が入った瓶（js/intro.jsが状態を制御する） ----------
+   状態：waiting → drifting → landing → arrived → opening → opened
+   イントロゲート内に表示される瓶。ゲート自体がPEフォールバック（.intro-gateのデフォルト非表示）を持ち、
+   このボタン自体もdisabled既定（index.html側）のため、JS/GSAP不通時は本編がそのまま通常表示になる。
+   position:relative + z-indexで、背景の波・砂浜（.intro-scene、position:absolute）より前面に出す */
+.intro-bottle {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: min(200px, 50vw);
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: default;
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+/* drifting/landing中はGSAPのインラインopacityが実際の見た目を制御するが、
+   arrive()のclearProps実行後やopening中はここのCSSがopacityの基準に戻るため、
+   0のままにならないよう明示しておく */
+.intro-bottle[data-state="drifting"],
+.intro-bottle[data-state="landing"],
+.intro-bottle[data-state="arrived"],
+.intro-bottle[data-state="opening"] {
+  opacity: 1;
+}
+
+.intro-bottle[data-state="arrived"] {
+  cursor: pointer;
+  animation: introBottleFloat 7s ease-in-out infinite;
+}
+
+.intro-bottle[data-state="opening"] {
+  animation: none;
+}
+
+.intro-bottle[data-state="opened"] {
+  animation: none;
+  opacity: 0;
+}
+
+/* 渚に打ち上げられた瓶が、寄せる波にごくわずかに揺すられている程度の浮遊（バウンド・大きな揺れは禁止） */
+@keyframes introBottleFloat {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-3px) rotate(-1.5deg);
+  }
+}
+
+.intro-bottle__frame {
+  display: block;
+  width: 100%;
+  height: auto;
+  opacity: 0;
+  transition: opacity 0.45s ease, filter 0.35s ease;
+  filter: drop-shadow(0 14px 20px rgba(40, 90, 110, 0.25));
+}
+
+.intro-bottle__frame.is-visible {
+  opacity: 1;
+}
+
+.intro-bottle__frame--open {
+  position: absolute;
+  inset: 0;
+}
+
+.intro-bottle[data-state="arrived"]:hover .intro-bottle__frame,
+.intro-bottle[data-state="arrived"]:focus-visible .intro-bottle__frame {
+  filter: drop-shadow(0 18px 24px rgba(40, 90, 110, 0.32));
+}
+
+/* hoverでコルクが緩みかけたように、開封後の絵をうっすら覗かせる */
+.intro-bottle[data-state="arrived"]:hover .intro-bottle__frame--open.is-visible,
+.intro-bottle[data-state="arrived"]:focus-visible .intro-bottle__frame--open.is-visible {
+  opacity: 1;
+}
+
+.intro-bottle[data-state="arrived"] .intro-bottle__frame--open {
+  transition: opacity 0.45s ease, filter 0.35s ease;
+}
+
+.intro-bottle:focus-visible {
+  outline: 2px solid var(--color-sea-deep);
+  outline-offset: 6px;
+}
+
+/* 漂流中に一度だけ流れるガラスの反射光。.seaglass-hoverと同じ「斜めの帯をbackground-positionで動かす」技法を流用 */
+.intro-bottle__shine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.65) 50%, transparent 60%);
+  background-repeat: no-repeat;
+  background-size: 250% 250%;
+  background-position: -150% -150%;
+  opacity: 0;
+}
+
+/* 瓶の下の影。着水中はごく薄く、渚に触れてから少し濃くなる（水面→砂の質感変化） */
+.intro-bottle__shadow {
+  position: absolute;
+  left: 50%;
+  bottom: -6%;
+  width: 70%;
+  height: 16%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(30, 60, 55, 0.3), transparent 72%);
+  opacity: 0.12;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.intro-bottle[data-state="landing"] .intro-bottle__shadow,
+.intro-bottle[data-state="arrived"] .intro-bottle__shadow {
+  opacity: 0.38;
+}
+
+/* 漂着の瞬間だけ瓶の足元を通り過ぎる白い泡。js/intro.jsがopacity/scaleを一度だけ動かす */
+.intro-bottle__foam {
+  position: absolute;
+  left: 50%;
+  bottom: 2%;
+  width: 135%;
+  height: 32%;
+  transform: translateX(-50%) scale(0.6);
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 72%);
+  filter: blur(2px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.intro-bottle__body {
+  position: absolute;
+  left: 50%;
+  bottom: 12%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+/* 漂着して完全に落ち着いてから、少し間（transition-delay）を置いてCTAを見せる */
+.intro-bottle[data-state="arrived"] .intro-bottle__body {
+  opacity: 1;
+  pointer-events: auto;
+  transition-delay: 0.35s;
+}
+
+.intro-bottle__eyebrow {
+  font-family: var(--font-en);
+  font-style: italic;
+  font-size: 11px;
+  color: var(--color-sea-deep);
+  opacity: 0.85;
+}
+
+.intro-bottle__label {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--color-accent);
 }
 
 /* ---------- アクセシビリティ：動きを減らす設定（第12章） ---------- */

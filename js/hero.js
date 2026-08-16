@@ -11,13 +11,8 @@
 
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  // 背景は動画（heroPhoto）だが、動画は naturalWidth/complete/load 等のimg専用APIを持たないため、
-  // new.png・hero_touka.pngと共通の基準キャンバスサイズを定数として持つ
+  // new.png（背景写真）の基準キャンバスサイズ
   var REF_W = 1536, REF_H = 1024;
-
-  if (reduceMotion && heroPhoto.pause) {
-    heroPhoto.pause();
-  }
 
   // 写真は object-fit:cover で表示されるため、実際の表示上のトリミング量を計算して
   // オーバーレイ（見出し・手書きテキスト・PC画面）の位置を写真に正確に合わせる
@@ -30,7 +25,7 @@
   // ノートPC画面の実際の4隅（写真のピクセル座標）。長方形の素材をこの4点にぴったり合わせる射影変換をかけることで、
   // PC本体の角度・遠近感と中身の見え方を一致させる（クリップだけだと中身が正面向きのまま浮いて見えるため）
   var laptopCorners = {
-    tl: [791, 296], tr: [1251, 306], br: [1218, 580], bl: [765, 578]
+    tl: [797, 350], tr: [1255, 362], br: [1219, 706], bl: [754, 660]
   };
   var laptopLocalW = 495, laptopLocalH = 360;
 
