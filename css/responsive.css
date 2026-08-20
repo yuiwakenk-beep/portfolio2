@@ -85,6 +85,13 @@
     justify-content: flex-start;
   }
 
+  .hero-splash-fallback {
+    justify-content: flex-start;
+  }
+
+  /* 水玉のサイズ・ラベルのfont-sizeはブレークポイントに関係なくJS/animation.css側で
+     固定値（86〜116px／16px）に統一したため、ここでの上書きは不要 */
+
   .contact__links {
     justify-content: center;
   }

@@ -25,7 +25,7 @@
   // ノートPC画面の実際の4隅（写真のピクセル座標）。長方形の素材をこの4点にぴったり合わせる射影変換をかけることで、
   // PC本体の角度・遠近感と中身の見え方を一致させる（クリップだけだと中身が正面向きのまま浮いて見えるため）
   var laptopCorners = {
-    tl: [797, 350], tr: [1255, 362], br: [1219, 706], bl: [754, 660]
+    tl: [793, 349], tr: [1258, 362], br: [1220, 710], bl: [754, 665]
   };
   var laptopLocalW = 495, laptopLocalH = 360;
 
@@ -76,6 +76,125 @@
   }
   positionHeroOverlays();
   window.addEventListener('resize', positionHeroOverlays);
+
+  // ---------- ノートPC画面の4隅を調整するキャリブレーションモード ----------
+  // 通常は一切動かない（コスト・見た目とも影響なし）。URLに ?calibrate を付けて開いた時だけ有効になる
+  // 例：index.html?calibrate
+  // 画面はめ込みの4隅（laptopCorners）に赤い丸のハンドルが表示されるので、ドラッグしてPC画面の
+  // 実際の角に合わせる。右下のパネルに、その場でコピーできる座標（laptopCorners用のコード）が
+  // 表示され続けるので、ズレが直ったらそれをコピーしてこのファイルの laptopCorners に貼り替える
+  if (/[?&]calibrate\b/.test(location.search)) {
+    (function initLaptopCalibration() {
+      var container = heroPhoto.parentElement; // #hero（position:relativeなので、これを基準に座標が取れる）
+      var order = ['tl', 'tr', 'br', 'bl'];
+      var labels = { tl: '左上', tr: '右上', br: '右下', bl: '左下' };
+
+      var panel = document.createElement('div');
+      panel.style.cssText = 'position:fixed;bottom:12px;right:12px;z-index:99999;background:rgba(20,30,35,0.9);' +
+        'color:#8ef2c8;font:12px/1.5 monospace;padding:12px 14px;border-radius:10px;max-width:300px;' +
+        'white-space:pre-wrap;box-shadow:0 4px 16px rgba(0,0,0,0.35);';
+      var title = document.createElement('div');
+      title.textContent = 'PC画面キャリブレーション（角をドラッグ）';
+      title.style.cssText = 'color:#fff;font-weight:bold;margin-bottom:6px;';
+      var pre = document.createElement('div');
+      var copyBtn = document.createElement('button');
+      copyBtn.textContent = 'コードをコピー';
+      copyBtn.style.cssText = 'display:block;margin-top:8px;padding:6px 12px;border:none;border-radius:6px;' +
+        'background:#2f9e93;color:#fff;font-weight:bold;cursor:pointer;';
+      panel.appendChild(title);
+      panel.appendChild(pre);
+      panel.appendChild(copyBtn);
+      document.body.appendChild(panel);
+
+      function cornerCode() {
+        return 'var laptopCorners = {\n' +
+          '  tl: [' + Math.round(laptopCorners.tl[0]) + ', ' + Math.round(laptopCorners.tl[1]) + '],\n' +
+          '  tr: [' + Math.round(laptopCorners.tr[0]) + ', ' + Math.round(laptopCorners.tr[1]) + '],\n' +
+          '  br: [' + Math.round(laptopCorners.br[0]) + ', ' + Math.round(laptopCorners.br[1]) + '],\n' +
+          '  bl: [' + Math.round(laptopCorners.bl[0]) + ', ' + Math.round(laptopCorners.bl[1]) + ']\n' +
+          '};';
+      }
+
+      copyBtn.addEventListener('click', function () {
+        var text = cornerCode();
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(text).catch(function () {});
+        }
+        copyBtn.textContent = 'コピーしました！';
+        setTimeout(function () { copyBtn.textContent = 'コードをコピー'; }, 1200);
+      });
+
+      var handles = {};
+      order.forEach(function (key) {
+        var handle = document.createElement('div');
+        handle.title = labels[key];
+        handle.style.cssText = 'position:absolute;width:20px;height:20px;margin:-10px 0 0 -10px;' +
+          'border-radius:50%;background:rgba(255,70,70,0.85);border:2px solid #fff;' +
+          'box-shadow:0 0 8px rgba(0,0,0,0.5);cursor:grab;z-index:9999;touch-action:none;';
+        container.appendChild(handle);
+        handles[key] = handle;
+      });
+
+      function updateHandles() {
+        var s = currentScale();
+        order.forEach(function (key) {
+          var pt = laptopCorners[key];
+          handles[key].style.left = (s.offX + pt[0] * s.scale) + 'px';
+          handles[key].style.top = (s.offY + pt[1] * s.scale) + 'px';
+        });
+      }
+
+      function refresh() {
+        positionHeroOverlays();
+        updateHandles();
+        pre.textContent = cornerCode();
+      }
+
+      var draggingKey = null;
+
+      function pointFromEvent(e) {
+        var t = e.touches && e.touches[0];
+        return { x: t ? t.clientX : e.clientX, y: t ? t.clientY : e.clientY };
+      }
+
+      function onPointerDown(key) {
+        return function (e) {
+          draggingKey = key;
+          handles[key].style.cursor = 'grabbing';
+          e.preventDefault();
+        };
+      }
+
+      function onPointerMove(e) {
+        if (!draggingKey) return;
+        e.preventDefault();
+        var p = pointFromEvent(e);
+        var rect = container.getBoundingClientRect();
+        var s = currentScale();
+        var photoX = (p.x - rect.left - s.offX) / s.scale;
+        var photoY = (p.y - rect.top - s.offY) / s.scale;
+        laptopCorners[draggingKey] = [photoX, photoY];
+        refresh();
+      }
+
+      function onPointerUp() {
+        if (draggingKey && handles[draggingKey]) handles[draggingKey].style.cursor = 'grab';
+        draggingKey = null;
+      }
+
+      order.forEach(function (key) {
+        handles[key].addEventListener('mousedown', onPointerDown(key));
+        handles[key].addEventListener('touchstart', onPointerDown(key), { passive: false });
+      });
+      window.addEventListener('mousemove', onPointerMove, { passive: false });
+      window.addEventListener('touchmove', onPointerMove, { passive: false });
+      window.addEventListener('mouseup', onPointerUp);
+      window.addEventListener('touchend', onPointerUp);
+      window.addEventListener('resize', refresh);
+
+      refresh();
+    })();
+  }
 
   // 万年筆が筆記体をなぞって書いているアニメーション。文字は左から右へ育つ矩形クリップで段階的に見せ、
   // ペン先は同じガイドパス上を getPointAtLength() で取得して、同じ進行度(progress)で同期させて動かす

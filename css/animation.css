@@ -38,6 +38,14 @@
   animation: waveDriftSlow 16s linear infinite reverse;
 }
 
+/* 【一時カット】Hero写真の上の波（back/mid/front）を非表示にする。
+   .wave-layer-trackはイントロ演出（.intro-scene内）でも同じクラスを流用しているため、
+   #hero配下だけに絞って非表示にし、イントロ側の波には影響しないようにしている。
+   元に戻す場合はこのルールを削除するだけでよい */
+#hero .wave-layer-track {
+  display: none;
+}
+
 @keyframes waveDriftSlow {
   from {
     transform: translateX(0);
@@ -45,6 +53,38 @@
   to {
     transform: translateX(-50%);
   }
+}
+
+/* ---------- Hero→次セクションの継ぎ目：波の塗り色自体をフェードさせて写真に溶け込ませる（v6） ----------
+   v3で追加していた「橋渡し用の波（ベタ塗り）」+「.section-photo-flow::beforeのグラデーション矩形」の
+   二重構成は、帯が二重に見える原因になっていたため撤去し、この1枚に置き換えた。
+   帯・矩形は使わず、SVGのlinearGradientで波の塗り色自体を上(不透明)→下(透明)にフェードさせることで、
+   波の裾から次セクションの写真がそのまま透けて見えるようにする。
+   Hero本体の3層波（back/mid/front）とそのアニメーションには一切触れない */
+.hero-seam-fade {
+  /* position:relative + margin-top のマイナス値だと、.section-photo-flow（親）との間で
+     マージン相殺（margin collapse）が起きてしまい、親自身の背景（次セクションの写真の薄い上端）が
+     そのままHero側にめり込んで表示される不具合があった（薄い水色の直線の帯として見えていた）。
+     position:absoluteにすればマージン相殺自体が起きないため、topのマイナス値だけで
+     同じ重なり量を再現しつつ、この不具合を根本的に回避できる
+    （.section-photo-flowはposition:relative済みなので、これを基準に配置される） */
+  position: absolute;
+  /* Heroの波にどれだけ重ねるか。CTAボタンの下端から余裕を持ってクリアしつつ、
+     波の谷（index.html側のpath、振幅を浅くして谷がここに収まるよう調整済み）が
+     Hero側にしっかり収まる値にしている */
+  top: -50px;
+  left: 0;
+  right: 0;
+  z-index: 2; /* .section-photo-flowの背景写真より前面、cloud-wrapの内容よりは背面 */
+  height: 200px;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.hero-seam-fade svg {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 /* ---------- 雲カードの浮遊（上下2〜6px / 6〜12秒） ---------- */
@@ -241,6 +281,119 @@
   margin: -5px 0 0 -23px;
 }
 
+/* ---------- ファーストビュー：波打ち際からバーストで飛ぶ水しぶき（js/hero-splash.js v7が生成・削除する） ----------
+   画面左側1/3（レーン分散）から数秒おきに複数個まとめて水しぶきが飛び、
+   「できること」4個だけがCTAラインを超えた瞬間に文字入りの水玉（.is-revealed）に変化する。
+   フェイク・ミニ飛沫（.hero-splash--satellite）は無地のまま消える。
+   位置(top/left)・不透明度・フェーズ1→2の引き継ぎはすべてjs/hero-splash.js側で
+   Web Animations API（el.animate）により直接制御するため、ここには@keyframesを持たず、
+   状態ごとの見た目だけを定義する。border-radius・transformのscaleは個体ごとに
+   js側でランダムに設定するため、ここでは初期値のみ置く。
+   JS不通・prefers-reduced-motion時の表示切替は css/style.css 側（.hero-splash-fallback）を参照 */
+.hero-splash-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 3; /* 波レイヤー（z-index:2）より手前、.hero__copy（z-index:3）と同層 */
+}
+
+/* 水玉化前：ほぼ透明・無色の水滴。本物（できること4個）とフェイク・ミニ飛沫は水玉化する瞬間まで
+   見た目のロジックが完全に同じ。色は --color-sea-light / --color-sea-deep のRGB値をごく薄い
+   透明度で使うのみで、色相のバリエーション（data-hue等）は持たない。
+   width/height/box-shadow/transformをtransitionしておくことで、.is-revealed付与の瞬間に
+   なめらかにサイズ・輝きが変化する（js/hero-splash.js側でtransform:scale(1)に戻す） */
+.hero-splash {
+  position: absolute;
+  width: 26px;
+  height: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  padding: 0;
+  margin: 0;
+  border-radius: 46% 54% 58% 42% / 55% 48% 52% 45%; /* しずく型・不定形（個体ごとにjs側で上書き） */
+  background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.55), rgba(189, 233, 239, 0.28) 45%, rgba(40, 125, 155, 0.22) 100%);
+  box-shadow: 0 3px 10px rgba(20, 60, 70, 0.15), inset 0 0 6px rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+  pointer-events: none;
+  cursor: default;
+  transition: width 0.3s cubic-bezier(0.2, 0.7, 0.2, 1), height 0.3s cubic-bezier(0.2, 0.7, 0.2, 1),
+    box-shadow 0.3s ease, transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+/* ミニ飛沫：主要な水玉の生成と同時に1〜2個添える装飾のみの粒。常にラベル無し・非表示のまま消える */
+.hero-splash--satellite {
+  border-width: 1px;
+  box-shadow: 0 2px 6px rgba(20, 60, 70, 0.12);
+}
+
+.hero-splash__label {
+  display: block;
+  opacity: 0;
+  color: #fff;
+  font-family: var(--font-heading-hero); /* 見出し「海のように〜」と同じフォント */
+  /* 最長ラベル「デザイン」は16pxで実測64px幅。水玉の最小サイズ(86px)からpadding(6px×2)を
+     引いた74px以内に収まる、読みやすさとの両立ライン */
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+  white-space: nowrap; /* 水玉が縮んでも文字は必ず1行のまま（js側でも1行に収まる最小サイズを確保している） */
+  /* 背景が写真次第でかなり明るくなる（砂浜・空など）ため、単純な影1つでは沈んで読めなくなる。
+     4方向の縁取り＋外側のぼかしを重ねて、どんな背景の上でも文字の輪郭が残るようにする */
+  text-shadow: -1px -1px 1px rgba(20, 50, 60, 0.9), 1px -1px 1px rgba(20, 50, 60, 0.9),
+    -1px 1px 1px rgba(20, 50, 60, 0.9), 1px 1px 1px rgba(20, 50, 60, 0.9),
+    0 1px 3px rgba(20, 50, 60, 0.9), 0 0 8px rgba(20, 50, 60, 0.6);
+  transition: opacity 0.3s ease 0.1s;
+}
+
+/* できること4個がCTAラインを超えた瞬間：文字入りの水玉に変化する。
+   前回のすりガラス質感（白っぽい背景）はやめ、フェイクと同系統の「透明感のあるガラス水滴」に統一する。
+   文字が沈まないよう、ラベル側の text-shadow で可読性を確保する（背景自体は白く塗り潰さない） */
+.hero-splash.is-revealed {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 44% 56% 52% 48% / 58% 46% 54% 42%; /* しずく型（個体ごとにjs側で上書き） */
+  background: radial-gradient(circle at 32% 26%, rgba(255, 255, 255, 0.4), rgba(189, 233, 239, 0.32) 45%, rgba(40, 125, 155, 0.4) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  box-shadow: 0 4px 14px rgba(20, 60, 70, 0.2), inset 0 0 8px rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  pointer-events: auto;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.2, 0.7, 0.2, 1), box-shadow 0.25s ease;
+}
+
+.hero-splash.is-revealed .hero-splash__label {
+  opacity: 1;
+}
+
+/* ホバー時の拡大・発光はPC（ホバー可能な環境）のみ。タッチデバイスでは常時ラベルが見えているため不要 */
+@media (hover: hover) and (pointer: fine) {
+  .hero-splash.is-revealed:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 20px rgba(20, 60, 70, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.35);
+  }
+}
+
+.hero-splash.is-revealed:focus-visible {
+  outline: 2px solid var(--color-sea-deep);
+  outline-offset: 4px;
+  transform: scale(1.08);
+  box-shadow: 0 6px 20px rgba(20, 60, 70, 0.3), inset 0 0 8px rgba(255, 255, 255, 0.35);
+}
+
+/* JS不通時：<html>の既定クラス（js-disabled）をhero-splash.jsが実行時に除去する定番パターン */
+.js-disabled .hero-splash-layer {
+  display: none;
+}
+
+.js-disabled .hero-splash-fallback {
+  display: flex;
+}
+
 /* ---------- 海からの手紙が入った瓶（js/intro.jsが状態を制御する） ----------
    状態：waiting → drifting → landing → arrived → opening → opened
    イントロゲート内に表示される瓶。ゲート自体がPEフォールバック（.intro-gateのデフォルト非表示）を持ち、
@@ -424,5 +577,14 @@
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+
+  /* 動きのある水玉は出さず、静的なチップ（.hero-splash-fallback）に切り替える */
+  .hero-splash-layer {
+    display: none;
+  }
+
+  .hero-splash-fallback {
+    display: flex;
   }
 }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="ja" class="js-disabled">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -88,7 +88,7 @@
   <!-- ========== ファーストビュー（6-2） ========== -->
   <section class="hero" id="hero">
     <!-- 背景写真：海を望むデスクでのワークシーン（人物なし）。動画演出は廃止し、静止画1枚のみ -->
-    <img id="heroPhoto" class="hero__photo" src="sozai/new.png" alt="">
+    <img id="heroPhoto" class="hero__photo" src="sozai/new1.png" alt="">
 
     <!-- 写真内のノートPC画面に実績スクリーンショットを射影変換で嵌め込む（js/hero.jsが位置を計算） -->
     <div id="heroLaptopMask" class="hero__laptop-mask" aria-hidden="true">
@@ -125,6 +125,11 @@
       <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,50 C100,80 200,20 300,50 C400,80 500,20 600,50 C700,80 800,20 900,50 C1000,80 1100,20 1200,50 C1300,80 1400,20 1440,50 L1440,100 L0,100 Z" fill="var(--color-sea-deep)"/></svg>
       <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,50 C100,80 200,20 300,50 C400,80 500,20 600,50 C700,80 800,20 900,50 C1000,80 1100,20 1200,50 C1300,80 1400,20 1440,50 L1440,100 L0,100 Z" fill="var(--color-sea-deep)"/></svg>
     </div>
+
+    <!-- 水しぶき→水玉（できることピックアップ）。js/hero-splash.jsが波の上に動的に生成する。
+         JS不通・prefers-reduced-motion時は直下の.hero-splash-fallbackをCSS側で表示する -->
+    <div class="hero-splash-layer" id="heroSplashLayer" aria-hidden="false"></div>
+
     <div class="hero__copy">
       <h1 class="visually-hidden">Yui / Web Creator - 海のように、心地よく届くデザインを。</h1>
       <div class="hero__cta fade-up-in">
@@ -137,11 +142,41 @@
           お問い合わせ
         </a>
       </div>
+
+      <!-- フォールバック：JS不通時、またはprefers-reduced-motion時のみ表示（通常時は非表示） -->
+      <ul class="hero-splash-fallback" id="heroSplashFallback">
+        <li><a href="#skills" class="tag" data-target="#skills">HP制作</a></li>
+        <li><a href="#skills" class="tag" data-target="#skills">LP制作</a></li>
+        <li><a href="#skills" class="tag" data-target="#skills">デザイン</a></li>
+        <li><a href="#skills" class="tag" data-target="#skills">実装</a></li>
+      </ul>
     </div>
   </section>
 
   <!-- concept〜contactの背景を1枚の写真で通しにする（スマホ版=haikei2.png、PC版=haikei.png。レスポンシブ 8-2） -->
   <div class="section-photo-flow" id="sectionPhotoFlow">
+
+  <!-- Hero下端の波（.wave-layer--front）と同じ曲線を流用した境目用の波。
+       ベタ塗りの帯にはせず、塗り色自体をSVGのlinearGradientで上(不透明)→下(透明)にフェードさせることで、
+       波の裾から次セクションの写真がそのまま透けて見えるようにする。
+       Hero自体の3層波（back/mid/front）とそのアニメーションには一切触れない -->
+  <div class="hero-seam-fade" aria-hidden="true">
+    <svg viewBox="0 0 1440 200" preserveAspectRatio="none">
+      <defs>
+        <!-- gradientUnitsをuserSpaceOnUse＋viewBoxに合わせたy座標にして、境界ボックスのずれによる
+             グラデーション基準のブレをなくしている（念のための補強。下記の波の谷が主因） -->
+        <linearGradient id="heroSeamGradient" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="200">
+          <stop offset="0%" style="stop-color: var(--color-sea-deep); stop-opacity: 1;" />
+          <stop offset="60%" style="stop-color: var(--color-sea-deep); stop-opacity: 0.5;" />
+          <stop offset="100%" style="stop-color: var(--color-sea-deep); stop-opacity: 0;" />
+        </linearGradient>
+      </defs>
+      <!-- 波の振幅（谷の深さ）をCTAとの間の限られた重なり量（css/animation.cssの.hero-seam-fadeのtop）に
+           収まる範囲まで浅くしている。振幅が深すぎると、谷の部分だけHeroの写真と重ならず、
+           次セクションの背景が隙間からのぞいて薄い帯のように見えてしまっていた -->
+      <path d="M0,40 C100,45 200,35 300,40 C400,45 500,35 600,40 C700,45 800,35 900,40 C1000,45 1100,35 1200,40 C1300,45 1400,35 1440,40 L1440,200 L0,200 Z" fill="url(#heroSeamGradient)" />
+    </svg>
+  </div>
 
   <!-- ========== 自己紹介（6-4）・コンセプト（6-3）横並び ========== -->
   <div class="concept-about-row">
@@ -543,5 +578,6 @@
 <script src="js/intro.js" defer></script>
 <script src="js/water-fx.js" defer></script>
 <script src="js/cta-splash.js" defer></script>
+<script src="js/hero-splash.js" defer></script>
 </body>
 </html>

@@ -736,6 +736,34 @@ button:focus-visible {
   display: block;
 }
 
+/* ---------- 「できること」フォールバック（js/hero-splash.js不通時・prefers-reduced-motion時のみ表示） ----------
+   通常時（JS動作時）は水玉アニメーション（.hero-splash-layer）が同じ情報を担うため、既定は非表示。
+   見た目は既存の.tagを流用し、リンクとして機能するよう装飾のみ追加する */
+.hero-splash-fallback {
+  display: none;
+  margin: 18px 0 0;
+  padding: 0;
+  list-style: none;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px 12px;
+}
+
+.hero-splash-fallback a {
+  text-decoration: none;
+  transition: background 0.25s ease, transform 0.25s ease;
+}
+
+.hero-splash-fallback a:hover {
+  background: var(--color-sea-light);
+  transform: translateY(-2px);
+}
+
+.hero-splash-fallback a:focus-visible {
+  outline: 2px solid var(--color-sea-deep);
+  outline-offset: 3px;
+}
+
 /* ---------- コンセプト（6-3） ---------- */
 .concept {
   position: relative;
