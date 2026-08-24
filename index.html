@@ -3,6 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- イントロ表示の要否を、初回ペイントより前に同期的に判定する。
+     js/intro.js自体はdefer読み込みのため、その実行を待ってから.intro-gateを表示したのでは、
+     ブラウザが先にHTML/CSSを描画し終えてしまい、その一瞬だけ本編（Hero）が見えてしまう（FOUC）。
+     ここではreduced-motion／訪問済みの判定だけを先取りしてhtmlにクラスを付け、
+     初回ペイントの時点からゲートが本編を覆っているようにする。
+     GSAP自体が読み込めるかはこの時点では判定できないため、その場合の後始末は
+     js/intro.js側の早期returnパスでintro-pendingクラスを外して行う -->
+<script>
+(function () {
+  try {
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var alreadySeen = sessionStorage.getItem('introSeen') === '1';
+    if (!reduceMotion && !alreadySeen) {
+      document.documentElement.classList.add('intro-pending');
+    }
+  } catch (e) {
+    /* 判定に失敗した場合は本編をそのまま表示する側に倒す（intro-pendingを付けない） */
+  }
+})();
+</script>
 <!-- 【要確認】title・descriptionは指示書の仮案です。確定後に差し替えてください -->
 <title>Yui Portfolio | Web Design & Development</title>
 <meta name="description" content="LP・ホームページのデザイン、HTML/CSS実装、画像制作、文章改善、サーバー公開まで対応するYuiのポートフォリオです。">
@@ -27,15 +47,13 @@
   <!-- 背景の波：Heroと同じレイヤー・キーフレームを流用（動画は使わずCSS/SVGのみ） -->
   <div class="intro-scene" aria-hidden="true">
     <div class="wave-layer-track wave-layer--back">
-      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,70 C120,95 240,45 360,70 C480,95 600,45 720,70 C840,95 960,45 1080,70 C1200,95 1320,45 1440,70 L1440,120 L0,120 Z" fill="var(--color-sea-light)"/></svg>
-      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,70 C120,95 240,45 360,70 C480,95 600,45 720,70 C840,95 960,45 1080,70 C1200,95 1320,45 1440,70 L1440,120 L0,120 Z" fill="var(--color-sea-light)"/></svg>
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,70 C120,95 240,45 360,70 C480,95 600,45 720,70 C840,95 960,45 1080,70 C1200,95 1320,45 1440,70 L1440,120 L0,120 Z" fill="var(--color-sea)"/></svg>
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,70 C120,95 240,45 360,70 C480,95 600,45 720,70 C840,95 960,45 1080,70 C1200,95 1320,45 1440,70 L1440,120 L0,120 Z" fill="var(--color-sea)"/></svg>
     </div>
     <div class="wave-layer-track wave-layer--mid">
-      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,60 C160,30 320,90 480,60 C640,30 800,90 960,60 C1120,30 1280,90 1440,60 L1440,120 L0,120 Z" fill="var(--color-sea)"/></svg>
-      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,60 C160,30 320,90 480,60 C640,30 800,90 960,60 C1120,30 1280,90 1440,60 L1440,120 L0,120 Z" fill="var(--color-sea)"/></svg>
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,60 C160,30 320,90 480,60 C640,30 800,90 960,60 C1120,30 1280,90 1440,60 L1440,120 L0,120 Z" fill="var(--color-sea-light)"/></svg>
+      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,60 C160,30 320,90 480,60 C640,30 800,90 960,60 C1120,30 1280,90 1440,60 L1440,120 L0,120 Z" fill="var(--color-sea-light)"/></svg>
     </div>
-    <!-- 波打ち際の「押し寄せ」：js/intro.jsが瓶の各拍（押す/戻る）に同期してscaleY/opacityを動かす -->
-    <div class="intro-wave-pulse" id="introWavePulse"></div>
     <div class="intro-shore"></div>
   </div>
   <!-- disabled既定＝JS/GSAP不通時も含め、漂着（arrived）するまでクリック不可を保証するPEフォールバック -->
@@ -45,13 +63,31 @@
     <img class="intro-bottle__frame intro-bottle__frame--closed is-visible" src="sozai/bottle-closed.png" alt="">
     <span class="intro-bottle__shine" aria-hidden="true"></span>
     <img class="intro-bottle__frame intro-bottle__frame--open" src="sozai/bottle-open.png" alt="">
-    <span class="intro-bottle__body">
-      <span class="intro-bottle__eyebrow">A Letter from the Sea</span>
-      <span class="intro-bottle__label">瓶を開く</span>
+    <!-- 瓶の左上に浮かぶ「open」のペーパータグ。装飾なのでaria-hiddenにし、
+         ボタンのアクセシブルネームはbutton要素側のaria-labelで担保する -->
+    <span class="intro-bottle__opentag" id="introOpenTag" aria-hidden="true">
+      <span class="intro-bottle__opentag-text">open</span>
     </span>
   </button>
-  <a href="#main" class="intro-skip" id="introSkip">スキップして本編へ</a>
+
+  <!-- 巻き紙は瓶の外・.intro-gate直下の独立レイヤー（瓶素材の中の絵と混同しないよう、
+       瓶よりずっと大きく画面中央に表示する）。開いた状態の1枚のみを表示し、
+       フェード＋拡大の1段階でふわっと現れる。文字は紙の余白部分に重ねて表示する -->
+  <div class="intro-letter-paper" id="introLetterPaper" aria-hidden="true">
+    <img class="intro-letter-paper__frame intro-letter-paper__frame--open" src="sozai/letter-scroll-open.png" alt="">
+    <span class="intro-letter-paper__text" id="introLetterText">Welcome to my portfolio</span>
+  </div>
 </div>
+
+<!-- 光が画面全体を包み込みHeroへ橋渡しする演出。.intro-gateの兄弟要素にして、
+     ゲート自体が消えた後もこれだけ独立してフェードアウトできるようにしている
+     （ゲートの子要素のままだと、ゲートのopacityが下がると道連れで見えなくなってしまうため） -->
+<div class="intro-light-wash" id="introLightWash" aria-hidden="true"></div>
+
+<!-- スキップリンクもゲートの外（.intro-gateの兄弟）に出し、常に最前面・操作可能にしてある。
+     表示/非表示はCSSの隣接兄弟セレクタ(.intro-gate.is-active ~ .intro-skip)のみで制御し、
+     JS/GSAP不通時はis-activeが付かない＝デフォルトのまま非表示になるPEフォールバックを保つ -->
+<a href="#main" class="intro-skip" id="introSkip" aria-label="スキップして本編へ">skip &rarr;</a>
 
 <a class="skip-link" href="#main">本文へスキップ</a>
 
@@ -193,12 +229,14 @@
           </div>
           <div class="about__body">
             <div class="about__photo">
+              <span class="about-photo__ring" aria-hidden="true"></span>
+              <span class="about-photo__blob" aria-hidden="true"></span>
               <img src="sozai/yui.png" alt="Yui">
             </div>
             <div class="about__info">
               <h3 class="about__name">Yui</h3>
               <p class="about__role">Web Creator</p>
-              <p class="about__text">雑貨販売やカフェ、リゾートバイトなど、さまざまな現場でお客さまと向き合ってきました。「伝わる」「使いやすい」「心地いい」体験をWebでも届けたいと思い、制作の道へ。初めての方も安心してご相談ください。</p>
+              <p class="about__text">はじめまして🌻埼玉県出身、学生時代は東京、沖縄で３か月のリゾートアルバイト、大阪に住んでみたいという気持ちだけで引っ越しをし約一年半ほど生活。自由に歩んできたYUIです！雑貨販売やカフェ、リゾートアルバイト、テレビ業界…さまざまな現場で過ごしてきて、これまで感じてきた「伝わる」「使いやすい」「心地いい」体験をWebの世界でお届けするべく、制作の道に進みました。初めての方もどうぞ安心してご相談ください。</p>
             </div>
           </div>
           <div class="about__tags">
@@ -209,6 +247,11 @@
           </div>
         </div>
       </div>
+    </div>
+    <!-- 波打ち際に自然に流れ着いた装飾（流木・貝）。本文の邪魔にならない位置にのみ配置 -->
+    <div class="about-beach-ornaments" aria-hidden="true">
+      <img src="sozai/ki.png" alt="" class="about-ornament about-ornament--driftwood">
+      <img src="sozai/kai.png" alt="" class="about-ornament about-ornament--shell">
     </div>
   </section>
 
@@ -223,7 +266,7 @@
             <h2 class="section-heading__jp">大切にしていること</h2>
           </div>
           <div class="concept__keywords">
-            <span class="tag">丁寧に話を聞く</span>
+            <span class="tag">小さな声にも耳を傾ける</span>
             <span class="tag">初めての方にも分かりやすく</span>
             <span class="tag">伝わりやすさを大切にする</span>
             <span class="tag">AIを活用しながら人の温度を残す</span>

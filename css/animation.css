@@ -12,6 +12,8 @@
   width: 200%;
   line-height: 0;
   will-change: transform;
+  /* scaleYで膨らませたときに下端（渚側）がずれないよう、下辺を基準に伸縮させる */
+  transform-origin: bottom;
 }
 
 .wave-layer-track svg {
@@ -23,13 +25,13 @@
 .wave-layer--back {
   bottom: 40px;
   opacity: 0.55;
-  animation: waveDriftSlow 35s linear infinite reverse;
+  animation: waveDriftSlow 35s ease-in-out infinite reverse;
 }
 
 .wave-layer--mid {
   bottom: 16px;
   opacity: 0.75;
-  animation: waveDriftSlow 24s linear infinite;
+  animation: waveDriftSlow 24s ease-in-out infinite;
 }
 
 .wave-layer--front {
@@ -46,12 +48,24 @@
   display: none;
 }
 
+/* 横スクロールだけでなく、上下のうねり（translateY）と膨らみ（scaleY）を重ねて
+   波らしいゆらゆらとした揺れを出す。水平方向は0%→-50%まで等間隔に進めることで、
+   2枚並べたSVGのループ継ぎ目は従来どおり途切れない */
 @keyframes waveDriftSlow {
-  from {
-    transform: translateX(0);
+  0% {
+    transform: translate(0%, 0) scaleY(1);
   }
-  to {
-    transform: translateX(-50%);
+  25% {
+    transform: translate(-12.5%, -8px) scaleY(1.04);
+  }
+  50% {
+    transform: translate(-25%, 4px) scaleY(0.97);
+  }
+  75% {
+    transform: translate(-37.5%, -6px) scaleY(1.02);
+  }
+  100% {
+    transform: translate(-50%, 0) scaleY(1);
   }
 }
 
@@ -423,6 +437,16 @@
   opacity: 1;
 }
 
+/* 巻き紙（.intro-letter-paper）が現れたら瓶は完全に消え、以降二度と表示しない。
+   opacityのtransition（0.6s）が終わってからvisibility:hiddenに切り替えることで、
+   フェード完了後は確実にクリック判定・描画コストからも外す */
+.intro-bottle.is-hidden {
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.6s ease, visibility 0s linear 0.6s;
+}
+
 .intro-bottle[data-state="arrived"] {
   cursor: pointer;
   animation: introBottleFloat 7s ease-in-out infinite;
@@ -486,6 +510,13 @@
   outline-offset: 6px;
 }
 
+/* 漂着時にjs/intro.jsがbottle.focus()するのはキーボード操作を伴わないため、
+   :focus-visibleが常時リング表示と誤判定してしまう。js側が付与するis-auto-focused
+   が付いている間だけ打ち消し、実際のキーボード操作によるフォーカスは通常どおり表示する */
+.intro-bottle.is-auto-focused:focus-visible {
+  outline: none;
+}
+
 /* 漂流中に一度だけ流れるガラスの反射光。.seaglass-hoverと同じ「斜めの帯をbackground-positionで動かす」技法を流用 */
 .intro-bottle__shine {
   position: absolute;
@@ -532,40 +563,103 @@
   pointer-events: none;
 }
 
-.intro-bottle__body {
+/* 巻き紙は瓶の外の独立レイヤー（開封プロローグ）。瓶素材（bottle-open.png）の絵の中にも
+   巻き紙が描き込まれているため、瓶の中に閉じ込めたまま小さく表示すると「瓶の絵の中の巻き紙」と
+   見分けがつかなくなっていた。瓶よりずっと大きく、画面中央に単独で表示することで解決している。
+   開いた状態の1枚のみを表示し、フェード＋拡大の1段階でふわっと現れる
+   （丸まる→半分開くという段階演出は行わない） */
+.intro-letter-paper {
   position: absolute;
+  top: 46%;
   left: 50%;
-  bottom: 12%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
+  width: min(64%, 420px);
+  /* wrapper自体を画像の外接ボックスと一致させる（中心基準に配置）。
+     こうすることで、内部の__textに指定するtop/left%が画像上の実際の位置と一致する */
+  transform: translate(-50%, -50%);
+  z-index: 6;
+  pointer-events: none;
+  /* 瓶の外の独立レイヤーになったため、瓶自身のopacityにはもう連動しない。
+     開封演出が始まるまで（＝is-visibleが付くまで）は必ず非表示にしておく */
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.intro-letter-paper.is-visible {
+  opacity: 1;
+}
+
+.intro-letter-paper__frame {
+  display: block;
+  width: 100%;
+  transform-origin: center center;
+  transform: scale(0.85) rotate(-2deg);
+  filter: drop-shadow(0 12px 18px rgba(20, 40, 45, 0.25));
+  transition: transform 0.5s ease;
+}
+
+.intro-letter-paper.is-visible .intro-letter-paper__frame {
+  transform: scale(1) rotate(-2deg);
+}
+
+/* 開封プロローグ終盤：紙がふわっと持ち上がりながら光に溶けていく。
+   wrapper自体の中心合わせtranslate(-50%,-50%)は維持したまま、さらに上へ持ち上げる */
+.intro-letter-paper.is-dissolving {
+  transition: opacity 1s ease, transform 1s ease;
+  opacity: 0;
+  transform: translate(-50%, calc(-50% - 14px));
+}
+
+/* 紙の上に書かれる「Welcome to my portfolio」。素材画像は紐が中央を斜めに横切っているため、
+   紐のない右上寄りの余白部分（画像に対する割合位置）に、紙の傾きに合わせて重ねて配置する */
+.intro-letter-paper__text {
+  position: absolute;
+  top: 44%;
+  left: 60%;
+  transform: translate(-50%, -50%) rotate(-15deg);
+  font-family: 'Parisienne', cursive;
+  font-size: 1.5rem;
+  color: #4a3b2a;
+  white-space: nowrap;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 1.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.intro-letter-paper.is-written .intro-letter-paper__text {
+  clip-path: inset(0 0% 0 0);
+}
+
+/* 瓶の左上に浮かぶ「open」ペーパータグ。.about-photo__blobと同系統の
+   角のない有機的な輪郭にし、サイト全体の意匠と統一感を持たせる。
+   瓶が漂着してクリック可能になった瞬間（data-state="arrived"）にふわっとフェードインし、
+   以後はゲートが閉じるまで常時表示のままにする */
+.intro-bottle__opentag {
+  position: absolute;
+  /* 瓶画像はコルク部分が左上ではなく上部やや右寄りにあるため、
+     コルクの位置を基準にアンカーする（画像トリミング後の実座標に合わせて調整済み） */
+  top: 4%;
+  left: 62%;
+  z-index: 4;
+  transform: translate(-100%, -70%) rotate(-4deg) translateY(8px);
+  background: var(--color-sand);
+  border-radius: 62% 38% 48% 52% / 48% 58% 42% 52%;
+  padding: clamp(8px, 2vw, 12px) clamp(14px, 4vw, 22px);
+  box-shadow: 0 6px 14px rgba(20, 50, 60, 0.16);
+  white-space: nowrap;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 0.5s ease;
+  transition: opacity 0.7s ease, transform 0.7s ease;
 }
 
-/* 漂着して完全に落ち着いてから、少し間（transition-delay）を置いてCTAを見せる */
-.intro-bottle[data-state="arrived"] .intro-bottle__body {
-  opacity: 1;
-  pointer-events: auto;
-  transition-delay: 0.35s;
-}
-
-.intro-bottle__eyebrow {
-  font-family: var(--font-en);
+.intro-bottle__opentag-text {
+  font-family: Georgia, "Times New Roman", serif;
   font-style: italic;
-  font-size: 11px;
-  color: var(--color-sea-deep);
-  opacity: 0.85;
+  font-size: clamp(0.85rem, 3vw, 1.05rem);
+  letter-spacing: 0.08em;
+  color: #23515f;
 }
 
-.intro-bottle__label {
-  font-family: var(--font-ui);
-  font-weight: 600;
-  font-size: 13px;
-  color: var(--color-accent);
+.intro-bottle[data-state="arrived"] .intro-bottle__opentag {
+  opacity: 1;
+  transform: translate(-100%, -70%) rotate(-4deg) translateY(0);
 }
 
 /* ---------- アクセシビリティ：動きを減らす設定（第12章） ---------- */

@@ -5,8 +5,8 @@
 // 設計方針：
 // 「セクションからセクションへ長距離を飛ばす」のではなく、
 // 各セクション内で「登場→横方向へ滑空→少しカーブ→退場」を完結させる。
-// Hero / About / Flow の3シーンのみで登場し、Skills/Toolsでは登場させない
-// （常時飛ばし続けないことで「案内役」の印象を保つ）。
+// About / Flow の2シーンのみで登場し、Hero・Skills/Toolsでは登場させない
+// （常時飛ばし続けないことで「案内役」の印象を保つ。Heroは指示によりあえて飛ばさない）。
 //
 // 読み込み時イントロ（js/intro.js）は瓶が波で流れ着く演出のため、
 // この海鳥とは無関係。ただしイントロが閉じるまではHero等の演出も始めたくないため、
@@ -119,18 +119,6 @@
 
   // ---------- シーン定義（各セクション内で完結する短い飛行） ----------
   // dx: 横移動量（500〜900px目安）/ dy: 縦移動量（50〜180px目安、真下移動は作らない）
-  function heroConfig() {
-    var el = document.querySelector('#hero');
-    if (!el) return null;
-    var r = docRect(el);
-    return {
-      start: { x: r.left + r.width * 0.86, y: r.top + r.height * 0.16 },
-      dx: -750, dy: 90,
-      duration: 5.5,
-      scaleFrom: 0.8, scaleMid: 0.98, scaleTo: 0.78
-    };
-  }
-
   function aboutConfig() {
     var row = document.querySelector('.concept-about-row') || document.querySelector('#about');
     if (!row) return null;
@@ -155,9 +143,8 @@
     };
   }
 
-  // Skills / Tools はあえてシーンを作らない（海鳥がいない時間を作る）
+  // Hero・Skills / Tools はあえてシーンを作らない（Heroには飛ばさない指示・海鳥がいない時間を作る）
   var scenes = [
-    { key: 'hero', trigger: '#hero', build: heroConfig, mobileEl: '.hero__headline-svg' },
     { key: 'about', trigger: '#about', build: aboutConfig, mobileEl: '#about .section-heading__jp' },
     { key: 'flow', trigger: '#flow', build: flowConfig, mobileEl: '#flow .section-heading__jp' }
   ];

@@ -280,7 +280,7 @@ button:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: transparent;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0));
   transition: background 0.3s ease, box-shadow 0.3s ease, backdrop-filter 0.3s ease;
 }
 
@@ -404,11 +404,15 @@ button:focus-visible {
   position: fixed;
   inset: 0;
   z-index: 500;
+  /* 保険：内部の要素（渚のゆらぎ・瓶の揺れ等）が万一ゲームの矩形からはみ出しても、
+     その部分から背後の本編が透けないようクリップする */
+  overflow: hidden;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
-  padding-bottom: max(14vh, 90px);
-  background: linear-gradient(180deg, var(--color-sky) 0%, var(--color-sea-light) 55%, var(--color-sea) 100%);
+  /* 瓶の最終停止位置＝画面の縦横センターにするため、flexで中央配置する
+     （js/intro.jsはこの中央位置をx:0,y:0として、そこからの相対オフセットで開始位置を計算している） */
+  background: linear-gradient(180deg, var(--color-sea-deep) 0%, var(--color-sea) 38%, var(--color-sea-light) 60%);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -424,6 +428,19 @@ button:focus-visible {
 .intro-gate[data-state="opening"],
 .intro-gate[data-state="opened"] {
   pointer-events: none;
+}
+
+/* 初回ペイント前に<head>内の同期スクリプトが付与するクラス（本編のFOUC対策）。
+   js/intro.jsのis-active切り替えより先に効くよう、transitionは持たせない
+   （js/intro.jsが起動し次第、is-active側に主導権を渡す） */
+html.intro-pending .intro-gate {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+html.intro-pending #main {
+  visibility: hidden;
 }
 
 /* 背景の波：.wave-layer-track/.wave-layer--*（animation.css）をHeroと共通で流用。
@@ -444,54 +461,92 @@ button:focus-visible {
   pointer-events: none;
 }
 
-/* 波打ち際の押し寄せ：js/intro.jsが瓶の各拍（押す/戻る）に同期してscaleY/opacityを動かす。
-   transform-origin:bottomで渚から立ち上がるように見せる */
-.intro-wave-pulse {
-  position: absolute;
-  left: -10%;
-  right: -10%;
-  bottom: 21%;
-  height: 90px;
-  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.55) 55%, rgba(255, 255, 255, 0.18));
-  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
-  transform: scaleY(0.3);
-  transform-origin: 50% 100%;
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* 砂浜：.works::beforeと同じノイズ・グラデーション技法を流用した軽量な砂質感 */
+/* 砂浜：.works::beforeと同じノイズ・グラデーション技法を流用した軽量な砂質感。
+   海60% / 砂浜40%。瓶の最終停止位置（画面中央）は変えないため、
+   瓶の下半分が渚のライン付近〜砂浜側に少しかかる構図になる（意図どおり）。
+   上端はborder-radiusの一枚ドームではなく、clip-path: polygon()で細かい波形にし、
+   shoreSwayでその波形自体をゆらゆらと揺らす */
 .intro-shore {
   position: absolute;
   left: 0;
   right: 0;
   bottom: 0;
-  height: 24%;
-  min-height: 96px;
+  height: 40%;
+  min-height: 130px;
   background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"),
-    radial-gradient(circle at 25% 20%, rgba(255, 255, 255, 0.35), transparent 45%),
-    linear-gradient(180deg, rgba(240, 224, 196, 0.55) 0%, var(--color-sand) 60%);
+    radial-gradient(circle at 25% 20%, rgba(255, 255, 255, 0.3), transparent 45%),
+    linear-gradient(180deg, rgba(240, 224, 196, 0.6) 0%, var(--color-sand-beige) 65%);
   background-size: 160px 160px, auto, auto;
-  border-radius: 50% 50% 0 0 / 22px 22px 0 0;
+  animation: shoreSway 10s ease-in-out infinite;
 }
 
+@keyframes shoreSway {
+  0%,
+  100% {
+    clip-path: polygon(0% 3%, 5% 4.5%, 10% 5.5%, 15% 5.4%, 20% 4.7%, 25% 3.9%, 30% 3.3%, 35% 3.2%, 40% 3.2%, 45% 3%, 50% 2.2%, 55% 1.1%, 60% 0.4%, 65% 0.3%, 70% 1.3%, 75% 2.8%, 80% 4.3%, 85% 5.2%, 90% 5.2%, 95% 4.6%, 100% 4%, 100% 100%, 0% 100%);
+  }
+  33% {
+    clip-path: polygon(0% 4.5%, 5% 3.3%, 10% 2.5%, 15% 2.3%, 20% 2.3%, 25% 2.3%, 30% 1.9%, 35% 1.2%, 40% 0.8%, 45% 1%, 50% 2.1%, 55% 3.7%, 60% 5.1%, 65% 5.8%, 70% 5.5%, 75% 4.5%, 80% 3.5%, 85% 2.9%, 90% 2.7%, 95% 2.7%, 100% 2.5%, 100% 100%, 0% 100%);
+  }
+  66% {
+    clip-path: polygon(0% 1.7%, 5% 2%, 10% 1.9%, 15% 1.6%, 20% 1.5%, 25% 1.9%, 30% 3%, 35% 4.5%, 40% 5.6%, 45% 6%, 50% 5.3%, 55% 4%, 60% 2.7%, 65% 2%, 70% 1.8%, 75% 2%, 80% 2.1%, 85% 1.8%, 90% 1.3%, 95% 1.1%, 100% 1.6%, 100% 100%, 0% 100%);
+  }
+}
+
+/* 文字色・書体は「open」のペーパータグ（.intro-bottle__opentag-text）と揃え、
+   同じ紙タグの一部のように見せる。
+   .intro-gateの子ではなく兄弟要素にしてある（.intro-light-washより手前のz-indexを持たせ、
+   光が画面を覆う演出中も含めて開封後もずっとクリックできる状態を保つため）。
+   表示・非表示はJSで直接操作せず、隣接兄弟セレクタで.intro-gateがis-activeの間だけ出す
+   （JS/GSAP不通時はis-activeが付かないため、そのままデフォルトの非表示を維持するPEフォールバック） */
 .intro-skip {
-  position: absolute;
+  position: fixed;
   right: max(20px, env(safe-area-inset-right));
   bottom: max(20px, env(safe-area-inset-bottom));
-  font-family: var(--font-ui);
-  font-size: 14px;
-  color: #fff;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  opacity: 0.85;
+  z-index: 502;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.05rem;
+  font-style: italic;
+  letter-spacing: 0.08em;
+  color: #23515f;
+  text-decoration: none;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
   padding: 8px 4px;
+  transition: opacity 0.3s ease;
+}
+
+.intro-gate.is-active ~ .intro-skip {
+  opacity: 0.85;
+  visibility: visible;
+  pointer-events: auto;
 }
 
 .intro-skip:hover,
 .intro-skip:focus-visible {
   opacity: 1;
+}
+
+/* 開封プロローグ終盤：光が画面全体を包み込みHeroへ橋渡しする。
+   .intro-gateの兄弟要素（z-indexはgateの500より上・skipの502より下）にし、
+   ゲート自体が消えた後もこれだけ独立してフェードアウトできるようにしている。
+   is-activeが最大まで覆いきったところでjs/intro.jsが裏でgateを消し#mainを見せ、
+   その状態のままis-activeを外すことで「Heroが既に見えている状態で光が引いていく」ように見せる */
+.intro-light-wash {
+  position: fixed;
+  inset: 0;
+  z-index: 501;
+  background: radial-gradient(circle at 50% 45%, rgba(255, 250, 235, 0) 0%, rgba(255, 250, 235, 0) 40%, rgba(255, 250, 235, 0.9) 100%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.9s ease, background 0.9s ease;
+}
+
+.intro-light-wash.is-active {
+  opacity: 1;
+  background: radial-gradient(circle at 50% 45%, rgba(255, 250, 235, 0.98) 0%, rgba(255, 250, 235, 0.98) 100%);
 }
 
 /* ---------- ファーストビュー（6-2） ---------- */
@@ -895,8 +950,8 @@ button:focus-visible {
 /* 写真=左、名前・肩書き・本文=右の横長レイアウト */
 .about__body {
   display: flex;
-  align-items: center;
-  gap: 18px;
+  align-items: flex-start;
+  gap: 26px;
   text-align: left;
   margin-bottom: 20px;
 }
@@ -905,19 +960,57 @@ button:focus-visible {
    左上だけわずかにふくらませ、右上を少し引き締めた上品な有機的シルエット（勾玉のニュアンス） */
 /* 写真だけ雲の輪郭からわずかにはみ出させ、視覚的なアクセントにする */
 .about__photo {
+  position: relative;
   flex-shrink: 0;
   width: 148px;
   aspect-ratio: 1 / 1;
   margin: -14px 0 -14px -28px;
-  border-radius: 60% 40% 50% 50% / 55% 45% 55% 45%;
-  overflow: hidden;
-  box-shadow: 0 18px 40px rgba(122, 99, 66, 0.22);
+  /* 波形ブロブ・輪郭線の調整用カスタムプロパティ（数値を変えるだけで見た目を調整できる） */
+  --photo-size: 148px;   /* .about__photoの実サイズと合わせる */
+  --blob-scale: 1.22;    /* ブロブの大きさ（写真サイズに対する倍率）。本文と被らない範囲に調整済み */
+  --ring-gap: 6px;       /* ブロブと輪郭線の間隔 */
+  --ring-stroke: 1px;    /* 輪郭線の太さ */
+  --ring-offset-x: 0px;  /* 輪郭線の中心を左右にずらす場合（通常は0） */
+  --ring-offset-y: 0px;  /* 輪郭線の中心を上下にずらす場合（通常は0） */
 }
 
 .about__photo img {
-  width: 100%;
-  height: 100%;
+  position: relative;
+  z-index: 3;
+  width: var(--photo-size);
+  height: var(--photo-size);
+  /* ブロブ・輪郭線と同じ形にして統一感を出す */
+  border-radius: 42% 58% 65% 35% / 55% 45% 55% 45%;
   object-fit: cover;
+  display: block;
+  box-shadow: 0 18px 40px rgba(122, 99, 66, 0.22);
+}
+
+/* 写真の背後に敷く、海をイメージした不定形のブロブ */
+.about-photo__blob {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--photo-size) * var(--blob-scale));
+  height: calc(var(--photo-size) * var(--blob-scale));
+  transform: translate(-50%, -50%);
+  background: linear-gradient(140deg, var(--color-sea-light), var(--color-sea));
+  border-radius: 42% 58% 65% 35% / 55% 45% 55% 45%;
+  box-shadow: 0 10px 24px rgba(31, 111, 130, 0.18);
+  z-index: 1;
+}
+
+/* ブロブと同じ形・同心円状の細い輪郭線（border-radiusはブロブと必ず同じ値にする） */
+.about-photo__ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--photo-size) * var(--blob-scale) + var(--ring-gap) * 2);
+  height: calc(var(--photo-size) * var(--blob-scale) + var(--ring-gap) * 2);
+  transform: translate(calc(-50% + var(--ring-offset-x)), calc(-50% + var(--ring-offset-y)));
+  border: var(--ring-stroke) solid color-mix(in srgb, var(--color-sea-deep) 45%, transparent);
+  border-radius: 42% 58% 65% 35% / 55% 45% 55% 45%;
+  z-index: 0;
 }
 
 .about__info {
@@ -947,6 +1040,38 @@ button:focus-visible {
   flex-wrap: wrap;
   justify-content: center;
   gap: 9px;
+}
+
+/* 波打ち際に自然に流れ着いた流木・貝の装飾。あくまで背景の添え物なので、
+   本文より確実に手前に出ない低いz-index・クリック不可・選択不可にしておく。
+   雲カードの外側（.about本体の余白）に置き、本文の可読性には触れない位置にとどめる */
+.about-beach-ornaments {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+}
+
+.about-ornament {
+  position: absolute;
+  display: block;
+  filter: drop-shadow(0 4px 10px rgba(60, 70, 80, 0.08));
+  /* 輪郭をくっきり出さず、縁を少し透けさせて背景になじませる（ステッカー感を消す） */
+  -webkit-mask-image: radial-gradient(ellipse 62% 62% at 50% 50%, #000 55%, transparent 100%);
+  mask-image: radial-gradient(ellipse 62% 62% at 50% 50%, #000 55%, transparent 100%);
+}
+
+.about-ornament--driftwood {
+  right: 2%;
+  bottom: 6%;
+  width: 100px;
+  transform: rotate(-6deg);
+}
+
+/* スマホ幅では貝まで置くと本文に近くなりすぎるため、流木のみ残す */
+.about-ornament--shell {
+  display: none;
 }
 
 /* ---------- 対応できること（6-5） ---------- */
