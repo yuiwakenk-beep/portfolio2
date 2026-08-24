@@ -44,17 +44,12 @@
      JS/GSAP不通・prefers-reduced-motion・2回目以降の訪問（sessionStorage）では
      js/intro.js側の判定でこのゲート自体を起動しない＝本編がデフォルトのまま見える -->
 <div class="intro-gate" id="introGate" role="dialog" aria-modal="true" aria-label="サイトへようこそ" aria-hidden="true">
-  <!-- 背景の波：Heroと同じレイヤー・キーフレームを流用（動画は使わずCSS/SVGのみ） -->
+  <!-- 背景の波：実写風の海・砂浜画像＋白波（透過PNG）。動画は使わずCSSアニメーションのみで
+       白波の揺れを表現する（intro-wave-background-spec-v2.md参照。白波は1枚のみ。
+       2枚重ねだと素材の1px差に起因する位置ずれが二重に出て輪郭が滲んで見えていたため） -->
   <div class="intro-scene" aria-hidden="true">
-    <div class="wave-layer-track wave-layer--back">
-      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,70 C120,95 240,45 360,70 C480,95 600,45 720,70 C840,95 960,45 1080,70 C1200,95 1320,45 1440,70 L1440,120 L0,120 Z" fill="var(--color-sea)"/></svg>
-      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,70 C120,95 240,45 360,70 C480,95 600,45 720,70 C840,95 960,45 1080,70 C1200,95 1320,45 1440,70 L1440,120 L0,120 Z" fill="var(--color-sea)"/></svg>
-    </div>
-    <div class="wave-layer-track wave-layer--mid">
-      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,60 C160,30 320,90 480,60 C640,30 800,90 960,60 C1120,30 1280,90 1440,60 L1440,120 L0,120 Z" fill="var(--color-sea-light)"/></svg>
-      <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,60 C160,30 320,90 480,60 C640,30 800,90 960,60 C1120,30 1280,90 1440,60 L1440,120 L0,120 Z" fill="var(--color-sea-light)"/></svg>
-    </div>
-    <div class="intro-shore"></div>
+    <img class="intro-scene__bg" src="sozai/intro-bg-beach.png" alt="">
+    <img class="intro-scene__foam" src="sozai/intro-wave-foam.png" alt="">
   </div>
   <!-- disabled既定＝JS/GSAP不通時も含め、漂着（arrived）するまでクリック不可を保証するPEフォールバック -->
   <button type="button" class="intro-bottle" id="introBottle" data-state="waiting" aria-label="瓶の中の手紙を開いてサイトを見る" disabled>
@@ -292,72 +287,54 @@
           <div class="skill-card__icon"><img src="sozai/icon-webdesign.png" alt="" aria-hidden="true"></div>
           <div class="skill-card__body">
             <p class="skill-card__title">Webデザイン</p>
-            <p class="skill-card__desc">[対応できる内容を記載]</p>
-            <span class="skill-card__scope">[対応範囲]</span>
           </div>
         </div>
         <div class="skill-card reveal">
           <div class="skill-card__icon"><img src="sozai/icon-lp.png" alt="" aria-hidden="true"></div>
           <div class="skill-card__body">
             <p class="skill-card__title">LP・ホームページ制作</p>
-            <p class="skill-card__desc">[対応できる内容を記載]</p>
-            <span class="skill-card__scope">[対応範囲]</span>
           </div>
         </div>
         <div class="skill-card reveal">
           <div class="skill-card__icon"><img src="sozai/icon-htmlcss.png" alt="" aria-hidden="true"></div>
           <div class="skill-card__body">
             <p class="skill-card__title">HTML / CSS実装</p>
-            <p class="skill-card__desc">[対応できる内容を記載]</p>
-            <span class="skill-card__scope">[対応範囲]</span>
           </div>
         </div>
         <div class="skill-card reveal">
           <div class="skill-card__icon"><img src="sozai/icon-responsive.png" alt="" aria-hidden="true"></div>
           <div class="skill-card__body">
             <p class="skill-card__title">レスポンシブ対応</p>
-            <p class="skill-card__desc">[対応できる内容を記載]</p>
-            <span class="skill-card__scope">[対応範囲]</span>
           </div>
         </div>
         <div class="skill-card reveal">
           <div class="skill-card__icon"><img src="sozai/icon-image.png" alt="" aria-hidden="true"></div>
           <div class="skill-card__body">
             <p class="skill-card__title">画像制作</p>
-            <p class="skill-card__desc">[対応できる内容を記載]</p>
-            <span class="skill-card__scope">[対応範囲]</span>
           </div>
         </div>
         <div class="skill-card reveal">
           <div class="skill-card__icon"><img src="sozai/icon-ai.png" alt="" aria-hidden="true"></div>
           <div class="skill-card__body">
             <p class="skill-card__title">AIを活用した制作</p>
-            <p class="skill-card__desc">[対応できる内容を記載]</p>
-            <span class="skill-card__scope">[対応範囲]</span>
           </div>
         </div>
         <div class="skill-card reveal">
           <div class="skill-card__icon"><img src="sozai/icon-writing.png" alt="" aria-hidden="true"></div>
           <div class="skill-card__body">
             <p class="skill-card__title">文章改善</p>
-            <p class="skill-card__desc">[対応できる内容を記載]</p>
-            <span class="skill-card__scope">[対応範囲]</span>
           </div>
         </div>
         <div class="skill-card reveal">
           <div class="skill-card__icon"><img src="sozai/icon-server.png" alt="" aria-hidden="true"></div>
           <div class="skill-card__body">
             <p class="skill-card__title">サーバー公開</p>
-            <p class="skill-card__desc">[対応できる内容を記載]</p>
-            <span class="skill-card__scope">[対応範囲]</span>
           </div>
         </div>
         <div class="skill-card reveal">
           <div class="skill-card__icon"><img src="sozai/icon-hearing.png" alt="" aria-hidden="true"></div>
           <div class="skill-card__body">
             <p class="skill-card__title">ヒアリング・構成整理</p>
-            <p class="skill-card__desc">[対応できる内容を記載]</p>
-            <span class="skill-card__scope">[対応範囲]</span>
           </div>
         </div>
       </div>
@@ -374,39 +351,30 @@
 
       <div class="tools__list reveal-group">
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-html.png" alt=""><span>HTML</span><span class="tool-chip__status">[状態]</span></span>
-          <p class="tool-caption">用途：[何に使用しているか]</p>
+          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-html.png" alt=""><span>HTML</span></span>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-css.png" alt=""><span>CSS</span><span class="tool-chip__status">[状態]</span></span>
-          <p class="tool-caption">用途：[何に使用しているか]</p>
+          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-css.png" alt=""><span>CSS</span></span>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-claude-code.png" alt=""><span>Claude Code</span><span class="tool-chip__status">[状態]</span></span>
-          <p class="tool-caption">用途：[何に使用しているか]</p>
+          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-claude-code.png" alt=""><span>Claude Code</span></span>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-chatgpt.png" alt=""><span>ChatGPT</span><span class="tool-chip__status">[状態]</span></span>
-          <p class="tool-caption">用途：[何に使用しているか]</p>
+          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-chatgpt.png" alt=""><span>ChatGPT</span></span>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-canva.png" alt=""><span>Canva</span><span class="tool-chip__status">[状態]</span></span>
-          <p class="tool-caption">用途：[何に使用しているか]</p>
+          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-canva.png" alt=""><span>Canva</span></span>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-git.png" alt=""><span>Git</span><span class="tool-chip__status">[状態]</span></span>
-          <p class="tool-caption">用途：[何に使用しているか]</p>
+          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-git.png" alt=""><span>Git</span></span>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-github.png" alt=""><span>GitHub</span><span class="tool-chip__status">[状態]</span></span>
-          <p class="tool-caption">用途：[何に使用しているか]</p>
+          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-github.png" alt=""><span>GitHub</span></span>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-xserver.png" alt=""><span>Xserver</span><span class="tool-chip__status">[状態]</span></span>
-          <p class="tool-caption">用途：[何に使用しているか]</p>
+          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-xserver.png" alt=""><span>Xserver</span></span>
         </div>
       </div>
-      <p class="tools__legend">状態・用途は【要確認】です。「使用可能 / 学習中 / 今後習得予定」などをご記入ください。</p>
     </div>
   </section>
 
@@ -608,6 +576,9 @@
 <div class="seagull" id="seagull" aria-hidden="true">
   <img class="seagull__frame seagull__frame--glide is-visible" src="sozai/seagull-glide.png" alt="">
   <img class="seagull__frame seagull__frame--flap" src="sozai/seagull-flap.png" alt="">
+  <!-- 右から左へ飛ぶシーン（skills-tools）専用の左向きフレーム -->
+  <img class="seagull__frame seagull__frame--glide-rev" src="sozai/seagull-glide-rev.png" alt="">
+  <img class="seagull__frame seagull__frame--flap-rev" src="sozai/seagull-flap-rev.png" alt="">
 </div>
 
 <script src="js/main.js" defer></script>

@@ -4,9 +4,11 @@
 //
 // 設計方針：
 // 「セクションからセクションへ長距離を飛ばす」のではなく、
-// 各セクション内で「登場→横方向へ滑空→少しカーブ→退場」を完結させる。
-// About / Flow の2シーンのみで登場し、Hero・Skills/Toolsでは登場させない
-// （常時飛ばし続けないことで「案内役」の印象を保つ。Heroは指示によりあえて飛ばさない）。
+// 各セクション内・セクションの境目で「登場→横方向へ滑空→少しカーブ→退場」を完結させる。
+// About / Skills-Toolsの境目 / Flow の3シーンで登場し、Heroでは登場させない
+// （Heroは指示によりあえて飛ばさない）。
+// Skills-Toolsは「対応できること」のカード群末尾と「使用ツール」の見出しの間にできる
+// 余白帯を飛行帯にし、カードやチップ・見出し文字に被らないようにしている。
 //
 // 読み込み時イントロ（js/intro.js）は瓶が波で流れ着く演出のため、
 // この海鳥とは無関係。ただしイントロが閉じるまではHero等の演出も始めたくないため、
@@ -28,29 +30,37 @@
   gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
 
   // ---------- 羽ばたき：常時パタパタさせず、「登場時」「方向転換時」だけ短く羽ばたき、
-  //            それ以外は滑空版（seagull-glide.png）を使う ----------
+  //            それ以外は滑空版（seagull-glide.png）を使う。
+  //            右→左へ飛ぶシーン用に左向きフレーム（-revサフィックス）も用意し、
+  //            進行方向に応じてどちらのフレーム組を使うか切り替える ----------
   var glideFrame = seagull.querySelector('.seagull__frame--glide');
   var flapFrame = seagull.querySelector('.seagull__frame--flap');
+  var glideRevFrame = seagull.querySelector('.seagull__frame--glide-rev');
+  var flapRevFrame = seagull.querySelector('.seagull__frame--flap-rev');
+  var allFrames = [glideFrame, flapFrame, glideRevFrame, flapRevFrame];
 
-  function setGlide() {
-    flapFrame.classList.remove('is-visible');
-    glideFrame.classList.add('is-visible');
+  function showFrame(frame) {
+    allFrames.forEach(function (f) { f.classList.remove('is-visible'); });
+    frame.classList.add('is-visible');
   }
 
-  function setFlap() {
-    glideFrame.classList.remove('is-visible');
-    flapFrame.classList.add('is-visible');
+  function setGlide(reversed) {
+    showFrame(reversed ? glideRevFrame : glideFrame);
   }
 
-  function flapBurst(times) {
+  function setFlap(reversed) {
+    showFrame(reversed ? flapRevFrame : flapFrame);
+  }
+
+  function flapBurst(times, reversed) {
     var i = 0;
     function tick() {
-      if (i % 2 === 0) setFlap(); else setGlide();
+      if (i % 2 === 0) setFlap(reversed); else setGlide(reversed);
       i += 1;
       if (i < times) {
         setTimeout(tick, 180);
       } else {
-        setTimeout(setGlide, 180);
+        setTimeout(function () { setGlide(reversed); }, 180);
       }
     }
     tick();
@@ -131,21 +141,47 @@
     };
   }
 
-  function flowConfig() {
-    var route = document.querySelector('#flow .flow__route') || document.querySelector('#flow');
-    if (!route) return null;
-    var r = docRect(route);
+  // 「対応できること」のカード群末尾と「使用ツール」の見出しの間にできる余白帯
+  // （それぞれのsection-innerのpadding-bottom/padding-top分の空き）だけを飛行帯にする。
+  // カード・チップ・見出し文字のどれにも被らない。
+  // このシーンだけ右端から出現して左へ飛ばしたいため、開始位置を右側に、
+  // dxを負値にして進行方向を反転し、左向きフレーム（reversed）を使う
+  function skillsToolsGapConfig() {
+    var skillsGrid = document.querySelector('#skills .skills__grid');
+    var toolsHeading = document.querySelector('#tools .section-heading');
+    if (!skillsGrid || !toolsHeading) return null;
+    var gRect = docRect(skillsGrid);
+    var hRect = docRect(toolsHeading);
+    var y = (gRect.bottom + hRect.top) / 2;
     return {
-      start: { x: r.left - 30, y: r.top + r.height * 0.45 },
-      dx: 720, dy: 65,
+      start: { x: gRect.right + 30, y: y },
+      dx: -780, dy: 24,
+      duration: 5,
+      scaleFrom: 0.78, scaleMid: 0.96, scaleTo: 0.8,
+      reversed: true
+    };
+  }
+
+  // ステップカード（.flow__route-wrap）のエリアは避け、.flow__note より下の
+  // セクション下部の余白帯（次セクションとの間の padding-bottom 部分）を飛行帯にする
+  function flowConfig() {
+    var note = document.querySelector('#flow .flow__note') || document.querySelector('#flow');
+    if (!note) return null;
+    var r = docRect(note);
+    return {
+      start: { x: r.left - 30, y: r.bottom + 30 },
+      dx: 720, dy: 40,
       duration: 5,
       scaleFrom: 0.78, scaleMid: 0.96, scaleTo: 0.78
     };
   }
 
-  // Hero・Skills / Tools はあえてシーンを作らない（Heroには飛ばさない指示・海鳥がいない時間を作る）
+  // Heroはあえてシーンを作らない（指示により飛ばさない・海鳥がいない時間を作る）
+  // skills-toolsシーンは、境目の余白帯がスクロールでちょうど画面に入り始めたタイミングで
+  // 飛ばしたいため、他のシーンより早いthreshold（#toolsに少しでも入った時点）で発火させる
   var scenes = [
     { key: 'about', trigger: '#about', build: aboutConfig, mobileEl: '#about .section-heading__jp' },
+    { key: 'skills-tools', trigger: '#tools', threshold: 0, build: skillsToolsGapConfig, mobileEl: '#tools .section-heading__jp', reversed: true },
     { key: 'flow', trigger: '#flow', build: flowConfig, mobileEl: '#flow .section-heading__jp' }
   ];
 
@@ -154,16 +190,18 @@
     if (!cfg) return;
     if (flightTimeline && flightTimeline.isActive()) return;
 
+    var reversed = !!cfg.reversed;
+
     setBasePosition(cfg.start.x, cfg.start.y);
     gsap.set(seagull, { scale: cfg.scaleFrom, opacity: 1, willChange: 'transform' });
     seagull.classList.add('is-active');
-    setGlide();
+    setGlide(reversed);
 
     var path = buildCurvePath(cfg.dx, cfg.dy);
     var ease = 'sine.inOut';
 
     flightTimeline = gsap.timeline({ onComplete: hideSeagull });
-    flightTimeline.call(function () { flapBurst(4); }, null, 0);
+    flightTimeline.call(function () { flapBurst(4, reversed); }, null, 0);
 
     if (cfg.slowMidRatio) {
       // パスを3分割し、中間区間だけ時間配分を増やして「少しだけ」速度を落とす。
@@ -178,13 +216,13 @@
 
       flightTimeline
         .to(seagull, { motionPath: { path: path, start: 0, end: segA, curviness: 1.2 }, duration: d1, ease: 'sine.out' }, 0)
-        .call(function () { flapBurst(2); })
+        .call(function () { flapBurst(2, reversed); })
         .to(seagull, { motionPath: { path: path, start: segA, end: segB, curviness: 1.2 }, duration: d2, ease: 'none' }, '>')
         .to(seagull, { motionPath: { path: path, start: segB, end: 1, curviness: 1.2 }, duration: d3, ease: 'sine.in' }, '>');
     } else {
       flightTimeline
         .to(seagull, { motionPath: { path: path, curviness: 1.2 }, duration: cfg.duration, ease: ease }, 0)
-        .call(function () { flapBurst(2); }, null, cfg.duration * 0.5);
+        .call(function () { flapBurst(2, reversed); }, null, cfg.duration * 0.5);
     }
 
     // 奥行き（scale）：前半sine.out（中間へ滑らかに減速して到達）→後半sine.in（中間から滑らかに加速して離れる）
@@ -201,7 +239,7 @@
     setBasePosition(r.left + r.width * 0.6, r.top - 30);
     gsap.set(seagull, { scale: 0.9, opacity: 1 });
     seagull.classList.add('is-active');
-    setGlide();
+    setGlide(!!scene.reversed);
     hideSeagull();
   }
 
@@ -224,7 +262,7 @@
             }
           });
         },
-        { threshold: 0.35 }
+        { threshold: scene.threshold != null ? scene.threshold : 0.35 }
       );
       io.observe(target);
       observers.push(io);
