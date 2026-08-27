@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 【要確認】title・descriptionは仮案です。確定後に差し替えてください -->
+<title>制作実績一覧 | Yui Portfolio</title>
+<meta name="description" content="Yuiがこれまで手がけたLP・ホームページ制作の実績一覧です。">
+<link rel="icon" type="image/svg+xml" href="assets/icons/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Parisienne&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/animation.css">
+<link rel="stylesheet" href="css/responsive.css">
+</head>
+<body>
+
+<a class="skip-link" href="#main">本文へスキップ</a>
+
+<header class="site-header" id="siteHeader">
+  <a href="index.html#hero" class="site-logo">Yui / Web Creator</a>
+
+  <nav class="nav-list" aria-label="メインナビゲーション">
+    <a href="index.html#about">About</a>
+    <a href="index.html#skills">Skills</a>
+    <a href="index.html#works">Works</a>
+    <a href="index.html#flow">Flow</a>
+    <a href="index.html#contact">Contact</a>
+  </nav>
+
+  <button class="nav-toggle" id="navToggle" aria-label="メニューを開く" aria-expanded="false" aria-controls="navMobile">
+    <svg class="icon-open" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+    <svg class="icon-close" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+  </button>
+</header>
+
+<div class="nav-overlay" id="navOverlay"></div>
+
+<nav class="nav-mobile" id="navMobile" aria-label="モバイルメニュー">
+  <a href="index.html#about">About</a>
+  <a href="index.html#skills">Skills</a>
+  <a href="index.html#works">Works</a>
+  <a href="index.html#flow">Flow</a>
+  <a href="index.html#contact">Contact</a>
+</nav>
+
+<main id="main">
+
+  <div class="works-page-header reveal">
+    <span class="works-page-header__en">Selected Works</span>
+    <h1 class="works-page-header__jp">制作実績一覧</h1>
+    <p class="works-page-header__lead">これまで手がけたLP・ホームページ制作の実績をまとめています。今後も制作したものをこちらに追加していく予定です。</p>
+    <a href="index.html#hero" class="works-back">&larr; トップページへ戻る</a>
+  </div>
+
+  <section class="works" id="works">
+    <div class="section-inner">
+
+      <!-- WORK 01 -->
+      <article class="work-item reveal" id="work-01">
+        <div class="work-item__media">
+          <img class="work-item__shot" src="sozai/work-01-hygge-coffee-fv.png" alt="hygge coffee サイトのファーストビュー（PC画面）" loading="lazy">
+          <div class="img-placeholder work-item__shot work-item__shot--mobile">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+            <span class="img-placeholder__label">スマホ画面<br>（差し替え予定）</span>
+          </div>
+        </div>
+        <div class="work-item__info">
+          <p class="work-item__number">WORK 01</p>
+          <h2 class="work-item__title">hygge coffee</h2>
+          <dl class="work-item__meta">
+            <div><dt>種別</dt><dd>[LP / HP / その他]</dd></div>
+            <div><dt>案件区分</dt><dd>[自主制作 / 架空案件 / 実案件]</dd></div>
+            <div><dt>業種</dt><dd>[業種]</dd></div>
+            <div><dt>ターゲット</dt><dd>[ここに記載]</dd></div>
+            <div><dt>担当範囲</dt><dd>[ここに記載]</dd></div>
+            <div><dt>使用ツール</dt><dd>[ここに記載]</dd></div>
+            <div><dt>制作期間</dt><dd>約[　]週間</dd></div>
+          </dl>
+          <p class="work-item__desc">制作目的：[ここに記載]<br>工夫したポイント：[ここに記載]</p>
+          <div class="work-item__actions">
+            <span class="btn btn--ghost btn--disabled" aria-disabled="true">サイトを見る<span class="visually-hidden">（公開URLは未設定です）</span></span>
+          </div>
+        </div>
+      </article>
+
+      <!-- WORK 02（PCでは画像・情報を左右反転） -->
+      <article class="work-item reveal" id="work-02" data-align="reverse">
+        <div class="work-item__media">
+          <img class="work-item__shot" src="sozai/work-02-hanami-flower-fv.png" alt="hanami flower サイトのファーストビュー（PC画面）" loading="lazy">
+          <img class="work-item__shot work-item__shot--mobile" src="sozai/work-02-hanami-flower-fv-mobile.png" alt="hanami flower サイトのファーストビュー（スマホ画面）" loading="lazy">
+        </div>
+        <div class="work-item__info">
+          <p class="work-item__number">WORK 02</p>
+          <h2 class="work-item__title">hanami flower</h2>
+          <dl class="work-item__meta">
+            <div><dt>種別</dt><dd>[LP / HP / その他]</dd></div>
+            <div><dt>案件区分</dt><dd>[自主制作 / 架空案件 / 実案件]</dd></div>
+            <div><dt>業種</dt><dd>[業種]</dd></div>
+            <div><dt>ターゲット</dt><dd>[ここに記載]</dd></div>
+            <div><dt>担当範囲</dt><dd>[ここに記載]</dd></div>
+            <div><dt>使用ツール</dt><dd>[ここに記載]</dd></div>
+            <div><dt>制作期間</dt><dd>約[　]週間</dd></div>
+          </dl>
+          <p class="work-item__desc">制作目的：[ここに記載]<br>工夫したポイント：[ここに記載]</p>
+          <div class="work-item__actions">
+            <span class="btn btn--ghost btn--disabled" aria-disabled="true">サイトを見る<span class="visually-hidden">（公開URLは未設定です）</span></span>
+          </div>
+        </div>
+      </article>
+
+      <!-- WORK 03 -->
+      <article class="work-item reveal" id="work-03">
+        <div class="work-item__media">
+          <div class="img-placeholder work-item__shot">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 20h8M12 18v2"/></svg>
+            <span class="img-placeholder__label">PC画面（差し替え予定）</span>
+          </div>
+          <div class="img-placeholder work-item__shot work-item__shot--mobile">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+            <span class="img-placeholder__label">スマホ画面<br>（差し替え予定）</span>
+          </div>
+        </div>
+        <div class="work-item__info">
+          <p class="work-item__number">WORK 03</p>
+          <h2 class="work-item__title">[作品名]</h2>
+          <dl class="work-item__meta">
+            <div><dt>種別</dt><dd>[LP / HP / その他]</dd></div>
+            <div><dt>案件区分</dt><dd>[自主制作 / 架空案件 / 実案件]</dd></div>
+            <div><dt>業種</dt><dd>[業種]</dd></div>
+            <div><dt>ターゲット</dt><dd>[ここに記載]</dd></div>
+            <div><dt>担当範囲</dt><dd>[ここに記載]</dd></div>
+            <div><dt>使用ツール</dt><dd>[ここに記載]</dd></div>
+            <div><dt>制作期間</dt><dd>約[　]週間</dd></div>
+          </dl>
+          <p class="work-item__desc">制作目的：[ここに記載]<br>工夫したポイント：[ここに記載]</p>
+          <div class="work-item__actions">
+            <span class="btn btn--ghost btn--disabled" aria-disabled="true">サイトを見る<span class="visually-hidden">（公開URLは未設定です）</span></span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 今後作品が増えたら、この位置にWORK 04, 05...とカードを追加していく -->
+
+      <div class="works-list-cta reveal">
+        <p class="works-list-cta__lead">気になる実績がありましたら、お気軽にご相談ください。</p>
+        <a href="index.html#contact" class="btn btn--primary">お問い合わせはこちら</a>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <p class="site-footer__logo">Yui</p>
+  <p class="site-footer__role">Web Creator</p>
+  <nav class="site-footer__nav" aria-label="フッターナビゲーション">
+    <a href="index.html#about">About</a>
+    <a href="index.html#skills">Skills</a>
+    <a href="index.html#works">Works</a>
+    <a href="index.html#flow">Flow</a>
+    <a href="index.html#contact">Contact</a>
+  </nav>
+  <p class="site-footer__copyright">&copy; 2026 Yui. All Rights Reserved.</p>
+</footer>
+
+<a href="#main" class="to-top" id="toTop" aria-label="ページの先頭へ戻る">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</a>
+
+<script src="js/main.js" defer></script>
+<script src="js/animation.js" defer></script>
+<!-- CTAボタン（お問い合わせはこちら）を押すと、ボタンの外へ小さな水しぶきが上がる演出 -->
+<script src="js/cta-splash.js" defer></script>
+</body>
+</html>

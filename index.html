@@ -119,7 +119,9 @@
   <!-- ========== ファーストビュー（6-2） ========== -->
   <section class="hero" id="hero">
     <!-- 背景写真：海を望むデスクでのワークシーン（人物なし）。動画演出は廃止し、静止画1枚のみ -->
-    <img id="heroPhoto" class="hero__photo" src="sozai/new1.png" alt="">
+    <img id="heroPhoto" class="hero__photo hero__photo--desktop" src="sozai/new1.png" alt="">
+    <!-- スマホ専用の縦長写真。767px以下でのみ表示する（css/responsive.css） -->
+    <img class="hero__photo hero__photo--mobile" src="sozai/hero-mobile.png" alt="">
 
     <!-- 写真内のノートPC画面に実績スクリーンショットを射影変換で嵌め込む（js/hero.jsが位置を計算） -->
     <div id="heroLaptopMask" class="hero__laptop-mask" aria-hidden="true">
@@ -143,6 +145,12 @@
       <text id="penText" class="hero__pen-text" x="8" y="78" font-size="50" textLength="630" lengthAdjust="spacingAndGlyphs" clip-path="url(#penRevealClip)">Design that connects and inspires</text>
     </svg>
     <img id="penIcon" class="hero__pen-icon" src="sozai/pen_quill.png" alt="">
+
+    <!-- スマホ専用の見出しブロック（2行版）。767px以下でのみ表示。PC版の見出しSVG・ノートPC画面は非表示のままだが、
+         手書き風コピー（#heroPenSvg）はPC版と共通の要素をスマホでも使う（js/hero.jsが位置を計算） -->
+    <div class="hero__intro-mobile">
+      <p class="hero__title">海のように、<br>心地よく届くデザインを。</p>
+    </div>
 
     <div class="wave-layer-track wave-layer--back" aria-hidden="true">
       <svg viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0,70 C120,95 240,45 360,70 C480,95 600,45 720,70 C840,95 960,45 1080,70 C1200,95 1320,45 1440,70 L1440,120 L0,120 Z" fill="var(--color-sea-light)"/></svg>
@@ -208,6 +216,11 @@
       <path d="M0,40 C100,45 200,35 300,40 C400,45 500,35 600,40 C700,45 800,35 900,40 C1000,45 1100,35 1200,40 C1300,45 1400,35 1440,40 L1440,200 L0,200 Z" fill="url(#heroSeamGradient)" />
     </svg>
   </div>
+
+  <!-- ========== 昼の光エリア（自己紹介〜対応できること）：マウスに合わせてやわらかな太陽光が反応する演出。
+       Toolsより前でこのラッパーが閉じるため、演出は自然にここで終わる（STEP B以降はTools側で別演出を追加する想定） -->
+  <div class="daylight-zone" id="daylightZone">
+  <div class="daylight-glow" aria-hidden="true"></div>
 
   <!-- ========== 自己紹介（6-4）・コンセプト（6-3）横並び ========== -->
   <div class="concept-about-row">
@@ -341,6 +354,24 @@
     </div>
   </section>
 
+  </div>
+  <!-- /.daylight-zone -->
+
+  <!-- ========== 夕暮れの光エリア（使用ツール〜お問い合わせ）STEP B：
+       複数の流れ星ではなく、マウスに寄り添う「ひとつの光」がついてきて、ときどき小さく瞬く演出。
+       ここで昼から夜への時間が進み、Contactの終わりでFooterの夜の海演出（js/footer-night.js。無変更）へ引き継ぐ ========== -->
+  <div class="twilight-zone" id="twilightZone">
+  <div class="twilight-light-layer" aria-hidden="true">
+    <div class="twilight-light" id="twilightLight">
+      <span class="twilight-light__glow"></span>
+      <span class="twilight-light__core"></span>
+      <span class="twilight-light__ray twilight-light__ray--h"></span>
+      <span class="twilight-light__ray twilight-light__ray--v"></span>
+      <span class="twilight-light__ray twilight-light__ray--d1"></span>
+      <span class="twilight-light__ray twilight-light__ray--d2"></span>
+    </div>
+  </div>
+
   <!-- ========== 使用ツール・制作環境（6-6） ========== -->
   <section class="tools" id="tools">
     <div class="section-inner">
@@ -386,104 +417,59 @@
         <h2 class="section-heading__jp">制作実績</h2>
       </div>
 
-      <!-- WORK 01 -->
-      <article class="work-item reveal">
-        <div class="work-item__media">
-          <img class="work-item__deco work-item__deco--shell" src="sozai/shell2.png" alt="" aria-hidden="true">
-          <div class="img-placeholder work-item__shot">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 20h8M12 18v2"/></svg>
-            <span class="img-placeholder__label">PC画面（差し替え予定）</span>
-          </div>
-          <div class="img-placeholder work-item__shot work-item__shot--mobile">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
-            <span class="img-placeholder__label">スマホ画面<br>（差し替え予定）</span>
-          </div>
-        </div>
-        <div class="work-item__info">
-          <p class="work-item__number">WORK 01</p>
-          <h3 class="work-item__title">[作品名]</h3>
-          <dl class="work-item__meta">
-            <div><dt>種別</dt><dd>[LP / HP / その他]</dd></div>
-            <div><dt>案件区分</dt><dd>[自主制作 / 架空案件 / 実案件]</dd></div>
-            <div><dt>業種</dt><dd>[業種]</dd></div>
-            <div><dt>ターゲット</dt><dd>[ここに記載]</dd></div>
-            <div><dt>担当範囲</dt><dd>[ここに記載]</dd></div>
-            <div><dt>使用ツール</dt><dd>[ここに記載]</dd></div>
-            <div><dt>制作期間</dt><dd>約[　]週間</dd></div>
-          </dl>
-          <p class="work-item__desc">制作目的：[ここに記載]<br>工夫したポイント：[ここに記載]</p>
-          <div class="work-item__actions">
-            <span class="btn btn--ghost btn--disabled" aria-disabled="true">サイトを見る<span class="visually-hidden">（公開URLは未設定です）</span></span>
-            <a href="works/work-01.html" class="btn btn--primary">詳細を見る</a>
-          </div>
-        </div>
-      </article>
+      <div class="works-overview-grid">
 
-      <!-- WORK 02（PCでは画像・情報を左右反転） -->
-      <article class="work-item reveal" data-align="reverse">
-        <div class="work-item__media">
-          <img class="work-item__deco work-item__deco--glass" src="sozai/glass1.png" alt="" aria-hidden="true">
-          <div class="img-placeholder work-item__shot">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 20h8M12 18v2"/></svg>
-            <span class="img-placeholder__label">PC画面（差し替え予定）</span>
+        <!-- WORK 01（概要カード） -->
+        <article class="work-card-mini reveal">
+          <a href="works.html#work-01" class="work-card-mini__media">
+            <img class="work-card-mini__shot" src="sozai/work-01-hygge-coffee-fv.png" alt="hygge coffee サイトのファーストビュー" loading="lazy">
+          </a>
+          <div class="work-card-mini__body">
+            <p class="work-card-mini__number">WORK 01</p>
+            <h3 class="work-card-mini__title">hygge coffee</h3>
+            <p class="work-card-mini__tags">[LP / HP]・[業種]</p>
+            <span class="work-card-mini__highlight">[一言アピール例：制作期間2週間・スマホ対応]</span>
+            <a href="works.html#work-01" class="work-card-mini__link">詳しく見る &rarr;</a>
           </div>
-          <div class="img-placeholder work-item__shot work-item__shot--mobile">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
-            <span class="img-placeholder__label">スマホ画面<br>（差し替え予定）</span>
-          </div>
-        </div>
-        <div class="work-item__info">
-          <p class="work-item__number">WORK 02</p>
-          <h3 class="work-item__title">[作品名]</h3>
-          <dl class="work-item__meta">
-            <div><dt>種別</dt><dd>[LP / HP / その他]</dd></div>
-            <div><dt>案件区分</dt><dd>[自主制作 / 架空案件 / 実案件]</dd></div>
-            <div><dt>業種</dt><dd>[業種]</dd></div>
-            <div><dt>ターゲット</dt><dd>[ここに記載]</dd></div>
-            <div><dt>担当範囲</dt><dd>[ここに記載]</dd></div>
-            <div><dt>使用ツール</dt><dd>[ここに記載]</dd></div>
-            <div><dt>制作期間</dt><dd>約[　]週間</dd></div>
-          </dl>
-          <p class="work-item__desc">制作目的：[ここに記載]<br>工夫したポイント：[ここに記載]</p>
-          <div class="work-item__actions">
-            <span class="btn btn--ghost btn--disabled" aria-disabled="true">サイトを見る<span class="visually-hidden">（公開URLは未設定です）</span></span>
-            <a href="works/work-02.html" class="btn btn--primary">詳細を見る</a>
-          </div>
-        </div>
-      </article>
+        </article>
 
-      <!-- WORK 03 -->
-      <article class="work-item reveal">
-        <div class="work-item__media">
-          <span class="work-item__deco work-item__deco--pebble" aria-hidden="true"></span>
-          <div class="img-placeholder work-item__shot">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 20h8M12 18v2"/></svg>
-            <span class="img-placeholder__label">PC画面（差し替え予定）</span>
+        <!-- WORK 02（概要カード） -->
+        <article class="work-card-mini reveal">
+          <a href="works.html#work-02" class="work-card-mini__media">
+            <img class="work-card-mini__shot" src="sozai/work-02-hanami-flower-fv.png" alt="hanami flower サイトのファーストビュー" loading="lazy">
+          </a>
+          <div class="work-card-mini__body">
+            <p class="work-card-mini__number">WORK 02</p>
+            <h3 class="work-card-mini__title">hanami flower</h3>
+            <p class="work-card-mini__tags">[LP / HP]・[業種]</p>
+            <span class="work-card-mini__highlight">[一言アピール例：デザイン〜実装まで対応]</span>
+            <a href="works.html#work-02" class="work-card-mini__link">詳しく見る &rarr;</a>
           </div>
-          <div class="img-placeholder work-item__shot work-item__shot--mobile">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
-            <span class="img-placeholder__label">スマホ画面<br>（差し替え予定）</span>
+        </article>
+
+        <!-- WORK 03（概要カード） -->
+        <article class="work-card-mini reveal">
+          <a href="works.html#work-03" class="work-card-mini__media">
+            <div class="img-placeholder work-card-mini__shot">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 20h8M12 18v2"/></svg>
+              <span class="img-placeholder__label">画面（差し替え予定）</span>
+            </div>
+          </a>
+          <div class="work-card-mini__body">
+            <p class="work-card-mini__number">WORK 03</p>
+            <h3 class="work-card-mini__title">[作品名]</h3>
+            <p class="work-card-mini__tags">[LP / HP]・[業種]</p>
+            <span class="work-card-mini__highlight">[一言アピール例：問い合わせ導線を改善]</span>
+            <a href="works.html#work-03" class="work-card-mini__link">詳しく見る &rarr;</a>
           </div>
-        </div>
-        <div class="work-item__info">
-          <p class="work-item__number">WORK 03</p>
-          <h3 class="work-item__title">[作品名]</h3>
-          <dl class="work-item__meta">
-            <div><dt>種別</dt><dd>[LP / HP / その他]</dd></div>
-            <div><dt>案件区分</dt><dd>[自主制作 / 架空案件 / 実案件]</dd></div>
-            <div><dt>業種</dt><dd>[業種]</dd></div>
-            <div><dt>ターゲット</dt><dd>[ここに記載]</dd></div>
-            <div><dt>担当範囲</dt><dd>[ここに記載]</dd></div>
-            <div><dt>使用ツール</dt><dd>[ここに記載]</dd></div>
-            <div><dt>制作期間</dt><dd>約[　]週間</dd></div>
-          </dl>
-          <p class="work-item__desc">制作目的：[ここに記載]<br>工夫したポイント：[ここに記載]</p>
-          <div class="work-item__actions">
-            <span class="btn btn--ghost btn--disabled" aria-disabled="true">サイトを見る<span class="visually-hidden">（公開URLは未設定です）</span></span>
-            <a href="works/work-03.html" class="btn btn--primary">詳細を見る</a>
-          </div>
-        </div>
-      </article>
+        </article>
+
+      </div>
+
+      <div class="works-overview-more reveal">
+        <a href="works.html" class="btn btn--primary">作品一覧をすべて見る</a>
+      </div>
+
     </div>
   </section>
 
@@ -523,6 +509,9 @@
 
   <!-- ========== お問い合わせ（6-9） ========== -->
   <section class="contact" id="contact">
+    <!-- Contact下部〜Footerへ向けて、ごくゆっくり夜の海の気配を足すオーバーレイ。
+         上部・中央（本文が載る範囲）は透明のままにして可読性を保つ -->
+    <div class="contact__night-overlay" aria-hidden="true"></div>
     <div class="section-inner contact__inner">
       <div class="section-heading reveal">
         <span class="section-heading__en">Contact</span>
@@ -531,9 +520,31 @@
       <p class="contact__message reveal">「こんなサイトを作りたい」「何から始めればよいか分からない」など、どんな小さなことでもお気軽にご相談ください。</p>
 
       <div class="contact__card cloud-card cloud-card--panel float-b reveal">
-        <div class="contact__icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--color-sea-deep)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 6 10-6"/></svg></div>
-        <a href="mailto:nk-sun_yui_@outlook.jp" class="contact__email">nk-sun_yui_@outlook.jp</a>
-        <a href="mailto:nk-sun_yui_@outlook.jp" class="btn btn--primary">メールを送る</a>
+        <!-- 【要確認】送信先が決まり次第、action属性とmethodをここに設定してください。現状は見た目のみの実装です -->
+        <form class="contact-form" id="contactForm" action="#">
+          <div class="contact-form__field">
+            <label class="contact-form__label" for="contactName">お名前<span class="contact-form__required">必須</span></label>
+            <input class="contact-form__input" type="text" id="contactName" name="name" autocomplete="name" required>
+          </div>
+          <div class="contact-form__field">
+            <label class="contact-form__label" for="contactEmail">メールアドレス<span class="contact-form__required">必須</span></label>
+            <input class="contact-form__input" type="email" id="contactEmail" name="email" autocomplete="email" required>
+          </div>
+          <div class="contact-form__field">
+            <label class="contact-form__label" for="contactType">ご相談の種類</label>
+            <select class="contact-form__select" id="contactType" name="inquiry_type">
+              <option value="">選択してください</option>
+              <option value="lp">LP制作について</option>
+              <option value="hp">HP制作について</option>
+              <option value="other">その他</option>
+            </select>
+          </div>
+          <div class="contact-form__field">
+            <label class="contact-form__label" for="contactMessage">お問い合わせ内容<span class="contact-form__required">必須</span></label>
+            <textarea class="contact-form__textarea" id="contactMessage" name="message" rows="6" required></textarea>
+          </div>
+          <button type="submit" class="btn btn--primary contact-form__submit">送信する</button>
+        </form>
       </div>
 
       <!-- 連絡手段の追加：hrefを設定し data-empty="true" を削除すると表示されます -->
@@ -546,16 +557,22 @@
     </div>
   </section>
 
-  <!-- ========== フッター（6-10） ========== -->
-  <!-- section-photo-flow内に置くことで、波の曲線より上の余白も背景写真と繋がるようにする -->
-  <div class="wave-divider" aria-hidden="true"><svg viewBox="0 0 1440 60" preserveAspectRatio="none"><path d="M0,30 C120,55 240,5 360,30 C480,55 600,5 720,30 C840,55 960,5 1080,30 C1200,55 1320,5 1440,30 L1440,60 L0,60 Z" fill="var(--color-footer)"/></svg></div>
+  </div>
+  <!-- /.twilight-zone -->
 
+  <!-- ========== フッター（6-10） ========== -->
   </div>
   <!-- /.section-photo-flow -->
 
 </main>
 
 <footer class="site-footer">
+  <!-- 夜の海の水面。マウス位置に淡い波紋を出す専用レイヤー（STEP2）。pointer-events:noneのため
+       リンク操作は妨げず、実際のpointermove取得はjs/footer-night.jsが.site-footer側で行う -->
+  <div class="footer-night__water" aria-hidden="true"></div>
+  <!-- クリック／タップ位置に小さな水しぶきを出す専用レイヤー（STEP3）。STEP2の波紋レイヤーより手前、
+       Footerコンテンツより奥に置く。pointer-events:noneでリンク操作を妨げない -->
+  <div class="footer-splash-layer" aria-hidden="true"></div>
   <p class="site-footer__logo">Yui</p>
   <p class="site-footer__role">Web Creator</p>
   <nav class="site-footer__nav" aria-label="フッターナビゲーション">
@@ -593,5 +610,18 @@
 <script src="js/water-fx.js" defer></script>
 <script src="js/cta-splash.js" defer></script>
 <script src="js/hero-splash.js" defer></script>
+<!-- 開発用：?heropos=1のときだけ動作するスマホ版ヒーロー見出しの位置調整パネル。納品版でも常時読み込まれるが、
+     クエリ無しでは即returnして何もしないためPEフォールバック同様に無害 -->
+<script src="js/hero-position-debug.js" defer></script>
+<!-- 夜の海Footerの水面演出（STEP2：マウス追従の波紋／STEP3：クリック・タップ位置の水しぶき）。
+     海鳥のエンディング退場（STEP4）はjs/seagull.js側で実装している -->
+<script src="js/footer-night.js" defer></script>
+<!-- 昼の光エリア（自己紹介〜対応できること）STEP A：マウスの動きに合わせたやわらかな太陽光の演出 -->
+<script src="js/daylight.js" defer></script>
+<!-- 夕暮れの光エリア（使用ツール〜お問い合わせ）STEP B：マウスの動きに合わせてときどき流れ星が走る演出 -->
+<script src="js/twilight-fx.js" defer></script>
+<!-- 開発用：?posdebug=1のときだけ動作するイントロ画像位置調整パネル。納品版でも常時読み込まれるが、
+     クエリ無しでは即returnして何もしないためPEフォールバック同様に無害 -->
+<script src="js/intro-position-debug.js" defer></script>
 </body>
 </html>

@@ -100,7 +100,8 @@ body {
 }
 
 /* 固定ヘッダー分のオフセット（アンカーリンク時に見出しが隠れないように） */
-section[id] {
+section[id],
+.work-item[id] {
   scroll-margin-top: 72px;
 }
 
@@ -473,14 +474,15 @@ html.intro-pending #main {
   z-index: 0;
 }
 
-/* 白波：背景と必ず同じobject-fit / object-positionにする（数値が1つでも違うとずれの原因になる） */
+/* 白波：背景写真とは別レイヤーで、渚の見え方に合わせてobject-positionを個別に調整している
+   （以前は背景と揃える設計だったが、意図的にずらす調整に変更した） */
 .intro-scene__foam {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 50%;
+  object-position: 50% 376%;
   z-index: 1;
   transform-origin: center center;
   animation: introFoamDrift var(--foam-drift-duration) ease-in-out infinite;
@@ -591,6 +593,15 @@ html.intro-pending #main {
   display: block;
 }
 
+/* スマホ専用写真・スマホ専用見出しブロックは、既定では非表示にしておく
+   （767px以下のときだけ css/responsive.css 側で display を戻す）。
+   これが無いと.hero__photoクラスの display:block を継承してPC幅でも表示され、
+   PC用写真の上に重なって表示されたり、レイアウトが崩れたりする */
+.hero__photo--mobile,
+.hero__intro-mobile {
+  display: none;
+}
+
 /* ヒーロー見出し（js/hero.js が写真に合わせて位置を制御） */
 .hero__headline-svg {
   position: absolute;
@@ -645,7 +656,11 @@ html.intro-pending #main {
 }
 
 /* 実績サイトの縦長フルページ画像(1440x7783)を、PC画面の枠(360px)の中で
-   ゆっくり上下にスクロールさせ、実際に閲覧しているように見せる */
+   ゆっくり上下にスクロールさせ、実際に閲覧しているように見せる。
+   イントロ表示中はvisibility:hiddenで隠れているだけでアニメーション自体は裏で進んでしまうため、
+   最初はpausedにしておき、イントロが完全に終わった時点（js/hero.js）でrunningに切り替える。
+   そうしないと本編が見えた瞬間には既にスクロールが数秒分進んだ状態になってしまう
+   （js/hero.jsの手書きコピーアニメーションと同じ問題への対応） */
 .hero__laptop-mask img {
   position: absolute;
   top: 0;
@@ -654,6 +669,7 @@ html.intro-pending #main {
   height: auto;
   display: block;
   animation: heroLaptopScroll 26s ease-in-out infinite;
+  animation-play-state: paused;
 }
 
 @keyframes heroLaptopScroll {
@@ -864,6 +880,9 @@ html.intro-pending #main {
   object-fit: cover;
   opacity: 0.95;
   pointer-events: none;
+  /* 昼の光エリア（.daylight-zone）の中にあるため、--daylight-intensityを継承して
+     日差しが当たった分だけ縁がごくわずかに明るくなる（雲全体が発光しない程度に抑える） */
+  filter: drop-shadow(0 0 22px rgba(255, 210, 150, calc(0.16 * var(--daylight-intensity, 0))));
 }
 
 .concept__cloud-content {
@@ -946,6 +965,9 @@ html.intro-pending #main {
   pointer-events: none;
   z-index: 0;
   animation: aboutCloudFloat 9s ease-in-out infinite;
+  /* 昼の光エリア（.daylight-zone）の中にあるため、--daylight-intensityを継承して
+     日差しが当たった分だけ縁がごくわずかに明るくなる（雲全体が発光しない程度に抑える） */
+  filter: drop-shadow(0 0 22px rgba(255, 210, 150, calc(0.16 * var(--daylight-intensity, 0))));
 }
 
 @keyframes aboutCloudFloat {
@@ -1236,6 +1258,11 @@ html.intro-pending #main {
 
 .work-item__shot {
   aspect-ratio: 16 / 10;
+  width: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+  border-radius: 6px;
 }
 
 /* 作品写真まわりの小さな海辺の小物（多用しない。1枚につき1個程度） */
@@ -1450,7 +1477,29 @@ html.intro-pending #main {
   overflow: hidden;
 }
 
+/* Contact上部〜中央（本文の範囲）は透明のまま明るさを保ち、下部にだけ夜の気配を足す。
+   .contact__innerより先に置いた要素なので、.contact__inner側にz-indexを与えて本文を必ず上に出す */
+.contact__night-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  /* 最後（100%）は不透明にし、直後に続く.wave-divider（不透明な#2e5568スタート）と
+     色・不透明度の両方でぴったり繋がるようにする。写真が透けたまま境目に達すると、
+     半透明なグラデーションと不透明な波の間に明るい帯が見えてしまうため */
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 45%,
+    rgba(46, 85, 104, 0.12) 65%,
+    rgba(46, 85, 104, 0.55) 85%,
+    #2e5568 100%
+  );
+}
+
 .contact__inner {
+  position: relative;
+  z-index: 1;
   text-align: center;
 }
 
@@ -1461,32 +1510,75 @@ html.intro-pending #main {
 }
 
 .contact__card {
-  max-width: 480px;
+  max-width: 560px;
   margin: 0 auto;
   padding: 34px 26px;
+}
+
+/* ---------- お問い合わせフォーム ---------- */
+.contact-form {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 16px;
+  gap: 18px;
+  width: 100%;
 }
 
-.contact__icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--color-sky);
+.contact-form__field {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
 }
 
-.contact__email {
+.contact-form__label {
   font-family: var(--font-ui);
   font-weight: 600;
-  font-size: 15px;
-  color: var(--color-sea-deep);
-  text-decoration: none;
-  word-break: break-all;
+  font-size: 13.5px;
+  color: var(--color-text);
+}
+
+.contact-form__required {
+  margin-left: 4px;
+  padding: 1px 6px;
+  border-radius: 50px;
+  background: var(--color-accent);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  vertical-align: middle;
+}
+
+.contact-form__input,
+.contact-form__select,
+.contact-form__textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--color-sea-light);
+  border-radius: var(--radius-card-sm);
+  background: #fff;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 14px;
+}
+
+.contact-form__input:focus,
+.contact-form__select:focus,
+.contact-form__textarea:focus {
+  outline: none;
+  border-color: var(--color-sea-deep);
+  box-shadow: 0 0 0 3px rgba(40, 125, 155, 0.15);
+}
+
+.contact-form__textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.contact-form__submit {
+  align-self: center;
+  margin-top: 4px;
+  border: none;
+  cursor: pointer;
 }
 
 .contact__links {
@@ -1518,18 +1610,185 @@ html.intro-pending #main {
 }
 
 /* ---------- フッター（6-10） ---------- */
+/* 波の区切り（.wave-divider）は使わず、Contactの.contact__night-overlayが終わる色（#2e5568）から
+   そのまま続く1本のグラデーションにする。単色の「元のフッター色」との境目が出ないようにするため */
 .site-footer {
   position: relative;
-  background: var(--color-footer);
+  z-index: 0; /* .footer-night__water（z-index:-1）をこの要素の中に閉じ込める */
+  background: linear-gradient(180deg, #2e5568 0%, var(--color-footer) 45%, #14323f 100%);
   color: rgba(255, 255, 255, 0.7);
   text-align: center;
   padding: 44px 20px 28px;
+  overflow: hidden;
 }
 
 .site-footer__logo {
   font-family: var(--font-logo);
   font-size: 24px;
   color: #fff;
+}
+
+/* ---------- 夜の海の水面：マウスの動きに沿って現れる波紋（STEP2） ----------
+   pointer-events:noneのため、リンクの操作やクリック判定を一切妨げない。
+   波紋の生成・削除はjs/footer-night.js側（.site-footer基準の座標）が行う。
+   z-index:-1でロゴ・ナビ・copyrightより必ず背面に置く */
+.footer-night__water {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* 波紋1個ぶん。中心が少し明るく外側ほど自然に透明になる柔らかい円が、
+   じわっと広がりながら消える。硬い一本線のリングにはせず、box-shadowでごく薄い縁取りだけ添える */
+.footer-ripple {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(214, 231, 240, 0.22) 0%,
+    rgba(214, 231, 240, 0.08) 45%,
+    transparent 72%
+  );
+  box-shadow: 0 0 0 1px rgba(214, 231, 240, 0.18);
+  opacity: 0;
+  pointer-events: none;
+  animation: footerRippleExpand 2.8s ease-out forwards;
+}
+
+@keyframes footerRippleExpand {
+  0% {
+    transform: scale(0.3);
+    opacity: 0.4;
+  }
+  65% {
+    opacity: 0.16;
+  }
+  100% {
+    transform: scale(9);
+    opacity: 0;
+  }
+}
+
+/* ---------- 小さな水しぶき（クリック／タップ位置に発生。夜の海Footer・CTAボタン共通） ----------
+   pointer-events:noneのため、リンク・ボタンの操作やクリック判定を一切妨げない。
+   .footer-splash-layer（夜の海Footer内、STEP3）と.cta-splash-layer（ページ全体、CTAボタン用）の
+   どちらからも同じ見た目（.water-splash-*）を使い回す */
+.footer-splash-layer {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* ページ全体に重ねる、CTAボタン用の水しぶきレイヤー。position:fixedのビューポート基準なので、
+   ボタンの外にはみ出しても他の要素に切り取られず表示できる。js/cta-splash.jsが生成する */
+.cta-splash-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  pointer-events: none;
+}
+
+/* クリック直後だけ水面がふっと明るくなるアクセント（波紋ではない。横長の短い光） */
+.water-splash-accent {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 26px;
+  height: 9px;
+  margin: -4.5px 0 0 -13px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, rgba(99, 188, 208, 0.6), transparent 75%);
+  opacity: 0;
+  pointer-events: none;
+  animation: waterSplashAccent 0.4s ease-out forwards;
+}
+
+@keyframes waterSplashAccent {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  30% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+}
+
+/* 水滴1粒。少し縦長の雫型。上へ跳ねて頂点を迎えたあと、重力を感じるように少し落ちながら消える
+   （マウス波紋の横方向へ広がる動きとは、はっきり方向を分けてある） */
+.water-splash-drop {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 50% 50% 45% 45% / 60% 60% 40% 40%;
+  background: rgba(99, 188, 208, 0.78);
+  opacity: 0;
+  pointer-events: none;
+  --dx: 0px;
+  --dy-up: -20px;
+  --dy-down: 8px;
+  animation: waterSplashDrop var(--drop-duration, 0.85s) cubic-bezier(0.2, 0.8, 0.3, 1) forwards;
+  animation-delay: var(--drop-delay, 0s);
+}
+
+@keyframes waterSplashDrop {
+  0% {
+    transform: translate(0, 0) scale(0.6);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.85;
+  }
+  45% {
+    transform: translate(calc(var(--dx) * 0.6), var(--dy-up)) scale(1);
+    opacity: 0.75;
+  }
+  100% {
+    transform: translate(var(--dx), var(--dy-down)) scale(0.65);
+    opacity: 0;
+  }
+}
+
+/* reduced-motion時の簡略版：跳ねる水滴は出さず、ごく小さな点が一瞬フェードするだけにする */
+.water-splash-dot {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 5px;
+  height: 5px;
+  margin: -2.5px 0 0 -2.5px;
+  border-radius: 50%;
+  background: rgba(99, 188, 208, 0.7);
+  opacity: 0;
+  pointer-events: none;
+  animation: waterSplashDotFade 0.5s ease-out forwards;
+}
+
+@keyframes waterSplashDotFade {
+  0% {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  35% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
 }
 
 .site-footer__role {
@@ -1564,12 +1823,27 @@ html.intro-pending #main {
 .wave-divider {
   line-height: 0;
   margin-bottom: -1px;
+  /* 波の曲線（SVG path）が覆わない部分（波の谷にあたる余白）から、背景写真が透けて見えるのを防ぐ。
+     波のSVG自体のグラデーション（#waveDividerGradient：上#2e5568→下--color-footer）と
+     完全に同じ不透明な色を敷くことで、谷間と波本体の境目が分からないようにする。
+     半透明にすると（写真の明るさ次第で）波の縁がくっきり浮いて見えてしまうため、必ず不透明にする */
+  background: linear-gradient(180deg, #2e5568 0%, var(--color-footer) 100%);
 }
 
 .wave-divider svg {
   width: 100%;
   height: clamp(32px, 6vw, 58px);
   display: block;
+}
+
+/* Contact→Footer間の波だけ、上側が少し明るく・下側ほど夜の色に近づくグラデーションにする
+   （index.html側の#waveDividerGradientのstopに対応） */
+.wave-divider-gradient__top {
+  stop-color: #2e5568;
+}
+
+.wave-divider-gradient__bottom {
+  stop-color: var(--color-footer);
 }
 
 /* ---------- concept〜contact背景（1枚の写真で通しにする。スマホ版=haikei2.png、PC版はresponsive.cssでhaikei.pngに差し替え） ---------- */
@@ -1590,6 +1864,155 @@ html.intro-pending #main {
 .flow,
 .contact {
   background: none;
+}
+
+/* ---------- 昼の光エリア（自己紹介〜対応できること）：STEP A ----------
+   マウスの動きに合わせて、ごく淡い太陽光がこちらへ差し込むように見せる演出。
+   .daylight-zoneが自己紹介・大切にしていること・対応できることの3セクションだけを囲むラッパーで、
+   Toolsより前で必ず閉じるため、演出はこのエリアの外へは物理的に広がらない
+   （js/daylight.jsのpointermoveリスナーも同じ要素にしか付けていない）。
+   --daylight-x/--daylight-y/--daylight-intensityはjs/daylight.jsがrequestAnimationFrame＋lerpで
+   なめらかに更新する。JSが動かない場合（reduced-motion・タッチ端末等）でも、
+   ここで指定した既定値（画面右上あたり・intensity:1）がそのまま固定の淡い光として機能する
+   （PEフォールバック。JS前提の演出にしない） */
+.daylight-zone {
+  position: relative;
+  z-index: 0;
+  --daylight-x: 70%;
+  --daylight-y: 12%;
+  --daylight-intensity: 1;
+}
+
+.daylight-glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 420px 340px at var(--daylight-x) var(--daylight-y),
+    rgba(255, 220, 165, calc(0.20 * var(--daylight-intensity))) 0%,
+    rgba(255, 210, 150, calc(0.10 * var(--daylight-intensity))) 30%,
+    transparent 65%
+  );
+}
+
+/* ---------- 夕暮れの光エリア（使用ツール〜お問い合わせ）：STEP B ----------
+   複数の流れ星ではなく、マウスに寄り添う「ひとつの光」がついてきて、
+   ときどき小さく「キラッ」と瞬く演出。.twilight-zoneが使用ツール・制作実績・
+   制作の流れ・お問い合わせの4セクションだけを囲むラッパーで、Footerより前で必ず閉じるため、
+   演出はFooterへは物理的に広がらない（js/twilight-fx.jsのpointer系リスナーも同じ要素にしか付けていない）。
+   光本体（#twilightLight）はDOM生成・削除をせず、常に1個の要素の位置だけをjs/twilight-fx.jsが更新する */
+.twilight-zone {
+  position: relative;
+  z-index: 0;
+}
+
+.twilight-light-layer {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.twilight-light {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  transform: translate3d(var(--light-x, 0px), var(--light-y, 0px), 0);
+  transition: opacity 0.4s ease;
+  --light-core: #5b8fa3;
+  --light-halo: rgba(235, 249, 255, 0.45);
+}
+
+.twilight-light.is-visible {
+  opacity: 1;
+}
+
+/* 外側のやわらかいhalo。淡い背景の上でも存在が分かるよう、白〜淡いブルーで少し広めに */
+.twilight-light__glow {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 24px;
+  height: 24px;
+  margin: -12px 0 0 -12px;
+  border-radius: 50%;
+  background: radial-gradient(circle, var(--light-halo) 0%, transparent 70%);
+  transition: width 0.3s ease, height 0.3s ease, margin 0.3s ease;
+}
+
+/* 中心の芯。halo任せにせず、少し濃いブルーグレーで芯そのものの存在感を作る
+   （明るい背景では芯の色、少し暗い背景ではhaloの白さで見える二段構え） */
+.twilight-light__core {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: var(--light-core);
+  box-shadow: 0 0 6px var(--light-core);
+}
+
+/* キラッと瞬く瞬間だけ現れる細い光線（4方向）。星型・絵文字は使わず、抽象的な線のみ */
+.twilight-light__ray {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  height: 1.2px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.95), transparent);
+  opacity: 0;
+}
+.twilight-light__ray--h {
+  transform: translate(-50%, -50%) rotate(0deg);
+}
+.twilight-light__ray--v {
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+.twilight-light__ray--d1 {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+.twilight-light__ray--d2 {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/* キラッ：haloが一瞬だけ膨らみ、4本の光線がふわっと伸びて消える（全体で約0.45秒） */
+.twilight-light.is-kira .twilight-light__glow {
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+}
+.twilight-light.is-kira .twilight-light__ray {
+  animation: twilightRayFlash 0.45s ease-out forwards;
+}
+
+@keyframes twilightRayFlash {
+  0% {
+    opacity: 0;
+    width: 4px;
+  }
+  35% {
+    opacity: 1;
+    width: 16px;
+  }
+  100% {
+    opacity: 0;
+    width: 20px;
+  }
+}
+
+/* reduced-motion時はjs/twilight-fx.js自体が早期returnして追従・瞬きを行わないが、
+   CSS側にも保険として非表示を持たせておく（PEフォールバックの二重化） */
+@media (prefers-reduced-motion: reduce) {
+  .twilight-light-layer {
+    display: none;
+  }
 }
 
 /* ---------- スキップリンク / スクリーンリーダー用 ---------- */
@@ -1690,6 +2113,21 @@ html.intro-pending #main {
   margin: 0 auto;
 }
 
+/* 実際のサイト画面（FVスクリーンショット）を敷いたコンテナ。
+   はみ出た部分は枠の角丸に沿ってきれいに切り取る */
+.work-detail__shot--photo {
+  overflow: hidden;
+  border-radius: var(--radius-card-sm);
+}
+
+.work-detail__shot--photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
 .work-detail__meta {
   display: grid;
   grid-template-columns: 1fr;
@@ -1759,4 +2197,167 @@ html.intro-pending #main {
 .to-top.is-visible {
   opacity: 1;
   visibility: visible;
+}
+
+/* ---------- 制作実績：トップページの概要カード ---------- */
+.works-overview-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 28px;
+}
+
+.work-card-mini {
+  background: linear-gradient(180deg, #fffdf8 0%, #fbf4e6 100%);
+  border-radius: 12px;
+  box-shadow: 0 18px 28px -16px rgba(120, 96, 64, 0.28), 0 3px 8px rgba(120, 96, 64, 0.1);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.work-card-mini__media {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  margin: 10px 10px 0;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.work-card-mini__shot {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+/* .work-card-mini__media・.work-card-mini自体がoverflow:hidden（角丸のため）なので、
+   枠からはみ出す位置に置くと隠れてしまう。写真の角に収まる位置（正の値）に置く */
+.work-card-mini__deco {
+  position: absolute;
+  z-index: 3;
+  width: 22px;
+  bottom: 8px;
+  right: 10px;
+  filter: drop-shadow(0 3px 5px rgba(90, 74, 50, 0.18));
+  transform: rotate(10deg);
+}
+
+.work-card-mini__deco--pebble {
+  position: absolute;
+  bottom: 8px;
+  right: 22%;
+  width: 14px;
+  height: 10px;
+  border-radius: 50%;
+  background: linear-gradient(155deg, #e9dfd0, #c7bca8);
+  z-index: 3;
+}
+
+.work-card-mini__body {
+  padding: 14px 16px 20px;
+}
+
+.work-card-mini__number {
+  font-family: var(--font-en);
+  font-style: italic;
+  color: var(--color-sea-deep);
+  font-size: 12px;
+}
+
+.work-card-mini__title {
+  font-size: 16px;
+  font-weight: 700;
+  margin: 4px 0 6px;
+}
+
+.work-card-mini__tags {
+  font-size: 12px;
+  color: var(--color-text-sub);
+  margin-bottom: 8px;
+}
+
+/* クライアントが一目で強みを把握できるよう、種別タグとは別に一言アピールをピル状に強調表示する */
+.work-card-mini__highlight {
+  display: table;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--color-sea-deep);
+  background: rgba(99, 188, 208, 0.12);
+  border-radius: 20px;
+  padding: 4px 10px;
+  margin-bottom: 12px;
+}
+
+.work-card-mini__link {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-sea-deep);
+  text-decoration: none;
+}
+
+.work-card-mini__link:hover {
+  color: var(--color-accent);
+}
+
+.works-overview-more {
+  text-align: center;
+  margin-top: 40px;
+}
+
+/* ---------- 制作実績一覧ページ（works.html） ---------- */
+.works-page-header {
+  text-align: center;
+  padding: 110px 20px 40px;
+  position: relative;
+}
+
+.works-page-header__en {
+  display: block;
+  font-family: var(--font-en);
+  font-style: italic;
+  font-size: 15px;
+  color: var(--color-sea-deep);
+}
+
+.works-page-header__jp {
+  font-size: 28px;
+  font-weight: 700;
+  margin-top: 8px;
+}
+
+.works-page-header__lead {
+  max-width: 560px;
+  margin: 16px auto 0;
+  font-size: 14px;
+  line-height: 1.9;
+  color: var(--color-text-sub);
+}
+
+.works-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 18px;
+  font-size: 13px;
+  color: var(--color-sea-deep);
+  text-decoration: none;
+}
+
+.works-back:hover {
+  color: var(--color-accent);
+}
+
+.works-list-cta {
+  text-align: center;
+  margin: 20px auto 0;
+  padding: 48px 20px 0;
+}
+
+.works-list-cta__lead {
+  font-size: 15px;
+  color: var(--color-text-sub);
+  margin-bottom: 20px;
 }

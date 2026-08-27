@@ -30,8 +30,16 @@
   var hero = document.getElementById('hero');
   // 実際のCTAボタン要素（最初の.hero-cta）。縦方向の「表示し始めるライン」の基準にする
   var ctaEl = document.querySelector('.hero-cta');
+
+  function isDesktop() {
+    return window.matchMedia('(min-width: 768px)').matches;
+  }
+
+  // 手書きコピー（#heroPenSvg）はPC/スマホ共通の要素を常に参照する（js/hero.jsが両方の位置を計算するため）。
+  // 見出し（#heroHeadlineSvg）はスマホでは非表示のままなので、非表示要素の座標（0扱い）を参照しないよう、
+  // スマホではスマホ専用の見出しブロック（.hero__intro-mobile）側を参照する
   var penEl = document.getElementById('heroPenSvg'); // 手書きコピー。無ければ縦方向の上限チェックはスキップする
-  var headlineEl = document.getElementById('heroHeadlineSvg'); // 見出し。上昇距離の目標地点として使う
+  var headlineEl = isDesktop() ? document.getElementById('heroHeadlineSvg') : document.querySelector('.hero__intro-mobile .hero__title'); // 見出し。上昇距離の目標地点として使う
   if (!layer || !hero || !ctaEl) return;
 
   var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -66,12 +74,27 @@
   var MIN_VISIBLE_RISE_PX = 24; // topLimitまでの安全な距離がほぼ無い場合でも、最低限これだけは上昇させる
   var LEFT_RANGE_MAX_PCT = 33; // 横方向の発生範囲（#hero幅に対する%）
 
+  // ---------- モバイルは4つの文字あり水玉が重ならないよう固定スロットに配置 ----------
+  var MOBILE_REVEAL_SLOTS = [
+    { xFrac: 0.08, yFrac: 0.10 },
+    { xFrac: 0.56, yFrac: 0.04 },
+    { xFrac: 0.04, yFrac: 0.58 },
+    { xFrac: 0.58, yFrac: 0.54 }
+  ];
+  var MOBILE_REVEALED_SIZE = 80; // 重なり防止のためモバイルは固定サイズにする（デスクトップはランダム86〜116のまま）
+
+  function pickMobileSlot(heroRect, bounds, index) {
+    var slot = MOBILE_REVEAL_SLOTS[index % MOBILE_REVEAL_SLOTS.length];
+    var size = MOBILE_REVEALED_SIZE;
+    var widthSpan = Math.max(heroRect.width - EDGE_MARGIN * 2 - size, 40);
+    var heightSpan = Math.max(bounds.gateTop - bounds.upperBound - size, 40);
+    var left = EDGE_MARGIN + widthSpan * slot.xFrac;
+    var top = bounds.upperBound + heightSpan * slot.yFrac;
+    return { targetTop: top, size: size, left: left };
+  }
+
   var running = false;
   var timerId = null;
-
-  function isDesktop() {
-    return window.matchMedia('(min-width: 768px)').matches;
-  }
 
   // 見出し（#heroHeadlineSvg）・手書きコピー（#heroPenSvg）のうち下端が低い方を基準に、
   // そのさらに下（CTA側）に余白を足したラインを「これ以上は上げない上限」として返す(px, #hero起点)。
@@ -337,23 +360,34 @@
     var topLimit = computeTopLimit(heroRect);
     var xRange = safeXRange();
 
-    var drops = SERVICES.map(function (s) { return createDrop(s, false); });
+    // 文字入り（できること）4つは同時に4つを超えて表示しない。前のバッチ（<button>要素）が
+    // 1つでも画面に残っている間（上昇中・表示中・フェードアウト中を問わず）は、今回のバーストでは
+    // 文字入りを追加しない。フェイク・ミニ飛沫は引き続き通常通り出す
+    var canSpawnReal = layer.querySelectorAll('button.hero-splash').length === 0;
+    var drops = canSpawnReal ? SERVICES.map(function (s) { return createDrop(s, false); }) : [];
 
     var fakeCount = 1 + Math.floor(Math.random() * 2); // 1 or 2（従来の2〜3からさらに半分程度に削減）
     if (!desktop) fakeCount = Math.random() < 0.5 ? 0 : 1; // モバイルは0〜1個に抑える
     for (var i = 0; i < fakeCount; i++) drops.push(createDrop(null, false));
 
     var lefts = assignLefts(drops.length, xRange);
+    var useMobileSlots = !desktop && canSpawnReal;
 
     drops.forEach(function (el, i) {
       var leftPx = lefts[i];
       var isReal = el.tagName === 'BUTTON';
-      // 「できること」4つは一斉感を保ちつつ僅かにずらす程度、フェイクは次のバーストが来るまでの
-      // 間（FAKE_STAGGER_MS）にランダムに散らして時間差で出す（一度にどっと出るのを避ける）
       var delay = isReal ? Math.random() * 150 : Math.random() * FAKE_STAGGER_MS;
-      // 「できること」4つは、水玉化する目標の高さ・サイズを1個ずつ個別に決める
-      // （#hero高さの中央あたりを狙いつつランダムに散らし、4つが同じラインに揃わないようにする）
-      var revealTarget = isReal ? pickRevealTarget(heroRect, bounds) : null;
+      // 「できること」4つの水玉化する目標の高さ・左右位置・サイズを決める。
+      // モバイルは重なり防止のため固定スロット（MOBILE_REVEAL_SLOTS）を使い、
+      // PCは従来通りランダムな位置・サイズのまま
+      var revealTarget = null;
+      if (isReal && useMobileSlots) {
+        var slotTarget = pickMobileSlot(heroRect, bounds, i);
+        leftPx = slotTarget.left;
+        revealTarget = { targetTop: slotTarget.targetTop, size: slotTarget.size };
+      } else if (isReal) {
+        revealTarget = pickRevealTarget(heroRect, bounds);
+      }
       setTimeout(function () {
         startDrop(el, originTop, bounds.gateTop, revealTarget, topLimit, leftPx);
         spawnSatellites(leftPx, originTop, bounds.gateTop, topLimit);
@@ -387,14 +421,34 @@
     while (layer.firstChild) layer.removeChild(layer.firstChild);
   }
 
-  // 生成ループを動かしてよいかどうかは「#heroが画面内にあるか」と「タブ自体が表示されているか」の
-  // 両方がそろって初めて真になる。どちらか一方でも欠けたら止める
+  // 生成ループを動かしてよいかどうかは「#heroが画面内にあるか」「タブ自体が表示されているか」
+  // 「イントロが終わっているか」の3つがそろって初めて真になる。どれか一つでも欠けたら止める。
+  // introReadyが無いと、イントロ表示中に裏でバーストが進んでしまい、本編が見えた瞬間には
+  // 演出が唐突に始まって（or 既に進行中に）見えるため
   var heroInView = false;
   var tabVisible = !document.hidden;
+  var introReady = false;
 
   function updateRunning() {
-    if (heroInView && tabVisible) start();
+    if (heroInView && tabVisible && introReady) start();
     else stop();
+  }
+
+  var START_DELAY_AFTER_INTRO = 150; // 本編が見えてから水しぶきを始めるまでの間（ms）
+  function onIntroReady() {
+    setTimeout(function () {
+      introReady = true;
+      updateRunning();
+    }, START_DELAY_AFTER_INTRO);
+  }
+  // 訪問済みの場合、js/intro.js側は読み込み直後に同期的に'intro:ready'を発火する。
+  // このスクリプトはjs/intro.jsより後に読み込まれるため、addEventListenerする前に発火済みで
+  // 聞き逃すことがある（実際に、初回訪問では動くがリロード時だけ水しぶきが出ない不具合として発生した）。
+  // まずすでに発火済みかどうかをwindow.__introReadyで確認する
+  if (window.__introReady) {
+    onIntroReady();
+  } else {
+    document.addEventListener('intro:ready', onIntroReady, { once: true });
   }
 
   document.addEventListener('visibilitychange', function () {

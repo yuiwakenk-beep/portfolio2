@@ -10,6 +10,12 @@
 // Skills-Toolsは「対応できること」のカード群末尾と「使用ツール」の見出しの間にできる
 // 余白帯を飛行帯にし、カードやチップ・見出し文字に被らないようにしている。
 //
+// 加えて、ページ最下部（夜の海Footer）に到達したときだけ、案内役の海鳥が最後に静かに
+// 遠くへ去っていく「エンディング・フライト」を1セッション1回だけ再生する（STEP4）。
+// 他の3シーンは横方向中心・何度でも再生されるのに対し、エンディングは
+// 「やや上方向へ抜けながら縮小・フェード」「一度きり」という別ロジックのため、
+// initScenes()とは独立したinitEndingScene()として実装している。
+//
 // 読み込み時イントロ（js/intro.js）は瓶が波で流れ着く演出のため、
 // この海鳥とは無関係。ただしイントロが閉じるまではHero等の演出も始めたくないため、
 // js/intro.js側がゲートを閉じたタイミングでwindow.SeagullFlight.init()を呼び、
@@ -275,10 +281,102 @@
     seagull.classList.remove('is-active');
   });
 
+  // ---------- エンディング・フライト（STEP4：ページ最下部で一度だけ、静かに遠くへ去っていく） ----------
+  // 他の3シーンとは目的が異なるため、意図的に独立したロジックにしている：
+  //   ・横方向の周回ではなく「やや上方向へ抜けながら縮小・フェード」
+  //   ・何度でも再生される通常シーンと違い、1セッション1回だけ（IntersectionObserverを発火後に破棄）
+  //   ・発火してもすぐには飛ばさず、少し“間”を置いてから飛ばす
+  function finishEnding() {
+    seagull.classList.remove('is-active');
+    gsap.set(seagull, { opacity: 0, willChange: 'auto' });
+  }
+
+  // PC/タブレット：Footer上部あたりから右上へ、ゆるい弧を描きながら小さく・薄くなって消える
+  function flyEndingDesktop(footerRect) {
+    var start = { x: footerRect.left + footerRect.width * 0.3, y: footerRect.top - 10 };
+    var dx = 620, dy = -190; // 右方向へ大きく、上方向へゆるやかに（下に落ちて見えないよう必ず負のdy）
+    var duration = 4;
+
+    setBasePosition(start.x, start.y);
+    gsap.set(seagull, { rotation: 0, scale: 0.85, opacity: 1, willChange: 'transform' });
+    seagull.classList.add('is-active');
+    setGlide(false);
+
+    var path = buildCurvePath(dx, dy);
+
+    flightTimeline = gsap.timeline({ onComplete: finishEnding });
+    // 飛び始めに3回だけ軽く羽ばたき、あとは滑空（パタパタさせすぎない）
+    flightTimeline.call(function () { flapBurst(3, false); }, null, 0);
+    flightTimeline.to(seagull, { motionPath: { path: path, curviness: 1.2 }, duration: duration, ease: 'sine.inOut' }, 0);
+    // 開始を100とすると終了は約56（40〜70の目安内）まで、終始なだらかに縮小し続ける
+    flightTimeline.to(seagull, { scale: 0.48, duration: duration, ease: 'sine.inOut' }, 0);
+    // 序盤は1のまま保持し、中盤で0.85程度、終盤にかけて0まで自然にフェード
+    flightTimeline.to(seagull, { opacity: 0.85, duration: duration * 0.3, ease: 'sine.inOut' }, duration * 0.35);
+    flightTimeline.to(seagull, { opacity: 0, duration: duration * 0.35, ease: 'sine.in' }, duration * 0.65);
+  }
+
+  // スマホ：完全に省略はせず、Footer上部でやや短く・控えめな上昇＋フェードに簡略化する
+  function flyEndingMobile(footerRect) {
+    var start = { x: footerRect.left + footerRect.width * 0.55, y: footerRect.top - 10 };
+    var duration = 2.2;
+
+    setBasePosition(start.x, start.y);
+    gsap.set(seagull, { rotation: 0, scale: 0.55, opacity: 1, willChange: 'transform' });
+    seagull.classList.add('is-active');
+    setGlide(false);
+
+    flightTimeline = gsap.timeline({ onComplete: finishEnding });
+    flightTimeline.call(function () { flapBurst(2, false); }, null, 0);
+    flightTimeline.to(seagull, { x: 150, y: -85, ease: 'sine.inOut', duration: duration }, 0);
+    flightTimeline.to(seagull, { scale: 0.3, duration: duration, ease: 'sine.inOut' }, 0);
+    flightTimeline.to(seagull, { opacity: 0, duration: duration * 0.5, ease: 'sine.in' }, duration * 0.5);
+  }
+
+  var ENDING_DELAY_MS = 1300; // Footerが見えてから、少し間を置いて飛び立たせる
+  var endingPlayed = false;
+
+  function initEndingScene() {
+    var footer = document.querySelector('.site-footer');
+    if (!footer) return;
+
+    var io = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          if (!entry.isIntersecting) return;
+          attemptEnding(io);
+        });
+      },
+      { threshold: 0.35 }
+    );
+    io.observe(footer);
+
+    function attemptEnding(observer) {
+      if (endingPlayed) return;
+      // Flow等の通常シーンが飛行中なら衝突を避けてリトライし、終わり次第エンディングへ引き継ぐ
+      if (flightTimeline && flightTimeline.isActive()) {
+        setTimeout(function () { attemptEnding(observer); }, 400);
+        return;
+      }
+      endingPlayed = true;
+      observer.disconnect(); // 以降は二度と発火させない（1セッション1回）
+      setTimeout(function () {
+        var r = docRect(footer);
+        if (desktopMql.matches) {
+          flyEndingDesktop(r);
+        } else {
+          flyEndingMobile(r);
+        }
+      }, ENDING_DELAY_MS);
+    }
+  }
+
   // js/water-fx.jsのwindow.WaterFXと同様の公開パターン。
   // js/intro.jsがイントロゲートを閉じたタイミングでinit()を呼び、
-  // Hero/About/Flowの通常シーン監視を開始する
+  // Hero/About/Flowの通常シーン監視とFooterのエンディング監視を開始する
   window.SeagullFlight = {
-    init: initScenes
+    init: function () {
+      initScenes();
+      initEndingScene();
+    }
   };
 })();

@@ -35,8 +35,21 @@
     document.documentElement.classList.remove('intro-pending');
   }
 
+  // イントロが完全に終わった（＝本編がユーザーに見えている状態になった）タイミングで発火するイベント。
+  // js/hero.js・js/hero-splash.jsはこれを合図にファーストビューの演出を開始する
+  // （イントロ表示中に裏で演出が進んでしまい、本編が見えた瞬間にはもう演出が終わりかけている問題への対応）。
+  // ゲートを起動しないパス（PEフォールバック等）でも、本編は最初から見えている＝即座に発火してよい。
+  // 訪問済み（sessionStorage）の場合はページ読み込み直後・同期的に発火するため、<script>の読み込み順によっては
+  // 後から読み込まれるスクリプト側がaddEventListenerする前にイベントを聞き逃す可能性がある。
+  // そのため発火した事実をwindow.__introReadyにも残し、聞く側は「すでに発火済みか」を先に確認できるようにする
+  function dispatchIntroReady() {
+    window.__introReady = true;
+    document.dispatchEvent(new CustomEvent('intro:ready'));
+  }
+
   if (!gate || !bottle || !skip || !main) {
     releasePendingFallback();
+    dispatchIntroReady();
     return;
   }
 
@@ -50,6 +63,7 @@
 
   if (reduceMotion || alreadySeen || !window.gsap) {
     releasePendingFallback();
+    dispatchIntroReady();
     if (window.SeagullFlight) window.SeagullFlight.init();
     return;
   }
@@ -262,6 +276,7 @@
     markSeen();
     document.body.style.overflow = '';
     if (window.SeagullFlight) window.SeagullFlight.init();
+    dispatchIntroReady();
   }
 
   // 光が画面を覆いきったタイミングで、隠れたまま裏でHero（#main）を見せる準備を整える。

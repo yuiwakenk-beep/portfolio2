@@ -111,6 +111,10 @@
     width: 90px;
     transform: rotate(12deg);
   }
+
+  .works-overview-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 /* ---------- デスクトップ（1024px〜） ---------- */
@@ -212,5 +216,257 @@
     bottom: -0.5%;
     width: 45px;
     transform: rotate(61deg);
+  }
+
+  .works-overview-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* ---------- 使用ツール（6-6）：PC版は横スクロールをやめ、8個を1列に収める ---------- */
+  .tools__list {
+    overflow-x: visible;
+    cursor: default;
+    flex-wrap: nowrap;
+    justify-content: center;
+    gap: clamp(8px, 1.2vw, 20px);
+  }
+
+  .tool-chip {
+    padding: 8px 14px;
+    font-size: 12.5px;
+    white-space: nowrap;
+  }
+}
+
+/* ---------- スマホ（767px以下）：Hero専用レイアウト ---------- */
+@media (max-width: 767px) {
+  .hero {
+    /* スマホ専用写真(hero-mobile.png, 853x1844)の実寸比率に完全一致させ、
+       object-fit:coverでのクロップが一切発生しないようにする（＝写真が欠けず全部映る） */
+    aspect-ratio: 853 / 1844;
+    /* デスクトップ側の.heroにはブレークポイント無指定のmax-height:92vhが効いているため、
+       ここで打ち消さないとaspect-ratioで伸びた高さが92vhで再びクリップされ、
+       結局写真の下のほうが見えなくなってしまう */
+    max-height: none;
+  }
+
+  /* 写真をスマホ専用に差し替え */
+  .hero__photo--desktop { display: none; }
+  .hero__photo--mobile {
+    display: block;
+    object-position: center top;
+  }
+
+  /* 見出しSVG・ノートPC画面差し込みはスマホ写真の構図に合わないため非表示のまま。
+     手書き風コピー（.hero__pen-svg / #penIcon）はPC版と同じアニメーションをスマホでも使うため、
+     ここでは非表示にしない（js/hero.jsがスマホ写真用の位置を計算する） */
+  .hero__headline-svg,
+  .hero__laptop-mask {
+    display: none !important;
+  }
+
+  /* 見出しブロック：写真上部の空（何もない部分）に配置 */
+  .hero__intro-mobile {
+    display: block;
+    position: absolute;
+    top: 78px;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    padding: 0 24px;
+    text-align: left;
+    /* ドラッグ位置調整ツール（?heropos=1）で決めた位置。基準位置（top:78px）からのズレをtransformで表現する */
+    transform: translate(-7px, 64px);
+  }
+  /* .hero__title自体のフォント・色・サイズは既存定義（style.css）をそのまま使う。
+     ここでは折り返し時の見た目だけ軽く調整する */
+  .hero__intro-mobile .hero__title {
+    text-shadow: 0 2px 16px rgba(255, 255, 255, 0.75), 0 1px 2px rgba(255, 255, 255, 0.6);
+    line-height: 1.5;
+  }
+
+  /* CTAボタン：縦並び・幅いっぱいに */
+  .hero__copy {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 0 20px 40px;
+  }
+  .hero__cta {
+    flex-direction: column;
+    gap: 12px;
+    padding: 0;
+    margin-top: 0;
+  }
+  .hero-cta {
+    width: 100%;
+    justify-content: center;
+    /* 背景の写真が賑やかな場所（ノート・ペン付近）に重なっても文字が読めるよう、
+       ガラスの不透明度をPC版より少し上げる */
+    background: rgba(255, 252, 246, 0.72);
+  }
+  /* JS不通時などの静的フォールバック（.hero-splash-fallback）はデスクトップ同様、
+     通常時は非表示のままでよい（既存のCSSに従う） */
+
+  /* ---------- 使用ツール（6-6）：スマホは2列×4行のグリッド表示 ---------- */
+  .tools__list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    overflow-x: visible;
+    cursor: default;
+  }
+
+  .tool-chip {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  /* ---------- ファーストビュー CTA：二つを横並びに ---------- */
+  .hero__cta {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 10px;
+    padding: 0;
+  }
+  .hero-cta {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 12px 12px 12px 30px;
+    font-size: 12.5px;
+    justify-content: center;
+  }
+  .hero-cta__charm {
+    width: 30px;
+    height: 30px;
+    top: -10px;
+    left: -8px;
+  }
+
+  /* ---------- 自己紹介（About）：雲を2つに増やし、重なってもよいのでバランス配置 ---------- */
+  .about__cloud-wrap {
+    margin: 40px auto 8px;
+    overflow: visible;
+  }
+  /* 2つ目の雲：Concept側の雲素材（kumo-concept.png）を控えめに右上へ重ねて奥行きを出す。
+     本文より手前に出ないようz-indexは0（.about__cloudと同じ階層）にとどめる */
+  .about__cloud-wrap::after {
+    content: '';
+    position: absolute;
+    top: -34px;
+    right: -28px;
+    width: 62%;
+    aspect-ratio: 1 / 1;
+    background-image: url('../sozai/kumo-concept.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 0;
+    animation: aboutCloudFloat 9s ease-in-out infinite -4s;
+  }
+  .about__cloud-content {
+    /* 本文がはみ出しても良い前提で、雲の輪郭に収めるための余白を削って詰める */
+    padding: 34px 20px;
+  }
+  .about__body {
+    margin-bottom: 14px;
+    gap: 14px;
+  }
+  /* 写真：PC版の余白を前提にした大きさ・はみ出しマージンだと本文が入り切らないため、
+     スマホでは一回り小さくし、はみ出しマージンもなくして本文側の幅を確保する。
+     --photo-sizeを変えるだけでブロブ・輪郭線（calcで連動）も一緒に縮む */
+  .about__photo {
+    width: 92px;
+    margin: 0;
+    --photo-size: 92px;
+  }
+  /* タグは4つを1行に横並び（Conceptの.concept__keywordsとは異なり、幅優先で詰める） */
+  .about__tags {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    gap: 4px;
+  }
+  .about__tags .tag {
+    white-space: nowrap;
+    font-size: 9.5px;
+    padding: 5px 6px;
+  }
+
+  /* ---------- 装飾（流木）：スマホ版では非表示（貝は元々スマホ非表示のため変更なし） ---------- */
+  .about-ornament--driftwood {
+    display: none;
+  }
+
+  /* ---------- 大切にしていること（Concept）：Aboutとの間の余白を詰める ---------- */
+  .concept__cloud-wrap {
+    margin: 0 auto;
+  }
+  .concept__cloud-content {
+    padding: 9% 14%;
+  }
+  /* .concept-about-rowはスマホ幅ではgridを使わない通常のブロックのためgapは効かない。
+     余白の正体はAbout/Conceptそれぞれの.section-inner上下パディングなので、こちらを詰める */
+  .about .section-inner,
+  .concept .section-inner {
+    padding-top: 28px;
+    padding-bottom: 28px;
+  }
+
+  /* ---------- 対応できること（Skills）：使用ツールと同じ2列のコンパクトなカードに ---------- */
+  .skills__grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+  .skill-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px 14px;
+  }
+  .skill-card__icon {
+    width: 44px;
+    height: 44px;
+  }
+  .skill-card__title {
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+
+  /* ---------- 制作の流れ（Flow）：後ろの波線をやめて縦のタイムライン形式に ---------- */
+  .flow__route {
+    display: none;
+  }
+  .flow__steps {
+    position: relative;
+    padding-left: 0;
+  }
+  .flow__steps::before {
+    content: '';
+    position: absolute;
+    left: 35px;
+    top: 17px;
+    bottom: 17px;
+    width: 2px;
+    background: var(--color-sea-light);
+    z-index: 0;
+  }
+  .flow-step {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ---------- 昼の光エリア：スマホはhoverが無いためマウス追従はさせず、
+     固定のごく淡い光だけを表示する（js/daylight.js側もタッチ端末では追従処理そのものを行わない）。
+     画面幅に対して620pxは大きすぎるため、一回り小さくする ---------- */
+  .daylight-glow {
+    background: radial-gradient(
+      ellipse 260px 220px at var(--daylight-x) var(--daylight-y),
+      rgba(255, 220, 165, calc(0.20 * var(--daylight-intensity))) 0%,
+      rgba(255, 210, 150, calc(0.10 * var(--daylight-intensity))) 30%,
+      transparent 65%
+    );
   }
 }

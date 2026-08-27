@@ -13,6 +13,8 @@
 
   // new.png（背景写真）の基準キャンバスサイズ
   var REF_W = 1536, REF_H = 1024;
+  // hero-mobile.png（スマホ専用写真）の基準キャンバスサイズ
+  var REF_W_MOBILE = 853, REF_H_MOBILE = 1844;
 
   // 写真は object-fit:cover で表示されるため、実際の表示上のトリミング量を計算して
   // オーバーレイ（見出し・手書きテキスト・PC画面）の位置を写真に正確に合わせる
@@ -20,7 +22,20 @@
     heroHeadlineSvg: { left: 47, top: 260, width: 636, height: 78 },
     heroPenSvg:       { left: 90, top: 308, width: 534, height: 92 }
   };
-  var heroTextRect = heroRects.heroPenSvg;
+  // スマホ写真用の手書きコピー位置（見出しSVG・ノートPC画面はスマホでは非表示のため、ここには持たない）。
+  // 写真の空（雲の少ない開けた部分）を目安にした初期値。実機で見た目を確認しながら調整する
+  var heroRectsMobile = {
+    heroPenSvg: { left: 21.2, top: 439.4, width: 700, height: 120 }
+  };
+
+  function isDesktopBreakpoint() {
+    return window.matchMedia('(min-width: 768px)').matches;
+  }
+
+  // 手書きコピーの現在有効な矩形（PC/スマホ）。ペン先アニメーション側から毎フレーム呼ばれる
+  function currentTextRect() {
+    return isDesktopBreakpoint() ? heroRects.heroPenSvg : heroRectsMobile.heroPenSvg;
+  }
 
   // ノートPC画面の実際の4隅（写真のピクセル座標）。長方形の素材をこの4点にぴったり合わせる射影変換をかけることで、
   // PC本体の角度・遠近感と中身の見え方を一致させる（クリップだけだと中身が正面向きのまま浮いて見えるため）
@@ -45,22 +60,36 @@
   function currentScale() {
     var cTop = heroPhoto.parentElement;
     var contW = cTop.clientWidth, contH = cTop.clientHeight;
-    var scale = Math.max(contW / REF_W, contH / REF_H);
-    var offX = (contW - REF_W * scale) / 2;
-    var offY = (contH - REF_H * scale) / 2;
+    var desktop = isDesktopBreakpoint();
+    var refW = desktop ? REF_W : REF_W_MOBILE;
+    var refH = desktop ? REF_H : REF_H_MOBILE;
+    var scale = Math.max(contW / refW, contH / refH);
+    var offX = (contW - refW * scale) / 2;
+    var offY = (contH - refH * scale) / 2;
     return { scale: scale, offX: offX, offY: offY };
   }
 
   function positionHeroOverlays() {
     var s = currentScale();
-    Object.keys(heroRects).forEach(function (id) {
-      var el = document.getElementById(id);
-      var r = heroRects[id];
-      el.style.left = (s.offX + r.left * s.scale) + 'px';
-      el.style.top = (s.offY + r.top * s.scale) + 'px';
-      el.style.width = (r.width * s.scale) + 'px';
-      el.style.height = (r.height * s.scale) + 'px';
-    });
+    var desktop = isDesktopBreakpoint();
+
+    // 手書きコピー（#heroPenSvg）はPC・スマホ共通で常に位置を計算する
+    var penRect = currentTextRect();
+    var penSvgEl = document.getElementById('heroPenSvg');
+    penSvgEl.style.left = (s.offX + penRect.left * s.scale) + 'px';
+    penSvgEl.style.top = (s.offY + penRect.top * s.scale) + 'px';
+    penSvgEl.style.width = (penRect.width * s.scale) + 'px';
+    penSvgEl.style.height = (penRect.height * s.scale) + 'px';
+
+    // 見出しSVG・ノートPC画面の射影変換はPC版のみ（スマホでは要素自体が非表示のため計算しない）
+    if (!desktop) return;
+
+    var headlineRect = heroRects.heroHeadlineSvg;
+    var headlineEl = document.getElementById('heroHeadlineSvg');
+    headlineEl.style.left = (s.offX + headlineRect.left * s.scale) + 'px';
+    headlineEl.style.top = (s.offY + headlineRect.top * s.scale) + 'px';
+    headlineEl.style.width = (headlineRect.width * s.scale) + 'px';
+    headlineEl.style.height = (headlineRect.height * s.scale) + 'px';
 
     // ノートPC画面：4隅を実際のレンダリング座標に変換し、495x360の素材ウィンドウをその4隅へ射影変換で合わせる
     function toReal(pt) { return [s.offX + pt[0] * s.scale, s.offY + pt[1] * s.scale]; }
@@ -76,6 +105,33 @@
   }
   positionHeroOverlays();
   window.addEventListener('resize', positionHeroOverlays);
+
+  // イントロ表示中はjs/intro.jsがdocument.body.style.overflowを'hidden'にしてスクロールバーを消しており、
+  // その分レイアウト幅が一時的に広がっている（スクロールバー分の増減はresizeイベントが発火しない）。
+  // 最初のpositionHeroOverlays()はこのスクロールバー有無が確定する前後どちらかのタイミングで走ってしまい、
+  // ノートPC画面のはめ込み位置が本編表示後の実際の幅とズレることがあるため、
+  // イントロが完全に終わって最終的なレイアウトが確定したタイミングで必ず一度計算し直す。
+  // あわせて、ノートPC画面のスクロールアニメーション（css/style.css側でanimation-play-state:pausedにしてある）も
+  // ここで初めてrunningにする。CSSアニメーションはvisibility:hiddenの間も裏で進んでしまうため、
+  // 最初からpausedにしておかないと本編が見えた瞬間には既にスクロールが数秒分進んだ状態になってしまう
+  function startLaptopScroll() {
+    positionHeroOverlays();
+    var shotImg = document.querySelector('.hero__laptop-mask img');
+    if (shotImg) shotImg.style.animationPlayState = 'running';
+  }
+  if (window.__introReady) {
+    startLaptopScroll();
+  } else {
+    document.addEventListener('intro:ready', startLaptopScroll, { once: true });
+  }
+
+  // js/hero-position-debug.js（?heropos=1のときだけ動く位置調整ツール）から、
+  // 手書き風コピー（#heroPenSvg）の位置を直接動かして再配置できるようにするための最小限の窓口
+  window.__heroDebugAPI = {
+    heroRectsMobile: heroRectsMobile,
+    currentScale: currentScale,
+    reposition: positionHeroOverlays
+  };
 
   // ---------- ノートPC画面の4隅を調整するキャリブレーションモード ----------
   // 通常は一切動かない（コスト・見た目とも影響なし）。URLに ?calibrate を付けて開いた時だけ有効になる
@@ -207,7 +263,7 @@
     var CYCLE_MS = DELAY + DRAW_MS + FADE_MS + HOLD_MS + RESET_MS;
     var guideLen = guidePath.getTotalLength();
     var PEN_W = 132.3, PEN_H = 55, TIP_X = 3.15, TIP_Y = 38.72;
-    // ガイドパスの座標系はSVGのviewBox基準（0-685）。表示箱の実際の幅はheroTextRect.widthで
+    // ガイドパスの座標系はSVGのviewBox基準（0-685）。表示箱の実際の幅はcurrentTextRect().widthで
     // viewBoxの685とは異なるため、写真の拡大率(s.scale)だけでなくこの縮小比も掛け合わせて実座標に変換する
     var PEN_VIEWBOX_W = 685;
 
@@ -222,9 +278,10 @@
 
     function placePenAt(len) {
       var s = currentScale();
-      var svgLeftPx = s.offX + heroTextRect.left * s.scale;
-      var svgTopPx = s.offY + heroTextRect.top * s.scale;
-      var penScale = (heroTextRect.width * s.scale) / PEN_VIEWBOX_W;
+      var textRect = currentTextRect();
+      var svgLeftPx = s.offX + textRect.left * s.scale;
+      var svgTopPx = s.offY + textRect.top * s.scale;
+      var penScale = (textRect.width * s.scale) / PEN_VIEWBOX_W;
       var clampedLen = Math.max(0, Math.min(guideLen, len));
       var p = guidePath.getPointAtLength(clampedLen);
       var p2 = guidePath.getPointAtLength(Math.max(0, Math.min(guideLen, clampedLen + 2)));
@@ -279,6 +336,21 @@
       penText.style.opacity = String(1 - rt);
       requestAnimationFrame(tick);
     }
-    requestAnimationFrame(tick);
+
+    // イントロ演出中はこのアニメーションが裏で進んでしまい、本編が見えた瞬間には
+    // 書き終わっている（＝唐突に見える）ため、イントロが完全に終わってから少し間を置いて開始する。
+    // js/intro.jsがゲートを起動しない場合（PEフォールバック等）も含め、必ず'intro:ready'が発火する
+    var START_DELAY_AFTER_INTRO = 150; // 本編が見えてから書き始めるまでの間（ms）
+    function startPenLoop() {
+      setTimeout(function () { requestAnimationFrame(tick); }, START_DELAY_AFTER_INTRO);
+    }
+    // 訪問済みの場合、js/intro.js側は読み込み直後に同期的に'intro:ready'を発火する。
+    // このスクリプトの読み込み順によっては、addEventListenerする前に発火済みで聞き逃す可能性があるため、
+    // まずすでに発火済みかどうかをwindow.__introReadyで確認する
+    if (window.__introReady) {
+      startPenLoop();
+    } else {
+      document.addEventListener('intro:ready', startPenLoop, { once: true });
+    }
   })();
 })();

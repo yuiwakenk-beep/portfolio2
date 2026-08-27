@@ -28,6 +28,30 @@
     revealTargets.forEach(function (el) {
       revealObserver.observe(el);
     });
+
+    // 追加：メニューからのアンカージャンプ等、高速スクロールでIntersectionObserverの
+    // 判定フレームを飛び越えてしまい、一度も交差を検知できないまま画面内に到達する要素を救済する。
+    // スクロールが止まったタイミングで、まだ表示されていない.revealのうち
+    // 実際に画面内（またはその近く）にあるものを直接チェックして表示する
+    function sweepReveal() {
+      document.querySelectorAll('.reveal:not(.is-visible)').forEach(function (el) {
+        var r = el.getBoundingClientRect();
+        if (r.top < window.innerHeight * 1.1 && r.bottom > -window.innerHeight * 0.1) {
+          el.classList.add('is-visible');
+        }
+      });
+    }
+
+    var sweepTimer = null;
+    window.addEventListener('scroll', function () {
+      clearTimeout(sweepTimer);
+      sweepTimer = setTimeout(sweepReveal, 150);
+    }, { passive: true });
+
+    // ハッシュ付きリンク（ナビゲーション・スキップリンク等）でのジャンプ直後にも念のため実行
+    window.addEventListener('hashchange', function () {
+      setTimeout(sweepReveal, 400);
+    });
   }
 
   // ---------- 制作の流れ：ステップをつなぐ波線をスクロール量に連動して描画 ----------
