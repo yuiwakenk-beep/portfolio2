@@ -358,19 +358,11 @@
   <!-- /.daylight-zone -->
 
   <!-- ========== 夕暮れの光エリア（使用ツール〜お問い合わせ）STEP B：
-       複数の流れ星ではなく、マウスに寄り添う「ひとつの光」がついてきて、ときどき小さく瞬く演出。
+       マウスが一定量動いた時だけ、その付近に小さな光が一瞬「キラッ」と現れて消える演出。
+       光は常駐せず、js/twilight-fx.jsが発生のたびにDOM要素を生成し、アニメーション終了後に削除する。
        ここで昼から夜への時間が進み、Contactの終わりでFooterの夜の海演出（js/footer-night.js。無変更）へ引き継ぐ ========== -->
   <div class="twilight-zone" id="twilightZone">
-  <div class="twilight-light-layer" aria-hidden="true">
-    <div class="twilight-light" id="twilightLight">
-      <span class="twilight-light__glow"></span>
-      <span class="twilight-light__core"></span>
-      <span class="twilight-light__ray twilight-light__ray--h"></span>
-      <span class="twilight-light__ray twilight-light__ray--v"></span>
-      <span class="twilight-light__ray twilight-light__ray--d1"></span>
-      <span class="twilight-light__ray twilight-light__ray--d2"></span>
-    </div>
-  </div>
+  <div class="twilight-light-layer" aria-hidden="true"></div>
 
   <!-- ========== 使用ツール・制作環境（6-6） ========== -->
   <section class="tools" id="tools">
