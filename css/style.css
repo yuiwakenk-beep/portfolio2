@@ -82,16 +82,74 @@ ul {
 
   /* セクション背景写真に重ねる共通ティント（全セクションで統一し、繋がりを持たせる） */
   --bg-photo-tint: color-mix(in srgb, var(--color-sand) 45%, transparent);
+
+  /* アーチ壁のマウス追従光（js/wall-light.js）。JS未実行時（タブレット/スマホ/reduced-motion等）
+     でも不自然にならないよう、中立値をここで既定しておく */
+  --wall-light-left-alpha: 0.08;
+  --wall-light-left-alpha-outer: 0.032;
+  --wall-light-right-alpha: 0.08;
+  --wall-light-right-alpha-outer: 0.032;
 }
 
 /* ---------- ベース ---------- */
 body {
   font-family: var(--font-body);
   color: var(--color-text);
-  background: var(--color-sand);
+  /* アーチ開口の左右の壁に、ごく薄い自然光を足す。#main幅の外側（壁側）にしか見えないよう、
+     中央の本編には大きく被らないようにしている。
+     中盤：ほぼニュートラル／下：ごく薄い青灰色でFooterの夜へ橋渡しする。
+     左右コーナーの光（radial-gradient）と、最上部を明るくするアイボリーのハイライトは、
+     Hero写真のドームクリップ（指示書①）の外側にできるすき間（元はsand色で目立たなかった）と重なり、
+     白いアーチ状に浮き上がって見えてしまったため撤去し、下方向の変化だけに絞った */
+  /* アーチ壁のマウス追従光（js/wall-light.js）。壁のごく上寄りだけに小さく固定サイズで置き、
+     ページ全体（bodyの高さ＝数千px）に対する自動サイズ指定は絶対に使わない。
+     以前、サイズ指定なしのradial-gradientを使った際、farthest-cornerの自動計算がbody全体の
+     高さを基準にしてしまい、横に伸びる不自然な光の帯になった不具合があったため
+     （style.css内の別コメント参照）、必ずpx固定の楕円サイズ・Y位置で指定する */
+  background:
+    radial-gradient(
+      ellipse 620px 440px at 3% 60px,
+      rgba(255, 252, 244, var(--wall-light-left-alpha)) 0%,
+      rgba(255, 252, 244, var(--wall-light-left-alpha-outer)) 24%,
+      rgba(255, 252, 244, 0) 50%
+    ),
+    radial-gradient(
+      ellipse 620px 440px at 97% 60px,
+      rgba(255, 252, 244, var(--wall-light-right-alpha)) 0%,
+      rgba(255, 252, 244, var(--wall-light-right-alpha-outer)) 24%,
+      rgba(255, 252, 244, 0) 50%
+    ),
+    linear-gradient(
+      to bottom,
+      rgba(255, 252, 246, 0) 38%,
+      rgba(88, 108, 118, 0.015) 72%,
+      rgba(72, 94, 108, 0.035) 100%
+    ),
+    var(--color-sand);
   line-height: 1.9;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+}
+
+/* タブレット：壁幅が狭くなる分、光もPCの6〜7割程度に弱める */
+@media (max-width: 1024px) {
+  body {
+    background:
+      linear-gradient(
+        to bottom,
+        rgba(255, 252, 246, 0) 38%,
+        rgba(88, 108, 118, 0.01) 72%,
+        rgba(72, 94, 108, 0.023) 100%
+      ),
+      var(--color-sand);
+  }
+}
+
+/* スマホ：左右の壁自体を表示しないため、光の演出も無効化して既存の本編背景を優先する */
+@media (max-width: 767px) {
+  body {
+    background: var(--color-sand);
+  }
 }
 
 ::selection {
@@ -580,6 +638,24 @@ html.intro-pending #main {
   align-items: flex-end;
   overflow: hidden;
   background: linear-gradient(180deg, var(--color-sky) 0%, var(--color-sea-light) 55%, var(--color-sea) 100%);
+  /* アーチ窓ステージ：Hero写真の上端を横長の楕円ドームにクリップする。
+     #main（Hero〜Contactまでを内包する縦に長大な要素）に同じクリップを掛けると
+     チラつきの原因になったため、対象をHero単体（元々overflow:hiddenを持つ小さな要素）に絞った */
+  border-radius: 50% 50% 0 0 / 120px 120px 0 0;
+}
+
+/* タブレット：アーチをやや控えめに（#main側の旧設定と合わせた値） */
+@media (max-width: 1024px) {
+  .hero {
+    border-radius: 50% 50% 0 0 / 70px 70px 0 0;
+  }
+}
+
+/* スマホ：アーチはごく浅く。可読性を最優先 */
+@media (max-width: 767px) {
+  .hero {
+    border-radius: 50% 50% 0 0 / 34px 34px 0 0;
+  }
 }
 
 /* 背景写真（デスクから海を望む構図。人物なし） */
@@ -1306,6 +1382,17 @@ html.intro-pending #main {
   aspect-ratio: 9 / 16;
 }
 
+/* スマホ画面を複数カット並べて見せる用（WORK 02など） */
+.work-item__mobile-group {
+  display: flex;
+  gap: 10px;
+}
+
+.work-item__mobile-group .work-item__shot--mobile {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
 .work-item__number {
   font-family: var(--font-en);
   font-style: italic;
@@ -1615,11 +1702,26 @@ html.intro-pending #main {
 .site-footer {
   position: relative;
   z-index: 0; /* .footer-night__water（z-index:-1）をこの要素の中に閉じ込める */
+  /* #mainと同じ横幅・中央寄せにして、アーチ窓の中の景色として最後まで統一する */
+  max-width: 1440px;
+  margin: 0 auto;
   background: linear-gradient(180deg, #2e5568 0%, var(--color-footer) 45%, #14323f 100%);
   color: rgba(255, 255, 255, 0.7);
   text-align: center;
   padding: 44px 20px 28px;
   overflow: hidden;
+}
+
+@media (max-width: 1024px) {
+  .site-footer {
+    max-width: 96vw;
+  }
+}
+
+@media (max-width: 767px) {
+  .site-footer {
+    max-width: 100%;
+  }
 }
 
 .site-footer__logo {
@@ -1856,6 +1958,46 @@ html.intro-pending #main {
   background-position: top center;
 }
 
+/* ============================================================
+   ページ全体「アーチ窓ステージ」化 第1段階：#main の整形
+   #main は Hero〜Contact までを内包する実要素。これをそのまま
+  「窓の中の景色」として扱う。新規ラッパー要素は追加しない。
+   PC/タブレットでは中央寄せ＋左右に壁（既存のsand色）を見せ、
+   黒くない柔らかい影で奥行きを出す。
+   ドーム型のクリップ（border-radius + overflow:hidden）は、
+   #main（Hero〜Contactを内包する縦に長大な要素）に載せるとチラつきの原因になったため、
+   Hero単体（.hero、上のブロック参照）側に移した。#mainにはクリップを伴わない
+   box-shadowのみを付ける ============================================================ */
+#main {
+  position: relative;
+  max-width: 1440px;
+  margin: 0 auto;
+  /* 以前あった `0 0 0 1px` の縁取り（ぼかしなし＝くっきりした1pxの輪郭線）は、
+     左右の壁厚の縁（#main::before/::after）と同じ位置に重なって、縦に伸びる
+     はっきりした光の線に見えてしまっていたため削除した */
+  box-shadow: 0 60px 120px -50px rgba(70, 100, 112, 0.38);
+}
+
+/* 左右の「壁の厚み」表現（#main::before/::after のグラデーション）は、
+   縦に伸びる光の線として見えてしまう不具合が繰り返し解消できなかったため撤去した。
+   #main自体の柔らかい外側box-shadowのみで奥行きを表現する */
+
+/* タブレット：影を少し弱めに */
+@media (max-width: 1024px) {
+  #main {
+    max-width: 96vw;
+    box-shadow: 0 36px 70px -36px rgba(70, 100, 112, 0.32);
+  }
+}
+
+/* スマホ：影もごく控えめに */
+@media (max-width: 767px) {
+  #main {
+    max-width: 100%;
+    box-shadow: 0 22px 40px -26px rgba(70, 100, 112, 0.24);
+  }
+}
+
 .concept,
 .about,
 .skills,
@@ -1898,28 +2040,6 @@ html.intro-pending #main {
 .twilight-zone {
   position: relative;
   z-index: 0;
-}
-
-/* ---------- ページ全体のマウス軌跡（飛行機雲）：js/air-trail.js ----------
-   Hero〜Contactを通して同じ演出を使う全画面固定Canvas。ヘッダー(z-index:100)・
-   ナビ(98/99)・イントロ系(500番台)より下、セクション内コンテンツ（最大でもz-index:3程度）
-   より上という、既存の重なり順を壊さない帯に置く。pointer-events:noneのため
-   リンク・フォーム操作を一切妨げない */
-.air-trail-canvas {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-/* reduced-motion時はjs/air-trail.js自体が早期returnして軌跡を生成しないが、
-   CSS側にも保険として非表示を持たせておく（PEフォールバックの二重化） */
-@media (prefers-reduced-motion: reduce) {
-  .air-trail-canvas {
-    display: none;
-  }
 }
 
 /* ---------- スキップリンク / スクリーンリーダー用 ---------- */

@@ -40,11 +40,6 @@
 </head>
 <body>
 
-<!-- ページ全体のマウス軌跡（飛行機雲）演出。position:fixedの全画面Canvasで、
-     Hero〜Contact（Footerでは徐々に弱まる）を通して同じ軌跡を描画する。js/air-trail.js側で
-     prefers-reduced-motion・タッチ端末・イントロ中(html.intro-pending)は完全に無効化する -->
-<canvas id="airTrailCanvas" class="air-trail-canvas" aria-hidden="true"></canvas>
-
 <!-- 読み込み時イントロ：波に流されて瓶に入った手紙が砂浜に流れ着き、開封すると本編が現れる。
      JS/GSAP不通・prefers-reduced-motion・2回目以降の訪問（sessionStorage）では
      js/intro.js側の判定でこのゲート自体を起動しない＝本編がデフォルトのまま見える -->
@@ -223,8 +218,7 @@
   </div>
 
   <!-- ========== 昼の光エリア（自己紹介〜対応できること）：やわらかな太陽光の固定背景演出。
-       マウス追従は行わず、css/style.cssの.daylight-zoneに定義した固定値のみで表示する
-       （ページ全体のマウス演出はjs/air-trail.jsの飛行機雲に統一したため） -->
+       マウス追従は行わず、css/style.cssの.daylight-zoneに定義した固定値のみで表示する -->
   <div class="daylight-zone" id="daylightZone">
   <div class="daylight-glow" aria-hidden="true"></div>
 
@@ -364,9 +358,8 @@
   <!-- /.daylight-zone -->
 
   <!-- ========== 夕暮れの光エリア（使用ツール〜お問い合わせ）：
-       個別のマウス演出は持たない（旧「キラッ」は廃止）。マウス軌跡はページ全体で
-       js/air-trail.jsの飛行機雲に統一し、Contactの終わりでFooterの夜の海演出
-       （js/footer-night.js。無変更）へ引き継ぐ ========== -->
+       個別のマウス演出は持たない（旧「キラッ」は廃止）。Contactの終わりで
+       Footerの夜の海演出（js/footer-night.js。無変更）へ引き継ぐ ========== -->
   <div class="twilight-zone" id="twilightZone">
 
   <!-- ========== 使用ツール・制作環境（6-6） ========== -->
@@ -433,7 +426,7 @@
         <!-- WORK 02（概要カード） -->
         <article class="work-card-mini reveal">
           <a href="works.html#work-02" class="work-card-mini__media">
-            <img class="work-card-mini__shot" src="sozai/work-02-hanami-flower-fv.png" alt="hanami flower サイトのファーストビュー" loading="lazy">
+            <img class="work-card-mini__shot" src="sozai/work-02-hanami-flower-menu.png" alt="hanami flower サイトのメニューページ" loading="lazy">
           </a>
           <div class="work-card-mini__body">
             <p class="work-card-mini__number">WORK 02</p>
@@ -613,9 +606,9 @@
 <!-- 夜の海Footerの水面演出（STEP2：マウス追従の波紋／STEP3：クリック・タップ位置の水しぶき）。
      海鳥のエンディング退場（STEP4）はjs/seagull.js側で実装している -->
 <script src="js/footer-night.js" defer></script>
-<!-- ページ全体のマウス軌跡（飛行機雲）。旧STEP A（daylight.js）・旧STEP B（twilight-fx.js）は
-     役割が重複するため廃止し、この一本の演出に統一した -->
-<script src="js/air-trail.js" defer></script>
+<!-- アーチ壁（#main左右のsand色の壁）に、マウスのX位置に応じてごく薄い自然光を反応させる演出。
+     PC（hover:hover かつ pointer:fine かつ1025px以上）・prefers-reduced-motion未希望の場合のみ動作する -->
+<script src="js/wall-light.js" defer></script>
 <!-- 開発用：?posdebug=1のときだけ動作するイントロ画像位置調整パネル。納品版でも常時読み込まれるが、
      クエリ無しでは即returnして何もしないためPEフォールバック同様に無害 -->
 <script src="js/intro-position-debug.js" defer></script>
