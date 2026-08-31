@@ -40,6 +40,11 @@
 </head>
 <body>
 
+<!-- ページ全体のマウス軌跡（飛行機雲）演出。position:fixedの全画面Canvasで、
+     Hero〜Contact（Footerでは徐々に弱まる）を通して同じ軌跡を描画する。js/air-trail.js側で
+     prefers-reduced-motion・タッチ端末・イントロ中(html.intro-pending)は完全に無効化する -->
+<canvas id="airTrailCanvas" class="air-trail-canvas" aria-hidden="true"></canvas>
+
 <!-- 読み込み時イントロ：波に流されて瓶に入った手紙が砂浜に流れ着き、開封すると本編が現れる。
      JS/GSAP不通・prefers-reduced-motion・2回目以降の訪問（sessionStorage）では
      js/intro.js側の判定でこのゲート自体を起動しない＝本編がデフォルトのまま見える -->
@@ -217,8 +222,9 @@
     </svg>
   </div>
 
-  <!-- ========== 昼の光エリア（自己紹介〜対応できること）：マウスに合わせてやわらかな太陽光が反応する演出。
-       Toolsより前でこのラッパーが閉じるため、演出は自然にここで終わる（STEP B以降はTools側で別演出を追加する想定） -->
+  <!-- ========== 昼の光エリア（自己紹介〜対応できること）：やわらかな太陽光の固定背景演出。
+       マウス追従は行わず、css/style.cssの.daylight-zoneに定義した固定値のみで表示する
+       （ページ全体のマウス演出はjs/air-trail.jsの飛行機雲に統一したため） -->
   <div class="daylight-zone" id="daylightZone">
   <div class="daylight-glow" aria-hidden="true"></div>
 
@@ -357,12 +363,11 @@
   </div>
   <!-- /.daylight-zone -->
 
-  <!-- ========== 夕暮れの光エリア（使用ツール〜お問い合わせ）STEP B：
-       マウスが一定量動いた時だけ、その付近に小さな光が一瞬「キラッ」と現れて消える演出。
-       光は常駐せず、js/twilight-fx.jsが発生のたびにDOM要素を生成し、アニメーション終了後に削除する。
-       ここで昼から夜への時間が進み、Contactの終わりでFooterの夜の海演出（js/footer-night.js。無変更）へ引き継ぐ ========== -->
+  <!-- ========== 夕暮れの光エリア（使用ツール〜お問い合わせ）：
+       個別のマウス演出は持たない（旧「キラッ」は廃止）。マウス軌跡はページ全体で
+       js/air-trail.jsの飛行機雲に統一し、Contactの終わりでFooterの夜の海演出
+       （js/footer-night.js。無変更）へ引き継ぐ ========== -->
   <div class="twilight-zone" id="twilightZone">
-  <div class="twilight-light-layer" aria-hidden="true"></div>
 
   <!-- ========== 使用ツール・制作環境（6-6） ========== -->
   <section class="tools" id="tools">
@@ -608,10 +613,9 @@
 <!-- 夜の海Footerの水面演出（STEP2：マウス追従の波紋／STEP3：クリック・タップ位置の水しぶき）。
      海鳥のエンディング退場（STEP4）はjs/seagull.js側で実装している -->
 <script src="js/footer-night.js" defer></script>
-<!-- 昼の光エリア（自己紹介〜対応できること）STEP A：マウスの動きに合わせたやわらかな太陽光の演出 -->
-<script src="js/daylight.js" defer></script>
-<!-- 夕暮れの光エリア（使用ツール〜お問い合わせ）STEP B：マウスの動きに合わせてときどき流れ星が走る演出 -->
-<script src="js/twilight-fx.js" defer></script>
+<!-- ページ全体のマウス軌跡（飛行機雲）。旧STEP A（daylight.js）・旧STEP B（twilight-fx.js）は
+     役割が重複するため廃止し、この一本の演出に統一した -->
+<script src="js/air-trail.js" defer></script>
 <!-- 開発用：?posdebug=1のときだけ動作するイントロ画像位置調整パネル。納品版でも常時読み込まれるが、
      クエリ無しでは即returnして何もしないためPEフォールバック同様に無害 -->
 <script src="js/intro-position-debug.js" defer></script>

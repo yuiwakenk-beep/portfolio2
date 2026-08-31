@@ -1866,15 +1866,11 @@ html.intro-pending #main {
   background: none;
 }
 
-/* ---------- 昼の光エリア（自己紹介〜対応できること）：STEP A ----------
-   マウスの動きに合わせて、ごく淡い太陽光がこちらへ差し込むように見せる演出。
-   .daylight-zoneが自己紹介・大切にしていること・対応できることの3セクションだけを囲むラッパーで、
-   Toolsより前で必ず閉じるため、演出はこのエリアの外へは物理的に広がらない
-   （js/daylight.jsのpointermoveリスナーも同じ要素にしか付けていない）。
-   --daylight-x/--daylight-y/--daylight-intensityはjs/daylight.jsがrequestAnimationFrame＋lerpで
-   なめらかに更新する。JSが動かない場合（reduced-motion・タッチ端末等）でも、
-   ここで指定した既定値（画面右上あたり・intensity:1）がそのまま固定の淡い光として機能する
-   （PEフォールバック。JS前提の演出にしない） */
+/* ---------- 昼の光エリア（自己紹介〜対応できること） ----------
+   マウス追従は行わない固定の太陽光（依頼によりjs/daylight.jsは廃止し、常にこの既定値のみで表示する）。
+   .daylight-zoneが自己紹介・大切にしていること・対応できることの3セクションだけを囲むラッパー。
+   --daylight-x/--daylight-y/--daylight-intensityはここで固定した値のまま変化しない
+   （画面右上あたり・intensity:1の柔らかい光が常時表示される） */
 .daylight-zone {
   position: relative;
   z-index: 0;
@@ -1896,98 +1892,32 @@ html.intro-pending #main {
   );
 }
 
-/* ---------- 夕暮れの光エリア（使用ツール〜お問い合わせ）：STEP B ----------
-   マウスに常駐する光は置かず、一定量マウスが動いた時だけ、その付近に小さな光が
-   一度だけ「キラッ」と現れてすぐ消える演出。.twilight-zoneが使用ツール・制作実績・
-   制作の流れ・お問い合わせの4セクションだけを囲むラッパーで、Footerより前で必ず閉じるため、
-   演出はFooterへは物理的に広がらない（js/twilight-fx.jsのpointer系リスナーも同じ要素にしか付けていない）。
-   キラッ要素（.kira）は発生のたびにjs/twilight-fx.jsがDOM生成し、アニメーション終了後に削除する
-   （常駐オブジェクトを持たない。footer-night.jsの波紋・水しぶきと同じ「生成→消滅」方式） */
+/* ---------- 夕暮れの光エリア（使用ツール〜お問い合わせ） ----------
+   個別のマウス演出は持たない（旧「キラッ」演出は廃止）。.twilight-zoneが使用ツール・制作実績・
+   制作の流れ・お問い合わせの4セクションを囲むラッパーとしてのみ残る */
 .twilight-zone {
   position: relative;
   z-index: 0;
 }
 
-.twilight-light-layer {
-  position: absolute;
+/* ---------- ページ全体のマウス軌跡（飛行機雲）：js/air-trail.js ----------
+   Hero〜Contactを通して同じ演出を使う全画面固定Canvas。ヘッダー(z-index:100)・
+   ナビ(98/99)・イントロ系(500番台)より下、セクション内コンテンツ（最大でもz-index:3程度）
+   より上という、既存の重なり順を壊さない帯に置く。pointer-events:noneのため
+   リンク・フォーム操作を一切妨げない */
+.air-trail-canvas {
+  position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: 40;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
-  overflow: hidden;
 }
 
-/* キラッ本体。丸いhaloは持たせず、小さな中心点と光線だけで構成する */
-.kira {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 0;
-  height: 0;
-  opacity: 0;
-  transform: translate(-50%, -50%) scale(0.65);
-  animation: kiraFlash 0.5s ease-out forwards;
-  --kira-core: #5b8fa3;
-}
-
-/* 中心の芯。丸い塊に見えないよう2〜4px程度に留める */
-.kira__core {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 3px;
-  height: 3px;
-  margin: -1.5px 0 0 -1.5px;
-  border-radius: 50%;
-  background: var(--kira-core);
-  box-shadow: 0 0 4px var(--kira-core);
-}
-
-/* 十字・斜め十字に伸びる細い光線（4方向）。星型・絵文字は使わず、抽象的な線のみ */
-.kira__ray {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 12px;
-  height: 1px;
-  background: linear-gradient(90deg, var(--kira-core), transparent);
-}
-.kira__ray--h {
-  transform: translate(-50%, -50%) rotate(0deg);
-}
-.kira__ray--v {
-  transform: translate(-50%, -50%) rotate(90deg);
-}
-.kira__ray--d1 {
-  transform: translate(-50%, -50%) rotate(45deg);
-}
-.kira__ray--d2 {
-  transform: translate(-50%, -50%) rotate(-45deg);
-}
-
-/* キラッ：現れてすぐ消える一連の動き（全体で0.5秒。js側のKIRA_LIFETIME_MSと合わせる） */
-@keyframes kiraFlash {
-  0% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0.65);
-  }
-  30% {
-    opacity: 1;
-    transform: translate(-50%, -50%) scale(1.1);
-  }
-  60% {
-    opacity: 0.85;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(1.25);
-  }
-}
-
-/* reduced-motion時はjs/twilight-fx.js自体が早期returnしてキラッを発生させないが、
+/* reduced-motion時はjs/air-trail.js自体が早期returnして軌跡を生成しないが、
    CSS側にも保険として非表示を持たせておく（PEフォールバックの二重化） */
 @media (prefers-reduced-motion: reduce) {
-  .twilight-light-layer {
+  .air-trail-canvas {
     display: none;
   }
 }
