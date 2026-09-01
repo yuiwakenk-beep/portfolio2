@@ -424,7 +424,8 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
-    padding: 12px 14px;
+    padding: 20px 18px;
+    border-radius: 20px;
   }
   .skill-card__icon {
     width: 44px;
@@ -433,6 +434,19 @@
   .skill-card__title {
     font-size: 12.5px;
     line-height: 1.4;
+  }
+
+  /* スマホでは主力2カードだけ不自然に大きくならないよう、通常カードと同じ寸法に戻す */
+  .skill-card--primary {
+    padding: 20px 18px;
+  }
+  .skill-card--primary .skill-card__icon {
+    width: 44px;
+    height: 44px;
+  }
+  .skill-card--primary .skill-card__title {
+    font-size: 12.5px;
+    font-weight: 600;
   }
 
   /* ---------- 制作の流れ（Flow）：後ろの波線をやめて縦のタイムライン形式に ---------- */

@@ -1195,33 +1195,65 @@ html.intro-pending #main {
 .skills__grid {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 16px;
+  gap: 22px;
 }
 
-/* アイコン=左、文章=右の横並び。中央揃えの縦積みより高さを抑えられる */
+/* アイコン=左、文章=右の横並び。中央揃えの縦積みより高さを抑えられる。
+   9枚が「管理画面」「料金表」に見えないよう、背景は不透明な白ではなく
+   海・空・光になじむ半透明アイボリーにし、輪郭は強い線ではなく
+   薄い白borderで背景からそっと分離するだけにとどめる */
 .skill-card {
   display: flex;
   align-items: center;
   gap: 14px;
-  background: var(--cloud-bg);
+  background: rgba(255, 251, 242, 0.64);
+  border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: var(--radius-card-sm);
-  box-shadow: var(--shadow-cloud-sm);
-  padding: 16px 20px;
+  box-shadow: 0 12px 30px rgba(70, 95, 105, 0.06);
+  padding: 28px 22px;
   text-align: left;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background-color 0.25s ease;
+}
+
+/* .reveal.is-visible の transform:none（同じ詳細度）に打ち消されないよう、
+   .skills__grid を足して詳細度を一段上げている */
+.skills__grid .skill-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 36px rgba(70, 95, 105, 0.09);
+}
+
+/* 主力2項目（Webデザイン／LP・ホームページ制作）だけ、
+   基本形はそのままに背景の濃さ・影・サイズをほんの少しだけ強める */
+.skill-card--primary {
+  background: rgba(255, 255, 255, 0.72);
+  padding: 32px 24px;
+  box-shadow: 0 16px 36px rgba(70, 95, 105, 0.08);
 }
 
 /* シーグラス風プレートが焼き込まれた画像アイコンをそのまま使うため、
-   背景円は持たせずサイズだけ指定する */
+   背景円は持たせず表示領域のサイズだけ統一する */
 .skill-card__icon {
   flex-shrink: 0;
-  width: 80px;
-  height: 80px;
+  width: 56px;
+  height: 56px;
+  display: grid;
+  place-items: center;
 }
 
 .skill-card__icon img {
-  width: 100%;
-  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
   object-fit: contain;
+}
+
+.skill-card--primary .skill-card__icon {
+  width: 62px;
+  height: 62px;
 }
 
 .skill-card__body {
@@ -1231,7 +1263,12 @@ html.intro-pending #main {
 .skill-card__title {
   font-family: var(--font-ui);
   font-weight: 600;
-  font-size: 14.5px;
+  font-size: 15px;
+}
+
+.skill-card--primary .skill-card__title {
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .skill-card__desc {
@@ -1339,6 +1376,13 @@ html.intro-pending #main {
   object-position: center top;
   display: block;
   border-radius: 6px;
+}
+
+/* 画像の縦横比がカード比率と合わず、cover指定だと左右が切れてしまう写真用。
+   トリミングせず全体を収める（hanami flowerのFV画像など） */
+.work-item__shot--contain {
+  object-fit: contain;
+  background: #fbf4e6;
 }
 
 /* 作品写真まわりの小さな海辺の小物（多用しない。1枚につき1個程度） */
