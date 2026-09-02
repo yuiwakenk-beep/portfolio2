@@ -119,9 +119,15 @@
   <!-- ========== ファーストビュー（6-2） ========== -->
   <section class="hero" id="hero">
     <!-- 背景写真：海を望むデスクでのワークシーン（人物なし）。動画演出は廃止し、静止画1枚のみ -->
-    <img id="heroPhoto" class="hero__photo hero__photo--desktop" src="sozai/new1.png" alt="">
+    <img id="heroPhoto" class="hero__photo hero__photo--desktop" src="sozai/hero-desktop-base.png" alt="">
     <!-- スマホ専用の縦長写真。767px以下でのみ表示する（css/responsive.css） -->
     <img class="hero__photo hero__photo--mobile" src="sozai/hero-mobile.png" alt="">
+
+    <!-- 右側カーテンの試作（PC版のみ）。カーテンを除いたベース写真の上に透過PNGを重ね、
+         ごく弱い揺れをCSSアニメーションだけで表現する。767px以下ではcss/responsive.cssで非表示にする -->
+    <div class="hero__curtain" aria-hidden="true">
+      <img src="sozai/hero-desktop-curtain.png" alt="">
+    </div>
 
     <!-- 写真内のノートPC画面に実績スクリーンショットを射影変換で嵌め込む（js/hero.jsが位置を計算） -->
     <div id="heroLaptopMask" class="hero__laptop-mask" aria-hidden="true">
@@ -206,14 +212,14 @@
              グラデーション基準のブレをなくしている（念のための補強。下記の波の谷が主因） -->
         <linearGradient id="heroSeamGradient" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="200">
           <stop offset="0%" style="stop-color: var(--color-sea-deep); stop-opacity: 1;" />
-          <stop offset="60%" style="stop-color: var(--color-sea-deep); stop-opacity: 0.5;" />
+          <stop offset="45%" style="stop-color: var(--color-sea-deep); stop-opacity: 0.9;" />
+          <stop offset="70%" style="stop-color: var(--color-sea-deep); stop-opacity: 0.45;" />
           <stop offset="100%" style="stop-color: var(--color-sea-deep); stop-opacity: 0;" />
         </linearGradient>
       </defs>
       <!-- 波の振幅（谷の深さ）をCTAとの間の限られた重なり量（css/animation.cssの.hero-seam-fadeのtop）に
-           収まる範囲まで浅くしている。振幅が深すぎると、谷の部分だけHeroの写真と重ならず、
-           次セクションの背景が隙間からのぞいて薄い帯のように見えてしまっていた -->
-      <path d="M0,40 C100,45 200,35 300,40 C400,45 500,35 600,40 C700,45 800,35 900,40 C1000,45 1100,35 1200,40 C1300,45 1400,35 1440,40 L1440,200 L0,200 Z" fill="url(#heroSeamGradient)" />
+           収まる範囲で、直線的な境目に見えないようごくわずかに深くしている（中心40・35〜50の緩い変化） -->
+      <path d="M0,40 C100,50 200,32 300,40 C400,50 500,32 600,40 C700,50 800,32 900,40 C1000,50 1100,32 1200,40 C1300,50 1400,32 1440,40 L1440,200 L0,200 Z" fill="url(#heroSeamGradient)" />
     </svg>
   </div>
 
@@ -244,7 +250,10 @@
             <div class="about__info">
               <h3 class="about__name">Yui</h3>
               <p class="about__role">Web Creator</p>
-              <p class="about__text">はじめまして🌻埼玉県出身、学生時代は東京、沖縄で３か月のリゾートアルバイト、大阪に住んでみたいという気持ちだけで引っ越しをし約一年半ほど生活。自由に歩んできたYUIです！雑貨販売やカフェ、リゾートアルバイト、テレビ業界…さまざまな現場で過ごしてきて、これまで感じてきた「伝わる」「使いやすい」「心地いい」体験をWebの世界でお届けするべく、制作の道に進みました。初めての方もどうぞ安心してご相談ください。</p>
+              <div class="about__text">
+                <p><strong>LP・ホームページ制作</strong>を中心に、デザインからHTML/CSS実装、画像制作、公開まで一貫して対応しています。</p>
+                <p class="about__text-detail">はじめまして🌻埼玉県出身、学生時代は東京、沖縄で３か月のリゾートアルバイト、大阪に住んでみたいという気持ちだけで引っ越しをし約一年半ほど生活。自由に歩んできたYUIです！雑貨販売やカフェ、リゾートアルバイト、テレビ業界…さまざまな現場で過ごしてきて、これまで感じてきた「伝わる」「使いやすい」「心地いい」体験をWebの世界でお届けするべく、制作の道に進みました。初めての方もどうぞ安心してご相談ください。</p>
+              </div>
             </div>
           </div>
           <div class="about__tags">
@@ -409,36 +418,8 @@
 
       <div class="works-overview-grid">
 
-        <!-- WORK 01（概要カード） -->
-        <article class="work-card-mini reveal">
-          <a href="works.html#work-01" class="work-card-mini__media">
-            <img class="work-card-mini__shot" src="sozai/work-01-hygge-coffee-fv.png" alt="hygge coffee サイトのファーストビュー" loading="lazy">
-          </a>
-          <div class="work-card-mini__body">
-            <p class="work-card-mini__number">WORK 01</p>
-            <h3 class="work-card-mini__title">hygge coffee</h3>
-            <p class="work-card-mini__tags">[LP / HP]・[業種]</p>
-            <span class="work-card-mini__highlight">[一言アピール例：制作期間2週間・スマホ対応]</span>
-            <a href="works.html#work-01" class="work-card-mini__link">詳しく見る &rarr;</a>
-          </div>
-        </article>
-
-        <!-- WORK 02（概要カード） -->
-        <article class="work-card-mini reveal">
-          <a href="works.html#work-02" class="work-card-mini__media">
-            <img class="work-card-mini__shot" src="sozai/work-02-hanami-flower-menu.png" alt="hanami flower サイトのメニューページ" loading="lazy">
-          </a>
-          <div class="work-card-mini__body">
-            <p class="work-card-mini__number">WORK 02</p>
-            <h3 class="work-card-mini__title">hanami flower</h3>
-            <p class="work-card-mini__tags">[LP / HP]・[業種]</p>
-            <span class="work-card-mini__highlight">[一言アピール例：デザイン〜実装まで対応]</span>
-            <a href="works.html#work-02" class="work-card-mini__link">詳しく見る &rarr;</a>
-          </div>
-        </article>
-
-        <!-- WORK 03（概要カード） -->
-        <article class="work-card-mini reveal">
+        <!-- WORK 01（概要カード：主役カード）※中身はWORK03だった仮プレースホルダーに差し替え -->
+        <article class="work-card-mini work-card-mini--featured reveal">
           <a href="works.html#work-03" class="work-card-mini__media">
             <div class="img-placeholder work-card-mini__shot">
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 20h8M12 18v2"/></svg>
@@ -448,11 +429,53 @@
           <div class="work-card-mini__body">
             <p class="work-card-mini__number">WORK 03</p>
             <h3 class="work-card-mini__title">[作品名]</h3>
-            <p class="work-card-mini__tags">[LP / HP]・[業種]</p>
+            <div class="work-card-mini__tags">
+              <span>[LP / HP]</span>
+              <span>[業種]</span>
+            </div>
             <span class="work-card-mini__highlight">[一言アピール例：問い合わせ導線を改善]</span>
-            <a href="works.html#work-03" class="work-card-mini__link">詳しく見る &rarr;</a>
+            <a href="works.html#work-03" class="work-card-mini__link">詳しく見る <span class="work-card-mini__arrow">&rarr;</span></a>
           </div>
         </article>
+
+        <!-- WORK 02 / 03（2段目：2列横並び） -->
+        <div class="works-overview-grid__sub">
+
+          <!-- WORK 02（概要カード） -->
+          <article class="work-card-mini reveal">
+            <a href="works.html#work-02" class="work-card-mini__media">
+              <img class="work-card-mini__shot" src="sozai/work-02-hanami-flower-menu.png" alt="hanami flower サイトのメニューページ" loading="lazy">
+            </a>
+            <div class="work-card-mini__body">
+              <p class="work-card-mini__number">WORK 02</p>
+              <h3 class="work-card-mini__title">hanami flower</h3>
+              <div class="work-card-mini__tags">
+                <span>[LP / HP]</span>
+                <span>[業種]</span>
+              </div>
+              <span class="work-card-mini__highlight">[一言アピール例：デザイン〜実装まで対応]</span>
+              <a href="works.html#work-02" class="work-card-mini__link">詳しく見る <span class="work-card-mini__arrow">&rarr;</span></a>
+            </div>
+          </article>
+
+          <!-- WORK 01（概要カード）※hygge coffeeをこちらの枠に移行 -->
+          <article class="work-card-mini reveal">
+            <a href="works.html#work-01" class="work-card-mini__media">
+              <img class="work-card-mini__shot" src="sozai/work-01-hygge-coffee-fv.png" alt="hygge coffee サイトのファーストビュー" loading="lazy">
+            </a>
+            <div class="work-card-mini__body">
+              <p class="work-card-mini__number">WORK 01</p>
+              <h3 class="work-card-mini__title">hygge coffee</h3>
+              <div class="work-card-mini__tags">
+                <span>[LP / HP]</span>
+                <span>[業種]</span>
+              </div>
+              <span class="work-card-mini__highlight">[一言アピール例：制作期間2週間・スマホ対応]</span>
+              <a href="works.html#work-01" class="work-card-mini__link">詳しく見る <span class="work-card-mini__arrow">&rarr;</span></a>
+            </div>
+          </article>
+
+        </div>
 
       </div>
 
@@ -507,9 +530,9 @@
         <span class="section-heading__en">Contact</span>
         <h2 class="section-heading__jp">お問い合わせ</h2>
       </div>
-      <p class="contact__message reveal">「こんなサイトを作りたい」「何から始めればよいか分からない」など、どんな小さなことでもお気軽にご相談ください。</p>
+      <p class="contact__message reveal">「こんなサイトを作りたい」「何から始めればよいか分からない」など、<br>どんな小さなことでもお気軽にご相談ください。</p>
 
-      <div class="contact__card cloud-card cloud-card--panel float-b reveal">
+      <div class="contact__card cloud-card cloud-card--panel reveal">
         <!-- 【要確認】送信先が決まり次第、action属性とmethodをここに設定してください。現状は見た目のみの実装です -->
         <form class="contact-form" id="contactForm" action="#">
           <div class="contact-form__field">

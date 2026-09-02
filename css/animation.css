@@ -85,14 +85,24 @@
   position: absolute;
   /* Heroの波にどれだけ重ねるか。CTAボタンの下端から余裕を持ってクリアしつつ、
      波の谷（index.html側のpath、振幅を浅くして谷がここに収まるよう調整済み）が
-     Hero側にしっかり収まる値にしている */
-  top: -50px;
+     Hero側にしっかり収まる値にしている。
+     実測でCTA下端と波の可視部分（塗りが始まるy=40の位置）の間の余白が
+     元々14px程度しかなかったため、20〜50pxの上方向シフトは丸ごとは取れず、
+     10px引き上げるだけに留め、残りは下記gradientの不透明範囲を広げて対応している */
+  top: -60px;
   left: 0;
   right: 0;
   z-index: 2; /* .section-photo-flowの背景写真より前面、cloud-wrapの内容よりは背面 */
   height: 200px;
   pointer-events: none;
   overflow: hidden;
+}
+
+/* スマホはHeroが低くCTAとの余白も狭いため、PCと同じpx値は使わず重なり量を控えめにする */
+@media (max-width: 767px) {
+  .hero-seam-fade {
+    top: -34px;
+  }
 }
 
 .hero-seam-fade svg {
@@ -600,12 +610,12 @@
   transform: scale(1) rotate(-2deg);
 }
 
-/* 開封プロローグ終盤：紙がふわっと持ち上がりながら光に溶けていく。
-   wrapper自体の中心合わせtranslate(-50%,-50%)は維持したまま、さらに上へ持ち上げる */
+/* 開封プロローグ終盤：紙が画面いっぱいに近づくまで拡大し、その白がintro-light-washの光へ
+   引き継がれる演出（js/intro.jsのGSAPタイムラインが__frameのscaleを直接制御する）。
+   紙自体（wrapper）はlight-washが十分に覆いきってから、ここで一瞬だけ静かにフェードアウトさせる */
 .intro-letter-paper.is-dissolving {
-  transition: opacity 1s ease, transform 1s ease;
+  transition: opacity 0.25s ease;
   opacity: 0;
-  transform: translate(-50%, calc(-50% - 14px));
 }
 
 /* 紙の上に書かれる「Welcome to my portfolio」。素材画像は紐が中央を斜めに横切っているため、

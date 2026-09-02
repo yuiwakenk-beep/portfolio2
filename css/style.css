@@ -106,7 +106,23 @@ body {
      以前、サイズ指定なしのradial-gradientを使った際、farthest-cornerの自動計算がbody全体の
      高さを基準にしてしまい、横に伸びる不自然な光の帯になった不具合があったため
      （style.css内の別コメント参照）、必ずpx固定の楕円サイズ・Y位置で指定する */
+  /* STEP 2：左右の壁にごくわずかな自然光差を追加する固定ベース光。
+     左＝ごく薄いアイボリーの光が回り込む、右＝ごく薄いブルーグレーで少し落ち着かせる。
+     どちらもwall-light.jsのマウス追従光（alpha 0.04〜0.12）より弱い固定値にとどめ、
+     「常時ある空間光」の上に「マウスで動く光」が重なる関係を保つ。
+     境界が見えないよう、#mainに近づく前（55%手前）でtransparentへ収束させる */
   background:
+    /* STEP 4追記：Footerは#mainの外側（壁）を覆わないため、Footerの高さ分（body全体の
+       約96%〜100%）だけは壁のsand色がそのまま隣に残ってしまい、Footerの夜色との間に
+       くっきりした縦の境目が見えていた。ここだけFooter自身の開始色と同じ色で塗り、
+       境目をなくす（Footerの要素自体は変更しない） */
+    linear-gradient(
+      to bottom,
+      transparent 0%,
+      transparent 93%,
+      rgba(46, 85, 104, 0.6) 96%,
+      rgba(46, 85, 104, 0.94) 100%
+    ),
     radial-gradient(
       ellipse 620px 440px at 3% 60px,
       rgba(255, 252, 244, var(--wall-light-left-alpha)) 0%,
@@ -118,6 +134,30 @@ body {
       rgba(255, 252, 244, var(--wall-light-right-alpha)) 0%,
       rgba(255, 252, 244, var(--wall-light-right-alpha-outer)) 24%,
       rgba(255, 252, 244, 0) 50%
+    ),
+    linear-gradient(
+      to right,
+      rgba(255, 253, 247, 0.06) 0%,
+      rgba(255, 253, 247, 0.02) 32%,
+      rgba(255, 253, 247, 0) 55%
+    ),
+    linear-gradient(
+      to left,
+      rgba(80, 100, 105, 0.035) 0%,
+      rgba(80, 100, 105, 0.012) 32%,
+      rgba(80, 100, 105, 0) 55%
+    ),
+    /* STEP 4：Contact区間（body全体の高さの約75%〜96%地点。#mainの78%〜100%地点に相当）で、
+       上のSTEP2左右光差・wall-light（マウス追従光）を、同じsand色を薄く重ねて少しずつ覆い隠す。
+       透明度が増すだけで色相は変えないため、下の夜色グラデーションはそのまま透けて見える */
+    linear-gradient(
+      to bottom,
+      rgba(247, 243, 233, 0) 0%,
+      rgba(247, 243, 233, 0) 75%,
+      rgba(247, 243, 233, 0.22) 85%,
+      rgba(247, 243, 233, 0.62) 92%,
+      rgba(247, 243, 233, 0.9) 96%,
+      rgba(247, 243, 233, 0.9) 100%
     ),
     linear-gradient(
       to bottom,
@@ -135,6 +175,35 @@ body {
 @media (max-width: 1024px) {
   body {
     background:
+      /* STEP 4追記：Footer分の高さだけ、壁のsand色をFooter開始色に合わせて塗り、縦の境目をなくす */
+      linear-gradient(
+        to bottom,
+        transparent 0%,
+        transparent 93%,
+        rgba(46, 85, 104, 0.5) 96%,
+        rgba(46, 85, 104, 0.88) 100%
+      ),
+      linear-gradient(
+        to right,
+        rgba(255, 253, 247, 0.035) 0%,
+        rgba(255, 253, 247, 0.012) 32%,
+        rgba(255, 253, 247, 0) 55%
+      ),
+      linear-gradient(
+        to left,
+        rgba(80, 100, 105, 0.02) 0%,
+        rgba(80, 100, 105, 0.007) 32%,
+        rgba(80, 100, 105, 0) 55%
+      ),
+      /* STEP 4：タブレットはPCよりフェード距離を短く（収束を早める） */
+      linear-gradient(
+        to bottom,
+        rgba(247, 243, 233, 0) 0%,
+        rgba(247, 243, 233, 0) 78%,
+        rgba(247, 243, 233, 0.5) 90%,
+        rgba(247, 243, 233, 0.85) 96%,
+        rgba(247, 243, 233, 0.85) 100%
+      ),
       linear-gradient(
         to bottom,
         rgba(255, 252, 246, 0) 38%,
@@ -519,6 +588,11 @@ html.intro-pending #main {
   --foam-bob-y: 2px;         /* 上下にどれだけ揺れるか */
   --foam-drift-duration: 9s; /* 1往復する時間（遅いほど上品） */
   --foam-opacity-min: 0.88;  /* 白波が最も薄くなる時の不透明度 */
+  --foam-overscan: 1.16;     /* 波素材をこの倍率だけ拡大し、はみ出した分を揺れの可動域にする */
+  --foam-tilt: -3deg;        /* 右上がり（波素材の右側を持ち上げる）方向の傾き。
+                                 実機確認では、この方向は右側で背景の渚ラインとの隙間が
+                                 広がりやすい傾向があったため、値を強めすぎないよう注意する */
+  --foam-shift-y: -12px;     /* 波素材全体を少し上へ移動する */
 }
 
 /* ベース背景：画面いっぱいに敷く */
@@ -533,7 +607,12 @@ html.intro-pending #main {
 }
 
 /* 白波：背景写真とは別レイヤーで、渚の見え方に合わせてobject-positionを個別に調整している
-   （以前は背景と揃える設計だったが、意図的にずらす調整に変更した） */
+   （以前は背景と揃える設計だったが、意図的にずらす調整に変更した）。
+   ボックス自体をwidth/leftで広げるとobject-fit: coverの拡大率が変わり、
+   object-position（縦376%）が示す実際の位置がずれてしまう（＝波の上下位置が動いて見える）
+   不具合があったため、ボックスの寸法は元のinset:0のまま維持する。
+   はみ出し量は、object-fit適用後の見た目に対してtransform: scale()で拡大することで確保する
+   （transformはレイアウト後の描画にのみ影響し、object-position自体の計算には影響しない） */
 .intro-scene__foam {
   position: absolute;
   inset: 0;
@@ -548,18 +627,19 @@ html.intro-pending #main {
 }
 
 @keyframes introFoamDrift {
-  0%   { transform: translate(0, 0); opacity: 1; }
-  45%  { transform: translate(var(--foam-drift-x), calc(var(--foam-bob-y) * -1)); opacity: var(--foam-opacity-min); }
-  55%  { transform: translate(var(--foam-drift-x), calc(var(--foam-bob-y) * -1)); opacity: var(--foam-opacity-min); }
-  100% { transform: translate(0, 0); opacity: 1; }
+  0%   { transform: rotate(var(--foam-tilt)) scale(var(--foam-overscan)) translate(0, var(--foam-shift-y)); opacity: 1; }
+  45%  { transform: rotate(var(--foam-tilt)) scale(var(--foam-overscan)) translate(var(--foam-drift-x), calc(var(--foam-shift-y) + (var(--foam-bob-y) * -1))); opacity: var(--foam-opacity-min); }
+  55%  { transform: rotate(var(--foam-tilt)) scale(var(--foam-overscan)) translate(var(--foam-drift-x), calc(var(--foam-shift-y) + (var(--foam-bob-y) * -1))); opacity: var(--foam-opacity-min); }
+  100% { transform: rotate(var(--foam-tilt)) scale(var(--foam-overscan)) translate(0, var(--foam-shift-y)); opacity: 1; }
 }
 
-/* 動きを抑えたい/不要な環境では静止画のまま表示する */
+/* 動きを抑えたい/不要な環境では静止画のまま表示する。
+   ただし傾き・拡大・上方向シフトは見た目の調整なのでアニメーションの有無に関わらず維持する */
 @media (prefers-reduced-motion: reduce) {
   .intro-scene__foam {
     animation: none;
     opacity: 1;
-    transform: none;
+    transform: rotate(var(--foam-tilt)) scale(var(--foam-overscan)) translate(0, var(--foam-shift-y));
   }
 }
 
@@ -569,6 +649,11 @@ html.intro-pending #main {
   .intro-scene__bg,
   .intro-scene__foam {
     object-position: center 42%;
+  }
+
+  /* スマホはPCより見える横幅の比率が変わるため、オーバースキャンをやや大きめに取る */
+  .intro-scene {
+    --foam-overscan: 1.24;
   }
 }
 
@@ -616,15 +701,17 @@ html.intro-pending #main {
   position: fixed;
   inset: 0;
   z-index: 501;
-  background: radial-gradient(circle at 50% 45%, rgba(255, 250, 235, 0) 0%, rgba(255, 250, 235, 0) 40%, rgba(255, 250, 235, 0.9) 100%);
+  /* 手紙の白と同じ色調（暖色のアイボリー）に統一し、「紙の白がそのまま光になる」ように見せる。
+     純白#fffの強いフラッシュは使わない */
+  background: radial-gradient(circle at 50% 45%, rgba(255, 253, 247, 0) 0%, rgba(255, 253, 247, 0) 40%, rgba(255, 253, 247, 0.9) 100%);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.9s ease, background 0.9s ease;
+  transition: opacity 0.7s ease, background 0.7s ease;
 }
 
 .intro-light-wash.is-active {
   opacity: 1;
-  background: radial-gradient(circle at 50% 45%, rgba(255, 250, 235, 0.98) 0%, rgba(255, 250, 235, 0.98) 100%);
+  background: radial-gradient(circle at 50% 45%, rgba(255, 253, 247, 0.98) 0%, rgba(255, 253, 247, 0.98) 100%);
 }
 
 /* ---------- ファーストビュー（6-2） ---------- */
@@ -676,6 +763,120 @@ html.intro-pending #main {
 .hero__photo--mobile,
 .hero__intro-mobile {
   display: none;
+}
+
+/* ---------- 右側カーテンの試作（PC版のみ） ----------
+   背景（.hero__photo, z-index:0）の上、本文（.hero__copy, z-index:3）の下に重ねる。
+   767px以下では下のdisplay:noneのままにし、768px以上だけcss/responsive.cssでblockに戻す */
+.hero__curtain {
+  display: none;
+  position: absolute;
+  top: 0;
+  /* アーチ窓枠とのわずかな隙間を埋めるため、右へ少しだけずらす（負の値で外側へ寄せる） */
+  right: -8px;
+  height: 100%;
+  z-index: 2;
+  pointer-events: none;
+  overflow: hidden;
+  /* このラッパーの中だけで3D変形が成立するようにする（Hero全体には波及させない） */
+  perspective: 1300px;
+}
+
+.hero__curtain img {
+  display: block;
+  height: 100%;
+  width: auto;
+  transform-origin: top right;
+  animation: heroCurtainSoftBreeze 16.8s ease-in-out infinite;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* 一定周期の往復ではなく「そよ風」感を出すため、0〜10%と90〜100%はほぼ静止させ、
+   その間だけ弱い風→大きめのふくらみ→小さな戻り→逆方向のごく弱いねじれ→静穏、という
+   不規則な流れにする。横移動(translateX)は補助にとどめ、rotateY/scaleX/scaleYを主役にする */
+@keyframes heroCurtainSoftBreeze {
+  0%,
+  10%,
+  100% {
+    transform:
+      perspective(1300px)
+      rotateY(0deg)
+      translateX(0px)
+      skewX(0deg)
+      scaleX(1)
+      scaleY(1);
+  }
+  22% {
+    transform:
+      perspective(1300px)
+      rotateY(-0.5deg)
+      translateX(0.45px)
+      skewX(-0.06deg)
+      scaleX(1.006)
+      scaleY(1.002);
+  }
+  38% {
+    transform:
+      perspective(1300px)
+      rotateY(-1.6deg)
+      translateX(1.6px)
+      skewX(-0.22deg)
+      scaleX(1.024)
+      scaleY(1.007);
+  }
+  48% {
+    transform:
+      perspective(1300px)
+      rotateY(-0.85deg)
+      translateX(0.9px)
+      skewX(-0.11deg)
+      scaleX(1.014)
+      scaleY(1.003);
+  }
+  60% {
+    transform:
+      perspective(1300px)
+      rotateY(0.8deg)
+      translateX(-0.45px)
+      skewX(0.14deg)
+      scaleX(0.996)
+      scaleY(1.001);
+  }
+  72% {
+    transform:
+      perspective(1300px)
+      rotateY(1.3deg)
+      translateX(-0.7px)
+      skewX(0.22deg)
+      scaleX(0.992)
+      scaleY(0.998);
+  }
+  82% {
+    transform:
+      perspective(1300px)
+      rotateY(0.35deg)
+      translateX(0.15px)
+      skewX(0.06deg)
+      scaleX(1.003)
+      scaleY(1);
+  }
+  90% {
+    transform:
+      perspective(1300px)
+      rotateY(0deg)
+      translateX(0px)
+      skewX(0deg)
+      scaleX(1)
+      scaleY(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__curtain img {
+    animation: none !important;
+    transform: none !important;
+  }
 }
 
 /* ヒーロー見出し（js/hero.js が写真に合わせて位置を制御） */
@@ -1134,21 +1335,42 @@ html.intro-pending #main {
 }
 
 .about__name {
-  font-size: 22px;
-  font-weight: 700;
+  font-size: 26px;
+  font-weight: 600;
 }
 
+/* 名前より明確に弱い補助ラベルとして扱う（名前と同じ強さにしない） */
 .about__role {
   font-family: var(--font-en);
   font-style: italic;
+  font-size: 13px;
+  letter-spacing: 0.08em;
   color: var(--color-sea-deep);
+  opacity: 0.72;
   margin: 2px 0 10px;
 }
 
+/* 「仕事内容→制作の方向性→人柄」の3段落。1つの文章の塊に見えないよう段落間に余白を取る */
 .about__text {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  max-width: 520px;
   color: var(--color-text-sub);
-  font-size: 13px;
-  line-height: 1.8;
+  font-size: 14px;
+  line-height: 1.95;
+}
+
+.about__text strong {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+/* 以前の自己紹介文（経歴の詳細）を補足として残す。3段落の要約より明確に小さく・薄くする */
+.about__text-detail {
+  font-size: 11.5px;
+  line-height: 1.75;
+  opacity: 0.8;
 }
 
 .about__tags {
@@ -1196,6 +1418,10 @@ html.intro-pending #main {
   display: grid;
   grid-template-columns: 1fr;
   gap: 22px;
+  /* デフォルトのstretchだと、主力カードと同じ行に並ぶ通常カードが背丈だけ引き伸ばされてしまうため、
+     各カードが自分のpadding/文字サイズ通りの高さになるようにする。
+     行の高さは主力カード基準になるため、背の低い通常カードは下端をそろえる */
+  align-items: end;
 }
 
 /* アイコン=左、文章=右の横並び。中央揃えの縦積みより高さを抑えられる。
@@ -1210,7 +1436,7 @@ html.intro-pending #main {
   border: 1px solid rgba(255, 255, 255, 0.55);
   border-radius: var(--radius-card-sm);
   box-shadow: 0 12px 30px rgba(70, 95, 105, 0.06);
-  padding: 28px 22px;
+  padding: 23px 19px;
   text-align: left;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
@@ -1231,7 +1457,7 @@ html.intro-pending #main {
    基本形はそのままに背景の濃さ・影・サイズをほんの少しだけ強める */
 .skill-card--primary {
   background: rgba(255, 255, 255, 0.72);
-  padding: 32px 24px;
+  padding: 28px 22px;
   box-shadow: 0 16px 36px rgba(70, 95, 105, 0.08);
 }
 
@@ -1239,8 +1465,8 @@ html.intro-pending #main {
    背景円は持たせず表示領域のサイズだけ統一する */
 .skill-card__icon {
   flex-shrink: 0;
-  width: 56px;
-  height: 56px;
+  width: 50px;
+  height: 50px;
   display: grid;
   place-items: center;
 }
@@ -1252,8 +1478,8 @@ html.intro-pending #main {
 }
 
 .skill-card--primary .skill-card__icon {
-  width: 62px;
-  height: 62px;
+  width: 56px;
+  height: 56px;
 }
 
 .skill-card__body {
@@ -1267,7 +1493,7 @@ html.intro-pending #main {
 }
 
 .skill-card--primary .skill-card__title {
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 600;
 }
 
@@ -1287,7 +1513,9 @@ html.intro-pending #main {
   padding: 3px 10px;
 }
 
-/* ---------- 使用ツール（6-6） ---------- */
+/* ---------- 使用ツール（6-6） ----------
+   SkillsがWorksより一段弱いのと同様、Toolsは「共通ルールのSサイズ＝カプセル型UI」として
+   Skillsよりさらに一段弱く（小さい・薄い・静か）扱う。見せ場ではなく信頼の補足情報。 */
 /* 折り返さず常に1列。全部は収まらない画面幅では横スクロールで見せる */
 .tools__list {
   display: flex;
@@ -1299,6 +1527,11 @@ html.intro-pending #main {
   margin: -4px -4px 0;
 }
 
+/* Toolsだけ縦のセクション余白をSkillsより抑える（他セクションの--section-pad-yは変更しない） */
+.tools .section-inner {
+  padding-top: calc(var(--section-pad-y) * 0.75);
+  padding-bottom: calc(var(--section-pad-y) * 0.75);
+}
 
 .tool-chip {
   display: flex;
@@ -1306,19 +1539,40 @@ html.intro-pending #main {
   justify-content: center;
   gap: 8px;
   max-width: 100%;
-  padding: 10px 20px;
-  border-radius: 50px;
-  background: var(--cloud-bg);
-  box-shadow: var(--shadow-cloud-sm);
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.48);
+  box-shadow: 0 6px 16px rgba(70, 95, 105, 0.035);
   font-family: var(--font-ui);
   font-size: 13px;
+  font-weight: 500;
   white-space: nowrap;
-  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1), background-position 0.65s ease-out;
+  transition: transform 0.35s cubic-bezier(0.2, 0.7, 0.2, 1),
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    background-position 0.65s ease-out;
+}
+
+/* 背景色・borderの変化はここで（.hero-ctaと同じ役割分担）。
+   浮き上がり・反射光は animation.css の .seaglass-hover が担当するが、
+   Toolsだけそのhoverを弱めるため、下の「.tools .seaglass-hover」で個別に上書きする */
+.tools .tool-chip:hover {
+  background: rgba(255, 255, 255, 0.52);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+/* SkillsのtranslateY(-3px)より弱く、反射光の帯（background-position）も動かさずほぼ無効化する。
+   他セクションの.seaglass-hoverには影響しないようToolsに限定 */
+.tools .seaglass-hover:hover {
+  transform: translateY(-1px);
+  background-position: -150% -150%;
 }
 
 .tool-chip__icon {
-  width: 40px;
-  height: 40px;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
   flex-shrink: 0;
 }
 
@@ -1488,35 +1742,19 @@ html.intro-pending #main {
   gap: 10px;
 }
 
-/* 背景一面を砂浜写真にはせず、既存の海の背景の上にごく薄い砂の質感だけを重ねる。
-   .works自体のbackgroundは他セクションと共有のためstyle.css内の共通ルール（background:none）は変更しない */
-.works {
-  position: relative;
-}
-
-.works::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background:
-    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E"),
-    radial-gradient(circle at 18% 25%, rgba(255, 255, 255, 0.4), transparent 42%),
-    radial-gradient(circle at 82% 75%, rgba(255, 255, 255, 0.28), transparent 46%),
-    linear-gradient(180deg, rgba(247, 238, 221, 0.3) 0%, rgba(240, 224, 196, 0.45) 100%);
-  background-size: 160px 160px, auto, auto, auto;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.works .section-inner {
-  position: relative;
-  z-index: 1;
-}
+/* Works独自の砂質感オーバーレイ（::before）は、セクション境界に横一直線の色差を作ってしまうため撤去した。
+   背景はAbout〜Contact共通の.section-photo-flowの1枚画像のみに任せる */
 
 /* ---------- 制作の流れ（6-8） ---------- */
 .flow {
   position: relative;
   overflow: hidden;
+}
+
+/* WorksからContactへの「休符」として、Worksより上下の余白を少し抑える（他セクションの--section-pad-yは変更しない） */
+.flow .section-inner {
+  padding-top: calc(var(--section-pad-y) * 0.8);
+  padding-bottom: calc(var(--section-pad-y) * 0.8);
 }
 
 /* 波線はステップ一覧と重ねて敷き、スクロール量に応じてjs/animation.jsがstroke-dashoffsetを直接更新する
@@ -1544,15 +1782,50 @@ html.intro-pending #main {
   display: block;
 }
 
+/* Worksより明確に静かなセクションにするため、波線は主役にならないごく薄いブルーグレーにとどめる */
 .flow__route-path {
   fill: none;
-  stroke: var(--color-text-sub);
-  stroke-width: 2.5;
+  stroke: rgba(105, 137, 148, 0.28);
+  stroke-width: 1.5;
   stroke-linecap: round;
-  opacity: 0.6;
-  /* JSがgetTotalLength()を基に実寸のstroke-dasharray/dashoffsetを設定するまでの初期値 */
+  /* JSがgetTotalLength()を基に実寸のstroke-dasharray/--flow-path-lengthを設定するまでの初期値 */
   stroke-dasharray: 3000;
-  stroke-dashoffset: 3000;
+  stroke-dashoffset: var(--flow-path-length, 3000);
+  animation-play-state: paused;
+}
+
+/* Flowセクションが画面内にある間だけ、波線が工程を1→7へなぞって現れ、少し止まってから
+   静かに消え、また現れる…を繰り返す。1回きりの描画ではなく定期的な動きにする */
+.flow.is-flowing .flow__route-path {
+  animation: flowRouteTrace 9s ease-in-out infinite;
+  animation-play-state: running;
+}
+
+/* 7→1へ戻るように見える「逆再生」を避けるため、消えるときは線をたどり直さずopacityだけで
+   静かにフェードアウトさせ、非表示の間にstroke-dashoffsetを次周回の開始位置へ戻す */
+@keyframes flowRouteTrace {
+  0% {
+    stroke-dashoffset: var(--flow-path-length, 3000);
+    opacity: 0;
+  }
+  5% {
+    stroke-dashoffset: var(--flow-path-length, 3000);
+    opacity: 1;
+  }
+  40%,
+  65% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  80% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+  85%,
+  100% {
+    stroke-dashoffset: var(--flow-path-length, 3000);
+    opacity: 0;
+  }
 }
 
 .flow__steps {
@@ -1564,41 +1837,45 @@ html.intro-pending #main {
   margin-top: 28px;
 }
 
+/* 「7枚のカード」に見せないため、白背景・border・shadow・角丸は持たせず
+   番号＋ラベルだけで成立する情報ブロックとして扱う */
 .flow-step {
   display: flex;
   align-items: center;
   gap: 14px;
-  background: var(--cloud-bg);
-  border-radius: 20px;
-  padding: 14px 18px;
-  box-shadow: var(--shadow-cloud-sm);
+  background: transparent;
+  border: none;
+  box-shadow: none;
 }
 
+/* 番号だけをSサイズの共通言語（小さな円）として残し、視線の手がかりにする */
 .flow-step__num {
   flex-shrink: 0;
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  background: var(--color-sea-deep);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: var(--font-en);
-  font-style: italic;
-  font-size: 14px;
+  display: grid;
+  place-items: center;
+  background: rgba(255, 255, 255, 0.52);
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  color: var(--color-sea-deep);
+  font-family: var(--font-ui);
+  font-weight: 500;
+  font-size: 12px;
 }
 
 .flow-step__label {
   font-family: var(--font-ui);
-  font-weight: 600;
-  font-size: 13.5px;
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 1.6;
 }
 
 .flow__note {
-  margin-top: 20px;
-  font-size: 11.5px;
+  margin-top: 36px;
+  font-size: 12.5px;
   color: var(--color-text-sub);
+  opacity: 0.7;
   text-align: center;
 }
 
@@ -1634,23 +1911,37 @@ html.intro-pending #main {
   text-align: center;
 }
 
+/* 見出しとフォームカードをつなぐ橋渡しの一文。見出しより弱く、営業的な圧を出さない */
 .contact__message {
   color: var(--color-text-sub);
-  max-width: 480px;
+  max-width: 660px;
   margin: 0 auto 32px;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.9;
 }
 
+/* ContactはWorks主役カードと同じ「Lサイズ＝浅いアーチパネル」の家族にする。
+   ただしWorksより静か（背景・shadowを一段弱く、hoverで浮かせない）にとどめ、
+   「画像が主役のWorks」に対して「余白とフォームが主役のContact」という役割差を保つ。
+   cloud-card/cloud-card--panelの雲形・浮遊感はここで打ち消し、静かな窓辺として扱う */
 .contact__card {
-  max-width: 560px;
+  max-width: 800px;
   margin: 0 auto;
-  padding: 34px 26px;
+  padding: 26px 20px 28px;
+  border-radius: 32px 32px 20px 20px;
+  background: rgba(255, 255, 255, 0.66);
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  box-shadow: 0 16px 44px rgba(70, 95, 105, 0.065);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 /* ---------- お問い合わせフォーム ---------- */
 .contact-form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 26px;
   width: 100%;
 }
 
@@ -1663,30 +1954,32 @@ html.intro-pending #main {
 
 .contact-form__label {
   font-family: var(--font-ui);
-  font-weight: 600;
-  font-size: 13.5px;
+  font-weight: 500;
+  font-size: 14px;
   color: var(--color-text);
 }
 
+/* 既存の「学習中」タグと同じくすみローズ系に揃え、警告色の赤を避ける */
 .contact-form__required {
   margin-left: 4px;
   padding: 1px 6px;
   border-radius: 50px;
-  background: var(--color-accent);
-  color: #fff;
+  background: var(--color-sunset-pink);
+  color: #8a4a3d;
   font-size: 10px;
   font-weight: 600;
   vertical-align: middle;
 }
 
+/* Mカード（22px）より小さなUIとして角丸を抑え、Contactカードの中で自然に分離する程度の背景にする */
 .contact-form__input,
 .contact-form__select,
 .contact-form__textarea {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid var(--color-sea-light);
-  border-radius: var(--radius-card-sm);
-  background: #fff;
+  border: 1px solid rgba(110, 135, 145, 0.18);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.62);
   color: var(--color-text);
   font-family: var(--font-body);
   font-size: 14px;
@@ -1696,17 +1989,18 @@ html.intro-pending #main {
 .contact-form__select:focus,
 .contact-form__textarea:focus {
   outline: none;
-  border-color: var(--color-sea-deep);
-  box-shadow: 0 0 0 3px rgba(40, 125, 155, 0.15);
+  border-color: rgba(90, 125, 138, 0.42);
+  box-shadow: 0 0 0 3px rgba(120, 155, 165, 0.1);
 }
 
 .contact-form__textarea {
   resize: vertical;
-  min-height: 120px;
+  min-height: 160px;
 }
 
 .contact-form__submit {
   align-self: center;
+  justify-content: center;
   margin-top: 4px;
   border: none;
   cursor: pointer;
@@ -2026,19 +2320,107 @@ html.intro-pending #main {
    縦に伸びる光の線として見えてしまう不具合が繰り返し解消できなかったため撤去した。
    #main自体の柔らかい外側box-shadowのみで奥行きを表現する */
 
+/* ============================================================
+   アーチ窓ブラッシュアップ STEP 1：内縁ハイライト
+   「壁にアーチ状の開口部がある」ように見せる、常時表示の建築的な光。
+   #main自体のborder-radiusは変えず（#mainは従来通り角なしの矩形のまま）、
+   新規の#main::beforeにHeroの弧（.hero, border-radius）と同じ曲率だけを与えて、
+   inset box-shadowをその形に沿わせる。これによりアーチ上部の曲線でも
+   ハイライトが途切れず、下の直線区間ともつながって見える。
+   マウスには反応しない静的な光で、body背景のwall-light（js/wall-light.js、
+   #mainの外側＝壁側にのみ効く）とはレイヤー・役割ともに独立させている */
+#main::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  border-radius: 50% 50% 0 0 / 120px 120px 0 0;
+  box-shadow: inset 0 0 0 2.5px rgba(255, 253, 247, 0.55);
+  /* STEP 4：Contact区間（#main全体の高さの約78%〜100%地点）へ向けて、
+     内縁ハイライトを少しずつ弱める。#main::before自体は#mainと同じ高さの
+     疑似要素なので、パーセンテージは#main全体の高さを基準にできる。
+     0〜78%（Hero〜Flow）は通常の強さのまま、Contact中央で7〜8割、
+     Contact下部で3〜4割に弱め、Footerとの境目（100%）では完全に透明にする。
+     ごく薄い残光でもFooterの暗い夜色に対しては白い線として見えてしまうため、
+     境界線だけは必ず0まで落とす */
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black 78%,
+    rgba(0, 0, 0, 0.78) 89%,
+    rgba(0, 0, 0, 0.32) 96%,
+    rgba(0, 0, 0, 0) 99%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    black 0%,
+    black 78%,
+    rgba(0, 0, 0, 0.78) 89%,
+    rgba(0, 0, 0, 0.32) 96%,
+    rgba(0, 0, 0, 0) 99%
+  );
+  /* STEP 3：アーチ上部の曲面だけに回り込む、ごく弱い固定光。
+     border-radiusにより自然にアーチ形状の外へはみ出さず、中心よりごくわずかに
+     左（STEP 2で明るくしている側）へ寄せる。マウスには反応しない常時光で、
+     下方向（縦壁の中段〜下部）へは伸ばさない */
+  background: radial-gradient(
+    ellipse 62% 230px at 47% 0%,
+    rgba(255, 253, 247, 0.14) 0%,
+    rgba(255, 253, 247, 0.08) 28%,
+    rgba(255, 253, 247, 0.03) 55%,
+    rgba(255, 253, 247, 0) 78%
+  );
+}
+
 /* タブレット：影を少し弱めに */
 @media (max-width: 1024px) {
   #main {
     max-width: 96vw;
     box-shadow: 0 36px 70px -36px rgba(70, 100, 112, 0.32);
   }
+
+  #main::before {
+    border-radius: 50% 50% 0 0 / 70px 70px 0 0;
+    box-shadow: inset 0 0 0 1.5px rgba(255, 253, 247, 0.42);
+    background: radial-gradient(
+      ellipse 56% 160px at 47% 0%,
+      rgba(255, 253, 247, 0.09) 0%,
+      rgba(255, 253, 247, 0.05) 28%,
+      rgba(255, 253, 247, 0.02) 55%,
+      rgba(255, 253, 247, 0) 78%
+    );
+    /* STEP 4：タブレットはPCよりフェード距離を短く（開始をやや遅く・収束を早める）。
+       Footerとの境目（100%）は白い線が出ないよう必ず0にする */
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      black 0%,
+      black 82%,
+      rgba(0, 0, 0, 0.7) 91%,
+      rgba(0, 0, 0, 0.25) 97%,
+      rgba(0, 0, 0, 0) 99%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      black 0%,
+      black 82%,
+      rgba(0, 0, 0, 0.7) 91%,
+      rgba(0, 0, 0, 0.25) 97%,
+      rgba(0, 0, 0, 0) 99%
+    );
+  }
 }
 
-/* スマホ：影もごく控えめに */
+/* スマホ：影もごく控えめに。内縁ハイライト・アーチ上部光ともに、壁自体を表示しないため非表示にする */
 @media (max-width: 767px) {
   #main {
     max-width: 100%;
     box-shadow: 0 22px 40px -26px rgba(70, 100, 112, 0.24);
+  }
+
+  #main::before {
+    box-shadow: none;
+    background: none;
   }
 }
 
@@ -2270,112 +2652,287 @@ html.intro-pending #main {
   visibility: visible;
 }
 
-/* ---------- 制作実績：トップページの概要カード ---------- */
-.works-overview-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 28px;
+/* ---------- 制作実績：「空に作品を飾った、海辺の静かなギャラリー」 ----------
+   Webのカード一覧ではなく、上質なマット紙プリントが、ごく薄い半透明アクリルの奥行きを
+   伴って空の中に静かに浮かんで展示されているように見せる。紙雑貨的な装飾（クリップ・テープ等）は
+   一切使わず、紙の質感・薄いアクリル板・柔らかい影だけで構成する。
+   B案：1段目にWORK01を横幅いっぱいの主役展示、2段目にWORK02/03を2列横並びで配置する。
+   3枚とも基本の縦積みカード（画像が上・本文が下）を共通で使い、WORK01だけ
+   面積・余白・タイトルサイズで差をつける（角度はどれもほぼ水平） */
+.works .section-heading {
+  margin-bottom: 56px;
 }
 
-.work-card-mini {
-  background: linear-gradient(180deg, #fffdf8 0%, #fbf4e6 100%);
-  border-radius: 12px;
-  box-shadow: 0 18px 28px -16px rgba(120, 96, 64, 0.28), 0 3px 8px rgba(120, 96, 64, 0.1);
-  overflow: hidden;
+.works-overview-grid {
   display: flex;
   flex-direction: column;
+  row-gap: 40px;
 }
 
+/* 2段目：WORK02/03。モバイルは単純に縦積み、Tablet/PC幅で2列横並びに切り替える */
+.works-overview-grid__sub {
+  display: flex;
+  flex-direction: column;
+  row-gap: 28px;
+}
+
+/* 前面：上質なマット紙プリント本体。真っ白ではなく、上：温かみのあるアイボリー→
+   下：ごくわずかに空の色（ブルーグレー）を拾う極薄グラデーションで、背景の空となじませる */
+.work-card-mini {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 0;
+  --plate-offset: 7px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 252, 246, 0.96) 0%,
+    rgba(255, 252, 246, 0.94) 75%,
+    rgba(245, 249, 250, 0.92) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(70, 95, 105, 0.06);
+  padding: 14px 14px 18px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* 主役(WORK01)は水平のまま、2段目のWORK02/03だけごくわずかに傾ける。
+   「整った展示」を優先し、目で傾きと分かるほど傾けない（最大でも±0.1deg程度） */
+.works-overview-grid__sub .work-card-mini:first-child {
+  transform: rotate(-0.1deg);
+}
+
+.works-overview-grid__sub .work-card-mini:last-child {
+  transform: rotate(0.1deg);
+}
+
+/* 背面：ごく薄い半透明アクリルプレート。「見える」より「奥行きとして感じる」程度に弱め、
+   紙のすぐ後ろに--plate-offset分だけずれて見える程度にとどめる（値は各breakpointで調整） */
+.work-card-mini::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: rgba(238, 247, 250, 0.19);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: inherit;
+  backdrop-filter: blur(3.5px);
+  -webkit-backdrop-filter: blur(3.5px);
+  transform: translate(var(--plate-offset), var(--plate-offset));
+  transition: transform 0.3s ease;
+}
+
+.works-overview-grid .work-card-mini:hover {
+  --plate-offset: 9px;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(70, 95, 105, 0.08);
+}
+
+.works-overview-grid__sub .work-card-mini:first-child:hover {
+  transform: translateY(-2px) rotate(-0.1deg);
+}
+
+.works-overview-grid__sub .work-card-mini:last-child:hover {
+  transform: translateY(-2px) rotate(0.1deg);
+}
+
+/* WORK01だけ主役展示：面積・余白・タイトルサイズで差をつける（装飾・強い影は増やさない）。
+   1段目いっぱいの横幅を使い、広すぎる場合に備えてmax-widthで中央配置する。
+   画像周囲の余白は12〜16px程度に保ちつつ、画像そのものを大きくする */
+.work-card-mini--featured {
+  width: 100%;
+  max-width: 1080px;
+  margin: 0 auto;
+  border-radius: 14px;
+  box-shadow: 0 16px 36px rgba(70, 95, 105, 0.08);
+  padding: 12px 12px 16px;
+}
+
+.works-overview-grid .work-card-mini--featured:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 40px rgba(70, 95, 105, 0.09);
+}
+
+/* スクリーンショットを絶対にトリミングしない：aspect-ratio/固定heightで画像を切らず、
+   object-fit: contain + 画像本来の比率のまま表示する。余白が出た場合はごく薄いアイボリーで埋める */
 .work-card-mini__media {
   position: relative;
   display: block;
-  aspect-ratio: 4 / 3;
-  margin: 10px 10px 0;
-  border-radius: 8px;
+  min-height: 140px;
   overflow: hidden;
+  border-radius: 8px;
+  background: rgba(250, 248, 243, 1);
 }
 
-.work-card-mini__shot {
+.work-card-mini--featured .work-card-mini__media {
+  min-height: 280px;
+  border-radius: 10px;
+}
+
+/* WORK02/03も「小さいサブカード」にならないよう、画像エリアに十分な高さの床を設ける */
+.works-overview-grid__sub .work-card-mini__media {
+  min-height: 220px;
+}
+
+/* WORK03のプレースホルダーが枠内に収まるよう、.img-placeholder自体が持つ余白だけ打ち消す */
+.work-card-mini__media .img-placeholder {
   width: 100%;
   height: 100%;
-  aspect-ratio: auto;
-  object-fit: cover;
-  object-position: center top;
+  min-height: 140px;
+  margin: 0;
+  border: none;
+  border-radius: 0;
+}
+
+img.work-card-mini__shot {
+  width: 100%;
+  height: auto;
   display: block;
-}
-
-/* .work-card-mini__media・.work-card-mini自体がoverflow:hidden（角丸のため）なので、
-   枠からはみ出す位置に置くと隠れてしまう。写真の角に収まる位置（正の値）に置く */
-.work-card-mini__deco {
-  position: absolute;
-  z-index: 3;
-  width: 22px;
-  bottom: 8px;
-  right: 10px;
-  filter: drop-shadow(0 3px 5px rgba(90, 74, 50, 0.18));
-  transform: rotate(10deg);
-}
-
-.work-card-mini__deco--pebble {
-  position: absolute;
-  bottom: 8px;
-  right: 22%;
-  width: 14px;
-  height: 10px;
-  border-radius: 50%;
-  background: linear-gradient(155deg, #e9dfd0, #c7bca8);
-  z-index: 3;
+  object-fit: contain;
+  object-position: center;
 }
 
 .work-card-mini__body {
-  padding: 14px 16px 20px;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding-top: 14px;
 }
 
+/* WORK02/03は画像面積を優先し、本文はWORK01よりさらにコンパクトにする */
+.works-overview-grid__sub .work-card-mini__body {
+  padding-top: 10px;
+}
+
+/* WORK番号はピル型バッジをやめ、展示の小さなキャプションとして控えめな薄いブルーグレーの文字だけで見せる */
 .work-card-mini__number {
+  display: block;
   font-family: var(--font-en);
   font-style: italic;
-  color: var(--color-sea-deep);
-  font-size: 12px;
+  color: var(--color-text-sub);
+  font-size: 11px;
+  letter-spacing: 0.14em;
 }
 
 .work-card-mini__title {
-  font-size: 16px;
-  font-weight: 700;
-  margin: 4px 0 6px;
+  font-size: 19px;
+  font-weight: 500;
+  margin: 8px 0 5px;
 }
 
+.work-card-mini--featured .work-card-mini__title {
+  font-size: 21px;
+  font-weight: 600;
+}
+
+.works-overview-grid__sub .work-card-mini__title {
+  margin: 5px 0 3px;
+}
+
+/* タグもチップ化せず、区切り線だけで並べるキャプション表記にする */
 .work-card-mini__tags {
-  font-size: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  margin-bottom: 6px;
+  font-size: 11px;
   color: var(--color-text-sub);
+}
+
+.work-card-mini__tags span {
+  padding: 0 10px 0 0;
+  margin-right: 10px;
+  border-right: 1px solid rgba(150, 165, 175, 0.35);
+  line-height: 1.4;
+}
+
+.work-card-mini__tags span:last-child {
+  padding-right: 0;
+  margin-right: 0;
+  border-right: none;
+}
+
+.works-overview-grid__sub .work-card-mini__tags {
+  margin-bottom: 4px;
+}
+
+/* 一言アピールはバッジ化せず、細い左ラインだけで本文より少し目立たせる */
+.work-card-mini__highlight {
+  display: block;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-text-sub);
+  border-left: 2px solid rgba(150, 175, 185, 0.5);
+  padding-left: 12px;
   margin-bottom: 8px;
 }
 
-/* クライアントが一目で強みを把握できるよう、種別タグとは別に一言アピールをピル状に強調表示する */
-.work-card-mini__highlight {
-  display: table;
-  font-size: 11.5px;
-  font-weight: 600;
-  color: var(--color-sea-deep);
-  background: rgba(99, 188, 208, 0.12);
-  border-radius: 20px;
-  padding: 4px 10px;
-  margin-bottom: 12px;
+.works-overview-grid__sub .work-card-mini__highlight {
+  font-size: 12.5px;
+  line-height: 1.5;
+  margin-bottom: 5px;
 }
 
 .work-card-mini__link {
+  position: relative;
+  align-self: flex-start;
+  margin-top: auto;
   font-size: 13px;
   font-weight: 600;
   color: var(--color-sea-deep);
   text-decoration: none;
 }
 
+.work-card-mini__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+}
+
+.work-card-mini__arrow {
+  display: inline-block;
+  transition: transform 0.25s ease;
+}
+
 .work-card-mini__link:hover {
   color: var(--color-accent);
 }
 
+.work-card-mini__link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.work-card-mini__link:hover .work-card-mini__arrow {
+  transform: translateX(3px);
+}
+
 .works-overview-more {
   text-align: center;
-  margin-top: 40px;
+  margin-top: 48px;
+}
+
+/* Works内の「作品一覧をすべて見る」だけ、空を隠さない軽いトーンに弱める。
+   「ギャラリーの出口」程度の静かな存在感を目指し、大きな変化・強い発光は付けない */
+.works-overview-more .btn--primary {
+  background: rgba(255, 252, 246, 0.68);
+  color: var(--color-sea-deep);
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  box-shadow: 0 10px 24px rgba(70, 95, 105, 0.06);
+  transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+}
+
+.works-overview-more .btn--primary:hover {
+  transform: translateY(-2px);
+  background: rgba(255, 252, 246, 0.82);
+  box-shadow: 0 12px 28px rgba(70, 95, 105, 0.08);
 }
 
 /* ---------- 制作実績一覧ページ（works.html） ---------- */

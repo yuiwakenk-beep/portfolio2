@@ -183,12 +183,13 @@
   }
 
   // Heroはあえてシーンを作らない（指示により飛ばさない・海鳥がいない時間を作る）
-  // skills-toolsシーンは、境目の余白帯がスクロールでちょうど画面に入り始めたタイミングで
-  // 飛ばしたいため、他のシーンより早いthreshold（#toolsに少しでも入った時点）で発火させる
+  // 3シーンとも「セクションに到達した瞬間」に発火させたいため、しきい値を低くしている
+  // （#toolsだけでなくabout/flowも少し入った時点で発火。一度離れて戻ってくれば何度でも再発火する。
+  //   IntersectionObserverはunobserveしていないため、再訪のたびに毎回発火する仕様のまま）
   var scenes = [
-    { key: 'about', trigger: '#about', build: aboutConfig, mobileEl: '#about .section-heading__jp' },
+    { key: 'about', trigger: '#about', threshold: 0.1, build: aboutConfig, mobileEl: '#about .section-heading__jp' },
     { key: 'skills-tools', trigger: '#tools', threshold: 0, build: skillsToolsGapConfig, mobileEl: '#tools .section-heading__jp', reversed: true },
-    { key: 'flow', trigger: '#flow', build: flowConfig, mobileEl: '#flow .section-heading__jp' }
+    { key: 'flow', trigger: '#flow', threshold: 0.1, build: flowConfig, mobileEl: '#flow .section-heading__jp' }
   ];
 
   // PC/タブレット：1セクション内で完結する短い滑空（登場→滑空→少しカーブ→退場）

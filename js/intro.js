@@ -256,18 +256,36 @@
 
   // 各ステップのタイミング（ms）。すべてクリックからの絶対経過時間で固定している
   // （setTimeoutのみで完結する構成のため、rAFの遅延に影響されず必ず時間どおりに進む）。
-  // 「丸まる→半分開く」の段階演出を廃止したため、以前より短いテンポになっている
+  // dissolveAt以降（手紙拡大→光→Hero）はGSAPタイムライン（letterExpandTimeline）が担当する
   var INTRO_LETTER_TIMING = {
-    writtenAt: 700, // 紙が現れてから、上に「Welcome to my portfolio」を書く
-    dissolveAt: 3200, // 紙を消しつつ光を広げ始める
-    heroAt: 4200, // 光が覆いきり、Heroへ切り替える
+    writtenAt: 700,   // 紙が現れてから、上に「Welcome to my portfolio」を書く
+    dissolveAt: 2550, // Welcome文字が書き終わってから0.65秒ほど静止した後、手紙の拡大を始める
     lightWashOutDuration: 900 // 光が引いてHeroが現れる
   };
+
+  var letterExpandTimeline = null;
 
   function resetLetterSequenceVisuals() {
     bottle.classList.remove('is-hidden');
     letterPaperEl.classList.remove('is-visible', 'is-written', 'is-dissolving');
     lightWashEl.classList.remove('is-active');
+    if (letterExpandTimeline) {
+      letterExpandTimeline.kill();
+      letterExpandTimeline = null;
+    }
+    // skip操作がGSAPタイムラインの途中（手紙拡大中・Heroのopacityフェード中）に入った場合、
+    // killTweensOfで進行中のtweenを確実に止めてからclearPropsしないと、次フレームで
+    // 古いtweenの値が上書きされてしまう可能性があるため、両方セットで行う
+    var frameEl = letterPaperEl.querySelector('.intro-letter-paper__frame--open');
+    var textEl = letterPaperEl.querySelector('.intro-letter-paper__text');
+    var heroEl = document.querySelector('.hero');
+    if (window.gsap) {
+      gsap.killTweensOf([letterPaperEl, frameEl, textEl, heroEl]);
+      gsap.set(letterPaperEl, { clearProps: 'opacity' });
+      if (frameEl) gsap.set(frameEl, { clearProps: 'scale' });
+      if (textEl) gsap.set(textEl, { clearProps: 'opacity' });
+      if (heroEl) gsap.set(heroEl, { clearProps: 'opacity' });
+    }
   }
 
   // ---------- 開封・スキップ共通の最終後処理 ----------
@@ -314,20 +332,67 @@
     // ⑤ 紙の上に「Welcome to my portfolio」をclip-pathで書く
     scheduleIntro(function () { letterPaperEl.classList.add('is-written'); }, T.writtenAt);
 
-    // ⑥ 紙を消しつつ光を広げる
+    // ⑥〜⑨ 「手紙が画面いっぱいに広がり、その白がintro-light-washの光へ変わる」演出。
+    // 手紙自体（wrapper）は動かさず、中の__frame（画像）だけをtransform-origin:center centerで
+    // 拡大することで、常に画面中央から自然に広がって見えるようにする（移動・回転は加えない）。
+    // 最終scaleは画面サイズから逆算し、どの画面幅でも手紙の白が画面を十分に覆うようにする
     scheduleIntro(function () {
-      letterPaperEl.classList.add('is-dissolving');
-      lightWashEl.classList.add('is-active');
-    }, T.dissolveAt);
+      var frameEl = letterPaperEl.querySelector('.intro-letter-paper__frame--open');
+      var textEl = letterPaperEl.querySelector('.intro-letter-paper__text');
+      if (!frameEl || !window.gsap) {
+        // 保険：GSAPやDOMが想定外の状態でも、必ずHeroまでたどり着けるようにする
+        letterPaperEl.classList.add('is-dissolving');
+        lightWashEl.classList.add('is-active');
+        scheduleIntro(function () {
+          revealMainBehindWash();
+          scheduleIntro(function () { lightWashEl.classList.remove('is-active'); }, 60);
+          scheduleIntro(completeIntro, 60 + T.lightWashOutDuration);
+        }, 700);
+        return;
+      }
 
-    // ⑦ 光が覆いきったところで、隠れたままHeroへ切り替える
-    scheduleIntro(function () {
-      revealMainBehindWash();
-      // Heroが見えている状態のまま、光を引かせる
-      scheduleIntro(function () { lightWashEl.classList.remove('is-active'); }, 60);
-      // 光が引き終えたら完全に完了
-      scheduleIntro(completeIntro, 60 + T.lightWashOutDuration);
-    }, T.heroAt);
+      var frameRect = frameEl.getBoundingClientRect();
+      var baseSize = Math.max(frameRect.width, frameRect.height) || 1;
+      // 画面の長辺の1.25倍を覆えるスケールを目標にする（対角線までは覆わないが、
+      // その前にintro-light-washが引き継ぐため、手紙自体はここまで拡大すれば十分）
+      var targetSize = Math.max(window.innerWidth, window.innerHeight) * 1.25;
+      var finalScale = Math.max(3.2, targetSize / baseSize);
+
+      letterExpandTimeline = gsap.timeline();
+
+      // 手紙：じわっと加速しながら拡大する（急激なズーム感を避けるため、序盤は小刻みなステップを踏む）
+      letterExpandTimeline
+        .to(frameEl, { scale: 1.03, duration: 0.22, ease: 'sine.inOut' }, 0)
+        .to(frameEl, { scale: 1.08, duration: 0.22, ease: 'sine.inOut' })
+        .to(frameEl, { scale: 1.16, duration: 0.22, ease: 'power1.inOut' })
+        .to(frameEl, { scale: finalScale, duration: 0.34, ease: 'power2.inOut' });
+
+      // Welcome文字：拡大が始まってから少し遅れて、紙の白へ溶けるように消える
+      if (textEl) {
+        letterExpandTimeline.to(textEl, { opacity: 0, duration: 0.5, ease: 'sine.inOut' }, 0.28);
+      }
+
+      // 手紙が画面の大部分を覆ったタイミングでlight-washを立ち上げ、紙の白と光を同じ色でつなげる
+      letterExpandTimeline.call(function () {
+        lightWashEl.classList.add('is-active');
+      }, null, 0.7);
+
+      // light-washがほぼ覆いきったところで、紙自体（透けて見える前に）を静かに退避させる
+      letterExpandTimeline.call(function () {
+        letterPaperEl.classList.add('is-dissolving');
+      }, null, 1.3);
+
+      // Heroを裏側で表示開始 → light-washを引かせて見せる。Hero側にもごく弱いopacityの余韻を添える
+      letterExpandTimeline.call(function () {
+        revealMainBehindWash();
+        var heroEl = document.querySelector('.hero');
+        if (heroEl) {
+          gsap.fromTo(heroEl, { opacity: 0.96 }, { opacity: 1, duration: 0.9, ease: 'sine.out' });
+        }
+        scheduleIntro(function () { lightWashEl.classList.remove('is-active'); }, 60);
+        scheduleIntro(completeIntro, 60 + T.lightWashOutDuration);
+      }, null, 1.4);
+    }, T.dissolveAt);
   }
 
   // ---------- 開封（クリック。<button>のためEnter/Spaceも自動的にclickを発火する） ----------
