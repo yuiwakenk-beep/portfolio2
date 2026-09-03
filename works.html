@@ -47,10 +47,13 @@
 
 <main id="main">
 
+  <!-- 海辺の静かなギャラリー：ヒーロー〜作品一覧〜Contact導線までを1枚の背景（海・空）で通しにする -->
+  <div class="works-page-flow" id="worksPageFlow">
+
   <div class="works-page-header reveal">
-    <span class="works-page-header__en">Selected Works</span>
-    <h1 class="works-page-header__jp">制作実績一覧</h1>
-    <p class="works-page-header__lead">これまで手がけたLP・ホームページ制作の実績をまとめています。今後も制作したものをこちらに追加していく予定です。</p>
+    <span class="works-page-header__en">Works</span>
+    <h1 class="works-page-header__jp">制作実績</h1>
+    <p class="works-page-header__lead">これまで制作したLP・ホームページをご紹介します。目的やターゲットに合わせて、伝わりやすさと心地よさを大切に制作しています。</p>
     <a href="index.html#hero" class="works-back">&larr; トップページへ戻る</a>
   </div>
 
@@ -59,6 +62,10 @@
 
       <!-- WORK 01（うみかぜトラベル。制作目的・工夫したポイントは画像から起こした下書きのため要確認） -->
       <article class="work-item reveal" id="work-01">
+        <div class="work-item__heading">
+          <p class="work-item__number">WORK 01</p>
+          <h2 class="work-item__title">うみかぜトラベル</h2>
+        </div>
         <div class="work-item__media">
           <img class="work-item__shot" src="sozai/work-umikaze-travel-fv-pc.png" alt="うみかぜトラベル サイトのファーストビュー（PC画面）" loading="lazy">
           <div class="work-item__mobile-group">
@@ -68,8 +75,6 @@
           </div>
         </div>
         <div class="work-item__info">
-          <p class="work-item__number">WORK 01</p>
-          <h2 class="work-item__title">うみかぜトラベル</h2>
           <dl class="work-item__meta">
             <div><dt>種別</dt><dd>LP</dd></div>
             <div><dt>案件区分</dt><dd>架空案件</dd></div>
@@ -79,15 +84,26 @@
             <div><dt>使用ツール</dt><dd>HTML / CSS / JavaScript / Claude Code / ChatGPT / Canva</dd></div>
             <div><dt>制作期間</dt><dd>約2週間</dd></div>
           </dl>
-          <p class="work-item__desc">制作目的：SNSや検索から訪れた20代女性に、「ひとりでも安心して沖縄を楽しめる」ことを伝え、LINEでの相談・申し込みにつなげることを目指しました。<br>工夫したポイント：爽やかな海と空の写真を活かし、お盆限定の特典やカウントダウン、沖縄の名所紹介を盛り込むことで、初めてのひとり旅でも具体的にイメージしやすい構成にしました。</p>
+          <div class="work-item__section">
+            <h3 class="work-item__section-heading"><span class="work-item__section-en">Purpose</span><span class="work-item__section-jp">制作目的</span></h3>
+            <p class="work-item__section-body">SNSや検索から訪れた20代女性に、「ひとりでも安心して沖縄を楽しめる」ことを伝え、LINEでの相談・申し込みにつなげることを目指しました。</p>
+          </div>
+          <div class="work-item__section">
+            <h3 class="work-item__section-heading"><span class="work-item__section-en">Design Point</span><span class="work-item__section-jp">工夫したポイント</span></h3>
+            <p class="work-item__section-body">爽やかな海と空の写真を活かし、お盆限定の特典やカウントダウン、沖縄の名所紹介を盛り込むことで、初めてのひとり旅でも具体的にイメージしやすい構成にしました。</p>
+          </div>
           <div class="work-item__actions">
-            <a href="https://yui-hidamari.com/okinawa_travel/" class="btn btn--ghost" target="_blank" rel="noopener">サイトを見る<span class="visually-hidden">（別タブで開きます）</span></a>
+            <a href="https://yui-hidamari.com/okinawa_travel/" class="work-item__link" target="_blank" rel="noopener">サイトを見る<span class="visually-hidden">（別タブで開きます）</span></a>
           </div>
         </div>
       </article>
 
       <!-- WORK 02（PCでは画像・情報を左右反転） -->
       <article class="work-item reveal" id="work-02" data-align="reverse">
+        <div class="work-item__heading">
+          <p class="work-item__number">WORK 02</p>
+          <h2 class="work-item__title">hanami flower</h2>
+        </div>
         <div class="work-item__media">
           <img class="work-item__shot" src="sozai/work-02-hanami-flower-fv-2.png" alt="hanami flower サイトのファーストビュー（PC画面）" loading="lazy">
           <div class="work-item__mobile-group">
@@ -97,8 +113,6 @@
           </div>
         </div>
         <div class="work-item__info">
-          <p class="work-item__number">WORK 02</p>
-          <h2 class="work-item__title">hanami flower</h2>
           <dl class="work-item__meta">
             <div><dt>種別</dt><dd>LP / ホームページ</dd></div>
             <div><dt>案件区分</dt><dd>架空案件</dd></div>
@@ -108,15 +122,26 @@
             <div><dt>使用ツール</dt><dd>HTML / CSS / JavaScript / Claude Code / ChatGPT / Canva</dd></div>
             <div><dt>制作期間</dt><dd>約2週間</dd></div>
           </dl>
-          <p class="work-item__desc">制作目的：花に詳しくない方でも、予算や贈る相手に合わせて安心して花束を選べるサイトを制作しました。<br>工夫したポイント：淡いピンク・アイボリーを基調に、花屋らしいやわらかさと贈り物としての上品さを表現しました。価格帯・花束のボリューム・ラッピングなどを整理し、選びやすさを意識した構成にしています。</p>
+          <div class="work-item__section">
+            <h3 class="work-item__section-heading"><span class="work-item__section-en">Purpose</span><span class="work-item__section-jp">制作目的</span></h3>
+            <p class="work-item__section-body">花に詳しくない方でも、予算や贈る相手に合わせて安心して花束を選べるサイトを制作しました。</p>
+          </div>
+          <div class="work-item__section">
+            <h3 class="work-item__section-heading"><span class="work-item__section-en">Design Point</span><span class="work-item__section-jp">工夫したポイント</span></h3>
+            <p class="work-item__section-body">淡いピンク・アイボリーを基調に、花屋らしいやわらかさと贈り物としての上品さを表現しました。価格帯・花束のボリューム・ラッピングなどを整理し、選びやすさを意識した構成にしています。</p>
+          </div>
           <div class="work-item__actions">
-            <a href="https://yui-hidamari.com/hanami_flower/" class="btn btn--ghost" target="_blank" rel="noopener">サイトを見る<span class="visually-hidden">（別タブで開きます）</span></a>
+            <a href="https://yui-hidamari.com/hanami_flower/" class="work-item__link" target="_blank" rel="noopener">サイトを見る<span class="visually-hidden">（別タブで開きます）</span></a>
           </div>
         </div>
       </article>
 
       <!-- WORK 03（hygge coffee。トップページの並びに合わせて末尾に表示） -->
       <article class="work-item reveal" id="work-03">
+        <div class="work-item__heading">
+          <p class="work-item__number">WORK 03</p>
+          <h2 class="work-item__title">hygge coffee</h2>
+        </div>
         <div class="work-item__media">
           <img class="work-item__shot" src="sozai/work-01-hygge-coffee-fv.png" alt="hygge coffee サイトのファーストビュー（PC画面）" loading="lazy">
           <div class="work-item__mobile-group">
@@ -129,8 +154,6 @@
           </div>
         </div>
         <div class="work-item__info">
-          <p class="work-item__number">WORK 03</p>
-          <h2 class="work-item__title">hygge coffee</h2>
           <dl class="work-item__meta">
             <div><dt>種別</dt><dd>LP</dd></div>
             <div><dt>案件区分</dt><dd>架空案件</dd></div>
@@ -140,22 +163,32 @@
             <div><dt>使用ツール</dt><dd>HTML / CSS / JavaScript / Claude Code / ChatGPT / Canva</dd></div>
             <div><dt>制作期間</dt><dd>約2週間</dd></div>
           </dl>
-          <p class="work-item__desc">制作目的：SNSから訪れたユーザーにカフェの静かな雰囲気や特徴を伝え、来店予約・お問い合わせにつなげることを目指しました。<br>工夫したポイント：木の間仕切りや半個室席、やわらかな自然光を活かし、「ひとりでも落ち着いて過ごせる」ことが伝わるデザインにしました。</p>
+          <div class="work-item__section">
+            <h3 class="work-item__section-heading"><span class="work-item__section-en">Purpose</span><span class="work-item__section-jp">制作目的</span></h3>
+            <p class="work-item__section-body">SNSから訪れたユーザーにカフェの静かな雰囲気や特徴を伝え、来店予約・お問い合わせにつなげることを目指しました。</p>
+          </div>
+          <div class="work-item__section">
+            <h3 class="work-item__section-heading"><span class="work-item__section-en">Design Point</span><span class="work-item__section-jp">工夫したポイント</span></h3>
+            <p class="work-item__section-body">木の間仕切りや半個室席、やわらかな自然光を活かし、「ひとりでも落ち着いて過ごせる」ことが伝わるデザインにしました。</p>
+          </div>
           <div class="work-item__actions">
-            <a href="https://yui-hidamari.com/hygge_coffee/" class="btn btn--ghost" target="_blank" rel="noopener">サイトを見る<span class="visually-hidden">（別タブで開きます）</span></a>
+            <a href="https://yui-hidamari.com/hygge_coffee/" class="work-item__link" target="_blank" rel="noopener">サイトを見る<span class="visually-hidden">（別タブで開きます）</span></a>
           </div>
         </div>
       </article>
 
       <!-- 今後作品が増えたら、この位置にWORK 04, 05...とカードを追加していく -->
 
-      <div class="works-list-cta reveal">
-        <p class="works-list-cta__lead">気になる実績がありましたら、お気軽にご相談ください。</p>
-        <a href="index.html#contact" class="btn btn--primary">お問い合わせはこちら</a>
-      </div>
-
     </div>
   </section>
+
+  <div class="works-list-cta reveal">
+    <p class="works-list-cta__lead">こんな雰囲気のサイトを作りたい方へ</p>
+    <a href="index.html#contact" class="works-list-cta__link">お問い合わせ <span class="works-list-cta__arrow">&rarr;</span></a>
+  </div>
+
+  </div>
+  <!-- /.works-page-flow -->
 
 </main>
 

@@ -1717,88 +1717,75 @@ html.intro-pending #main {
   color: var(--color-text-sub);
 }
 
-/* ---------- 制作実績（6-7） ---------- */
+/* ---------- 制作実績（6-7）：「海辺の静かなギャラリー」----------
+   1枚の巨大な白いカードで作品を囲わず、①見出し（番号＋タイトル）②作品写真（マット紙）
+   ③制作情報（背景を持たないテキスト）の3つを、余白だけで区切って展示する構成。
+   PC/スマホ共通のグリッド領域名（heading/media/info）で組み、並び順の入れ替え（reverse）や
+   列数の切り替えはresponsive.css側でgrid-template-areas/columnsを変えるだけで対応する */
 .work-item {
-  position: relative;
   display: grid;
-  grid-template-columns: 1fr;
-  gap: 24px;
-  padding: 28px 0;
-  border-bottom: 1px solid rgba(99, 188, 208, 0.25);
+  grid-template-areas:
+    "heading"
+    "media"
+    "info";
+  gap: 28px;
 }
 
-.work-item:last-child {
-  border-bottom: none;
+.work-item:not(:last-child) {
+  margin-bottom: 84px;
 }
 
-/* 「制作実績カード」ではなく「白いフチを持った作品写真」に見せる。
-   傾き（nth-of-type）はresponsive.cssの768px以上でのみ付与し、スマホは崩さない */
+.work-item__heading {
+  grid-area: heading;
+}
+
+.work-item__number {
+  display: block;
+  font-family: var(--font-en);
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  color: color-mix(in srgb, var(--color-sea-deep) 55%, var(--color-text-sub) 45%);
+  margin-bottom: 6px;
+}
+
+.work-item__title {
+  font-size: 21px;
+  font-weight: 700;
+}
+
+/* 作品写真：白フチのカードではなく、乳白色の半透明なマット紙。
+   object-fit:containで重要部分を一切トリミングせず、写真全体をそのまま見せる */
 .work-item__media {
-  position: relative;
+  grid-area: media;
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: linear-gradient(180deg, #fffdf8 0%, #fbf4e6 100%);
-  padding: 14px 14px 26px;
-  border-radius: 10px;
-  box-shadow: 0 18px 28px -16px rgba(120, 96, 64, 0.32), 0 3px 8px rgba(120, 96, 64, 0.1);
+  background: rgba(255, 252, 246, 0.88);
+  padding: 14px;
+  border-radius: 18px;
+  box-shadow: 0 18px 45px rgba(70, 95, 105, 0.07);
 }
 
 .work-item__shot {
-  aspect-ratio: 16 / 10;
   width: 100%;
-  object-fit: cover;
-  object-position: center top;
-  display: block;
-  border-radius: 6px;
-}
-
-/* 画像の縦横比がカード比率と合わず、cover指定だと左右が切れてしまう写真用。
-   トリミングせず全体を収める（hanami flowerのFV画像など） */
-.work-item__shot--contain {
-  object-fit: contain;
-  background: #fbf4e6;
-}
-
-/* 作品写真まわりの小さな海辺の小物（多用しない。1枚につき1個程度） */
-.work-item__deco {
-  position: absolute;
-  z-index: 3;
-  width: 26px;
   height: auto;
-  pointer-events: none;
-  filter: drop-shadow(0 3px 5px rgba(90, 74, 50, 0.18));
-  display: none;
+  max-height: 560px;
+  object-fit: contain;
+  display: block;
+  border-radius: 10px;
 }
 
-.work-item__deco--shell {
-  bottom: -9px;
-  left: 18px;
-  width: 24px;
-  transform: rotate(-12deg);
-}
-
-.work-item__deco--glass {
-  bottom: -10px;
-  right: 16px;
-  width: 22px;
-  transform: rotate(14deg);
-}
-
-/* 画像素材がないためCSSのみの小石。他の.work-item__decoと違いimgではなくspan */
-.work-item__deco--pebble {
-  bottom: -6px;
-  right: 26%;
-  width: 14px;
-  height: 10px;
-  border-radius: 50%;
-  background: linear-gradient(155deg, #e9dfd0, #c7bca8);
-  box-shadow: inset -2px -2px 3px rgba(110, 94, 68, 0.35), inset 1px 1px 2px rgba(255, 255, 255, 0.6);
+/* 画像の縦横比がマットと合わない写真用（hanami flowerのFV画像など）。
+   .work-item__shot自体が既にcontainなので、現在は互換のためだけに残している */
+.work-item__shot--contain {
+  background: transparent;
 }
 
 .work-item__shot--mobile {
   max-width: 160px;
   aspect-ratio: 9 / 16;
+  object-fit: contain;
+  background: rgba(70, 95, 105, 0.05);
 }
 
 /* スマホ画面を複数カット並べて見せる用（WORK 02など） */
@@ -1827,55 +1814,100 @@ html.intro-pending #main {
   padding: 0;
 }
 
-.work-item__number {
-  font-family: var(--font-en);
-  font-style: italic;
-  color: var(--color-sea-deep);
-  font-size: 14px;
-}
-
-.work-item__title {
-  font-size: 20px;
-  font-weight: 700;
-  margin: 4px 0 12px;
+/* 制作情報：カードで囲わず、海・空の背景の上にそのまま文字を置く。
+   メタ情報の上にだけ、行ごとではなく1本の細い区切り線を入れる */
+.work-item__info {
+  grid-area: info;
 }
 
 .work-item__meta {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 6px 18px;
+  gap: 14px 20px;
   font-size: 12.5px;
-  color: var(--color-text-sub);
-  margin-bottom: 14px;
-}
-
-.work-item__meta dt {
-  font-family: var(--font-ui);
-  color: var(--color-accent);
-  font-weight: 600;
-  display: inline;
-}
-
-.work-item__meta dd {
-  display: inline;
+  margin-bottom: 26px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(70, 95, 105, 0.12);
 }
 
 .work-item__meta div {
   display: flex;
-  gap: 6px;
+  flex-direction: column;
+  gap: 3px;
 }
 
-.work-item__desc {
-  font-size: 13px;
-  line-height: 1.75;
+.work-item__meta dt {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  letter-spacing: 0.02em;
   color: var(--color-text-sub);
-  margin-bottom: 18px;
+  opacity: 0.85;
+}
+
+.work-item__meta dd {
+  color: var(--color-text);
+}
+
+/* 制作目的・工夫したポイントを、長文のまま続けず小さな2つの章に分ける */
+.work-item__section {
+  margin-bottom: 20px;
+}
+
+.work-item__section-heading {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.work-item__section-en {
+  font-family: var(--font-en);
+  font-style: italic;
+  font-size: 12.5px;
+  letter-spacing: 0.04em;
+  color: var(--color-sea-deep);
+}
+
+.work-item__section-jp {
+  font-size: 11.5px;
+  color: var(--color-text-sub);
+}
+
+.work-item__section-body {
+  font-size: 13px;
+  line-height: 1.85;
+  color: var(--color-text-sub);
 }
 
 .work-item__actions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  margin-top: 22px;
+}
+
+/* サイトを見る／詳しく見る：強いCTAではなく、ギャラリーの案内板程度の控えめなボタン */
+.work-item__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 42px;
+  padding: 10px 24px;
+  border-radius: 999px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 13px;
+  text-decoration: none;
+  color: var(--color-sea-deep);
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(99, 188, 208, 0.35);
+  box-shadow: 0 8px 20px rgba(70, 95, 105, 0.05);
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.work-item__link:hover {
+  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(99, 188, 208, 0.6);
 }
 
 /* Works独自の砂質感オーバーレイ（::before）は、セクション境界に横一直線の色差を作ってしまうため撤去した。
@@ -3071,11 +3103,39 @@ img.work-card-mini__shot {
   box-shadow: 0 12px 28px rgba(70, 95, 105, 0.08);
 }
 
-/* ---------- 制作実績一覧ページ（works.html） ---------- */
-.works-page-header {
-  text-align: center;
-  padding: 110px 20px 40px;
+/* ---------- 制作実績一覧ページ（works.html）：「海辺の静かなギャラリー」 ----------
+   ヒーロー〜作品一覧〜Contact導線までを真っ白にしないよう、既存の世界観（海・空・アイボリー）の
+   縦グラデーションで通しにする。1枚の写真をbackground-size:coverで敷くと、作品数によって
+   ページの長さが変わるたびに写真の見え方（どこまでが海でどこから砂地か）が変わってしまうため、
+   写真そのものは短く高さが安定しているヒーローだけに使い、それ以外は色のグラデーションで
+   同じ世界観をゆるく保つ */
+.works-page-flow {
   position: relative;
+  background: linear-gradient(
+    180deg,
+    var(--color-sky) 0%,
+    var(--color-sea-light) 30%,
+    color-mix(in srgb, var(--color-sea-light) 55%, var(--color-sand) 45%) 75%,
+    var(--color-sand) 100%
+  );
+}
+
+/* ヒーロー：Works / 制作実績 + 短い導入文のみ。高さを抑え、強い新規装飾は追加しない。
+   背景は.section-photo-flowと同じ海・空の写真（高さが安定しているのでcoverでも破綻しない） */
+.works-page-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 240px;
+  text-align: center;
+  padding: 96px 20px 32px;
+  position: relative;
+  --bg-photo-flow-image: url('../sozai/haikei2.png');
+  background-image: linear-gradient(var(--bg-photo-tint), var(--bg-photo-tint)), var(--bg-photo-flow-image);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: top center;
 }
 
 .works-page-header__en {
@@ -3114,14 +3174,41 @@ img.work-card-mini__shot {
   color: var(--color-accent);
 }
 
+/* ページ下部のContact導線：大きな営業CTAにせず、ギャラリーの案内程度に控えめにする */
 .works-list-cta {
   text-align: center;
-  margin: 20px auto 0;
-  padding: 48px 20px 0;
+  padding: 56px 20px 88px;
 }
 
 .works-list-cta__lead {
-  font-size: 15px;
+  font-size: 14px;
   color: var(--color-text-sub);
-  margin-bottom: 20px;
+  margin-bottom: 14px;
+}
+
+.works-list-cta__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-sea-deep);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(99, 188, 208, 0.4);
+  padding-bottom: 2px;
+  transition: color 0.25s ease, border-color 0.25s ease;
+}
+
+.works-list-cta__link:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.works-list-cta__arrow {
+  transition: transform 0.25s ease;
+}
+
+.works-list-cta__link:hover .works-list-cta__arrow {
+  transform: translateX(3px);
 }

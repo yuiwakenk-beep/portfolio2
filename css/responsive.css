@@ -24,42 +24,35 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
+  /* 「海辺の静かなギャラリー」：画像60〜65% / 情報35〜40%の非対称2列。
+     見出し（WORK番号＋タイトル）は両列にまたがせて上に置く */
   .work-item {
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
+    grid-template-columns: 1.7fr 1fr;
+    grid-template-areas:
+      "heading heading"
+      "media info";
+    column-gap: 48px;
+    row-gap: 0;
+    align-items: start;
+  }
+
+  .work-item__heading {
+    margin-bottom: 22px;
   }
 
   .work-item__meta {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  /* 作品写真に、海辺にそっと置かれたような小さな傾き・自然なズレ・小物装飾を付ける（スマホでは崩さない） */
-  .work-item:nth-of-type(1) .work-item__media {
-    transform: rotate(-1.5deg);
+  /* 作品間の余白（PC：100〜140px）。works.htmlだけに絞る */
+  body.works-list-page .work-item:not(:last-child) {
+    margin-bottom: 120px;
   }
 
-  .work-item:nth-of-type(2) .work-item__media {
-    transform: rotate(1.2deg);
-  }
-
-  .work-item:nth-of-type(3) .work-item__media {
-    transform: rotate(-0.5deg);
-  }
-
-  .work-item:nth-of-type(1) {
-    margin-top: -6px;
-  }
-
-  .work-item:nth-of-type(2) {
-    margin-top: 16px;
-  }
-
-  .work-item:nth-of-type(3) {
-    margin-top: 4px;
-  }
-
-  .work-item__deco {
-    display: block;
+  /* ヒーロー高さ（PC：300〜420px） */
+  .works-page-header {
+    min-height: 340px;
+    padding: 150px 32px 40px;
   }
 
   .flow__steps {
@@ -168,13 +161,12 @@
     padding: 18px 10px;
   }
 
-  /* 作品ごとの左右交互レイアウト（6-7） */
-  .work-item[data-align="reverse"] .work-item__media {
-    order: 2;
-  }
-
-  .work-item[data-align="reverse"] .work-item__info {
-    order: 1;
+  /* 作品ごとの左右交互レイアウト（6-7）：画像・情報の列を入れ替える */
+  .work-item[data-align="reverse"] {
+    grid-template-columns: 1fr 1.7fr;
+    grid-template-areas:
+      "heading heading"
+      "info media";
   }
 
   .hero__copy {
@@ -224,7 +216,8 @@
   }
 
   /* ---------- 8-2. PC版：ファーストビュー以外の背景をhaikei.pngに差し替え ---------- */
-  .section-photo-flow {
+  .section-photo-flow,
+  .works-page-header {
     --bg-photo-flow-image: url('../sozai/haikei.png');
   }
 
@@ -675,84 +668,23 @@
     transform: translateY(-2px);
   }
 
-  /* ---------- 制作実績一覧ページ（works.html）：詰まった一覧から余白のあるギャラリーへ ----------
+  /* ---------- 制作実績一覧ページ（works.html）：「海辺の静かなギャラリー」（スマホ） ----------
      body.works-list-pageで works.html だけに絞って上書きする（index.html側の
-     Works プレビュー（.work-card-mini）や.works .section-innerの共通値には影響させない） */
+     Works プレビュー（.work-card-mini）や.works .section-innerの共通値には影響させない）。
+     カード化・マット紙・区切り線などの基本デザインはcss/style.css側の共通ルールに統一したため、
+     ここでは左右余白・作品間の余白・メタ情報の列数など、画面幅特有の値だけを上書きする */
   body.works-list-page .works .section-inner {
     padding-inline: 22px;
   }
 
-  /* 作品ブロック自体：区切り線をやめ、余白だけで1点ずつ独立して見せる。
-     最後の作品の下に余計な余白ができないよう、gapではなく:not(:last-child)のmargin-bottomで
-     作品「間」だけに余白を作る */
-  body.works-list-page .work-item {
-    padding: 0;
-    border-bottom: none;
-  }
-
+  /* 作品と作品の間：72〜96pxの範囲で、背景の海・空がしっかり見える余白を確保する */
   body.works-list-page .work-item:not(:last-child) {
-    margin-bottom: 72px;
+    margin-bottom: 80px;
   }
 
-  /* 作品写真（マット紙カード）：角を少し柔らかく、影をかなり弱める。
-     マット紙の余白（padding）も詰めすぎない範囲で少し絞り、写真自体は大きいまま見せる */
-  body.works-list-page .work-item__media {
-    padding: 10px 10px 20px;
-    border-radius: 20px;
-    box-shadow: 0 12px 30px rgba(70, 95, 105, 0.06);
-  }
-
-  body.works-list-page .work-item__shot {
-    border-radius: 14px;
-  }
-
-  /* 制作情報：これまで背景を持たない生のテキストだったため、乳白色・半透明のやわらかいカードに包み、
-     写真カードと同じ「外側→作品→内部情報」の余白階層を作る */
-  body.works-list-page .work-item__info {
-    background: rgba(255, 255, 255, 0.62);
-    border-radius: 20px;
-    padding: 22px 20px;
-    box-shadow: 0 12px 30px rgba(70, 95, 105, 0.06);
-  }
-
-  /* WORK番号は情報表に埋め込まず、作品の小さなアイキャッチとして少し強調する */
-  body.works-list-page .work-item__number {
-    font-size: 13px;
-    letter-spacing: 0.06em;
-    margin-bottom: 8px;
-  }
-
-  body.works-list-page .work-item__title {
-    margin: 0 0 18px;
-  }
-
-  /* メタ情報：dt:ddを横並びの表組みで見せていたのをやめ、ラベル（小）→値（少し大きい）の
-     縦積みブロックを2列に並べる「小さな情報ブロック」の見せ方に変更する。
-     区切り線は行ごとには引かず、タイトルとの間に1本だけ薄く入れる */
+  /* メタ情報はスマホでは2列（種別・案件区分などが短い値のため2列でも窮屈にならない） */
   body.works-list-page .work-item__meta {
-    display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
-    margin-bottom: 20px;
-    border-top: 1px solid rgba(70, 95, 105, 0.12);
-    padding-top: 16px;
-  }
-
-  body.works-list-page .work-item__meta div {
-    display: flex;
-    flex-direction: column;
-    gap: 3px;
-  }
-
-  body.works-list-page .work-item__meta dt {
-    font-size: 10.5px;
-    letter-spacing: 0.03em;
-    opacity: 0.75;
-  }
-
-  body.works-list-page .work-item__meta dd {
-    font-size: 13.5px;
-    color: var(--color-text);
   }
 
   /* ---------- お問い合わせ（Contact）：アーチをさらに浅く、タップしやすい送信ボタンに ----------
