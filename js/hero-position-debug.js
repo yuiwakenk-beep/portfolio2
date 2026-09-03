@@ -32,7 +32,7 @@
     document.body.appendChild(panel);
 
     initTitleDrag(panel);
-    initPenSvgDrag(panel);
+    initPenGapAdjust(panel);
   }
 
   // 数値を見やすく丸める（小数第1位まで）
@@ -167,49 +167,40 @@
     sync();
   }
 
-  // ---------- (2) 手書き風の英文コピー（#heroPenSvg）のドラッグ調整 ----------
-  // 位置はCSSではなくjs/hero.jsが写真の比率に合わせて毎回計算しているため、
-  // ここではjs/hero.jsが公開しているwindow.__heroDebugAPI経由で基準座標（heroRectsMobile.heroPenSvg）
-  // 自体を書き換え、js/hero.js側の再配置処理を呼び直す方式にする
-  function initPenSvgDrag(panel) {
+  // ---------- (2) 手書き風の英文コピー（#heroPenSvg）：タイトル下端からのすき間だけを調整 ----------
+  // 左右位置・幅は常に.hero__intro-mobileへ自動追従する設計に変更したため、自由な位置ドラッグはできない。
+  // 縦方向のすき間（js/hero.jsのmobilePenGap）だけを上下ドラッグで調整し、確定値をコピーできるようにする
+  function initPenGapAdjust(panel) {
     var api = window.__heroDebugAPI;
     var target = document.getElementById('heroPenSvg');
-    if (!api || !target) return;
+    if (!api || !target || !api.mobilePenGap) return;
 
-    var rect = api.heroRectsMobile.heroPenSvg;
-    var startLeft = rect.left;
-    var startTop = rect.top;
+    var startGap = api.mobilePenGap.value;
 
     target.style.outline = '2px dashed rgba(90, 160, 255, 0.85)';
     target.style.outlineOffset = '2px';
-    target.style.cursor = 'grab';
+    target.style.cursor = 'ns-resize';
     target.style.pointerEvents = 'auto'; // 通常はクリックを透過させるためpointer-events:noneが効いているので、調整中だけ解除する
 
     var dragging = false;
-    var startX = 0, startY = 0, baseLeft = 0, baseTop = 0;
+    var startY = 0, baseGap = 0;
 
     function pointerDown(e) {
       dragging = true;
-      target.style.cursor = 'grabbing';
       var p = e.touches ? e.touches[0] : e;
-      startX = p.clientX;
       startY = p.clientY;
-      baseLeft = rect.left;
-      baseTop = rect.top;
+      baseGap = api.mobilePenGap.value;
       e.preventDefault();
     }
     function pointerMove(e) {
       if (!dragging) return;
       var p = e.touches ? e.touches[0] : e;
-      var scale = api.currentScale().scale;
-      rect.left = baseLeft + (p.clientX - startX) / scale;
-      rect.top = baseTop + (p.clientY - startY) / scale;
+      api.mobilePenGap.value = baseGap + (p.clientY - startY);
       api.reposition();
       sync();
     }
     function pointerUp() {
       dragging = false;
-      target.style.cursor = 'grab';
     }
 
     target.addEventListener('mousedown', pointerDown);
@@ -222,16 +213,16 @@
     var section = document.createElement('div');
     section.innerHTML =
       '<div style="font-weight:bold;margin-bottom:6px;">英文（手書き風コピー）の位置調整</div>' +
-      '<div style="color:#cbd5df;margin-bottom:6px;">青の点線枠をドラッグして動かせます</div>' +
+      '<div style="color:#cbd5df;margin-bottom:6px;">青の点線枠を上下にドラッグすると、タイトル下端からのすき間だけを調整できます（左右位置・幅はタイトルに自動追従）</div>' +
       '<div id="hp-pen-val" style="margin-bottom:6px;"></div>' +
       '<div style="display:flex;gap:6px;">' +
       '<button id="hp-pen-reset" type="button" style="flex:1;padding:8px;">リセット</button>' +
       '<button id="hp-pen-copy" type="button" style="flex:1;padding:8px;">位置をコピー</button>' +
       '</div>' +
       '<div id="hp-pen-status" style="margin-top:4px;min-height:14px;color:#8ee6a8;"></div>' +
-      '<textarea id="hp-pen-output" readonly style="width:100%;height:44px;margin-top:6px;' +
+      '<textarea id="hp-pen-output" readonly style="width:100%;height:36px;margin-top:6px;' +
       'font:11px/1.4 monospace;box-sizing:border-box;"></textarea>' +
-      '<div style="margin-top:6px;color:#cbd5df;">js/hero.jsの heroRectsMobile.heroPenSvg を貼り替えてください。</div>';
+      '<div style="margin-top:6px;color:#cbd5df;">js/hero.jsの mobilePenGap の初期値（value）を貼り替えてください。</div>';
     panel.appendChild(section);
 
     var valEl = section.querySelector('#hp-pen-val');
@@ -239,19 +230,15 @@
     var statusEl = section.querySelector('#hp-pen-status');
 
     function buildSnippet() {
-      return '  heroRectsMobile: {\n' +
-        '    heroPenSvg: { left: ' + round(rect.left) + ', top: ' + round(rect.top) +
-        ', width: ' + rect.width + ', height: ' + rect.height + ' }\n' +
-        '  }';
+      return 'var mobilePenGap = { value: ' + round(api.mobilePenGap.value) + ' }; // タイトル下端からのすき間(px)';
     }
     function sync() {
-      valEl.textContent = '現在位置：left ' + round(rect.left) + ' / top ' + round(rect.top) + '（写真の基準座標）';
+      valEl.textContent = '現在のすき間：' + round(api.mobilePenGap.value) + 'px';
       outputEl.value = buildSnippet();
     }
 
     section.querySelector('#hp-pen-reset').addEventListener('click', function () {
-      rect.left = startLeft;
-      rect.top = startTop;
+      api.mobilePenGap.value = startGap;
       api.reposition();
       sync();
       statusEl.textContent = '';

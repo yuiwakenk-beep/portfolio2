@@ -13,28 +13,52 @@
 
   // new.png（背景写真）の基準キャンバスサイズ
   var REF_W = 1536, REF_H = 1024;
-  // hero-mobile.png（スマホ専用写真）の基準キャンバスサイズ
-  var REF_W_MOBILE = 853, REF_H_MOBILE = 1844;
+  // hero-mobile-base.png（スマホ専用・カーテン別レイヤー版の写真）の基準キャンバスサイズ。
+  // 旧hero-mobile.png（853x1844、カーテン焼き込み済み）とは縦横比・構図が異なる別素材のため、
+  // 基準サイズだけでなく、これを参照するheroRectsMobile／laptopCornersMobileも
+  // 新素材に合わせて再計測している
+  var REF_W_MOBILE = 941, REF_H_MOBILE = 1672;
 
   // 写真は object-fit:cover で表示されるため、実際の表示上のトリミング量を計算して
-  // オーバーレイ（見出し・手書きテキスト・PC画面）の位置を写真に正確に合わせる
+  // オーバーレイ（見出し・手書きテキスト・PC画面）の位置を写真に正確に合わせる（PC版のみ）
   var heroRects = {
     heroHeadlineSvg: { left: 47, top: 260, width: 636, height: 78 },
     heroPenSvg:       { left: 90, top: 308, width: 534, height: 92 }
   };
-  // スマホ写真用の手書きコピー位置（見出しSVG・ノートPC画面はスマホでは非表示のため、ここには持たない）。
-  // 写真の空（雲の少ない開けた部分）を目安にした初期値。実機で見た目を確認しながら調整する
-  var heroRectsMobile = {
-    heroPenSvg: { left: 21.2, top: 439.4, width: 700, height: 120 }
-  };
+
+  // 手書き風コピー（#heroPenSvg）のSVG viewBox比率（PC/スマホ共通）
+  var PEN_VIEWBOX_W = 685, PEN_VIEWBOX_H = 118;
+
+  // スマホは写真の構図に対する固定座標ではなく、見出しブロック（.hero__intro-mobile）の
+  // 実際のレンダリング位置を基準に手書きコピーを配置する（画面幅・見出しの折返し行数が変わっても
+  // 常にタイトル直下に来るようにするため）。
+  // PAD_Xはcss/responsive.cssの .hero__intro-mobile { padding: 0 24px; } と必ず一致させる
+  var MOBILE_INTRO_PAD_X = 24;
+  // タイトル下端から手書きコピーまでのすき間（目安12〜20pxの中間値）。
+  // ?heropos=1 の位置調整ツールでも変更でき、その場合はここへ確定値を反映する
+  var mobilePenGap = { value: 16 };
 
   function isDesktopBreakpoint() {
     return window.matchMedia('(min-width: 768px)').matches;
   }
 
-  // 手書きコピーの現在有効な矩形（PC/スマホ）。ペン先アニメーション側から毎フレーム呼ばれる
-  function currentTextRect() {
-    return isDesktopBreakpoint() ? heroRects.heroPenSvg : heroRectsMobile.heroPenSvg;
+  // 手書きコピーの現在有効な配置（実レンダリング座標のpx）。PC/スマホで算出方法が異なるため、
+  // ここで一本化し、positionHeroOverlays()とペン先アニメーション側の両方から呼ぶ
+  function currentPenBoxPx() {
+    if (isDesktopBreakpoint()) {
+      var s = currentScale();
+      var r = heroRects.heroPenSvg;
+      return { left: s.offX + r.left * s.scale, top: s.offY + r.top * s.scale, width: r.width * s.scale };
+    }
+    var heroEl = heroPhoto.parentElement;
+    var heroRect = heroEl.getBoundingClientRect();
+    var introEl = document.querySelector('.hero__intro-mobile');
+    var introRect = introEl.getBoundingClientRect();
+    return {
+      left: introRect.left - heroRect.left + MOBILE_INTRO_PAD_X,
+      top: introRect.bottom - heroRect.top + mobilePenGap.value,
+      width: introRect.width - MOBILE_INTRO_PAD_X * 2
+    };
   }
 
   // ノートPC画面の実際の4隅（写真のピクセル座標）。長方形の素材をこの4点にぴったり合わせる射影変換をかけることで、
@@ -43,6 +67,13 @@
     tl: [793, 349], tr: [1258, 362], br: [1220, 710], bl: [754, 665]
   };
   var laptopLocalW = 495, laptopLocalH = 360;
+
+  // スマホ専用写真（hero-mobile-base.png, 941x1672）内のノートPC画面の4隅。
+  // canvasで画面の明るい領域（青空・海）をフラッドフィルして輪郭を検出し、算出した座標
+  var laptopCornersMobile = {
+    tl: [416, 924], tr: [825, 958], br: [786, 1278], bl: [385, 1215]
+  };
+  var laptopLocalWMobile = 369, laptopLocalHMobile = 292;
 
   // 単位正方形(0,0)-(W,0)-(W,H)-(0,H)を任意の四角形P0-P1-P2-P3に写す射影変換の係数を求める（Heckbertの手法）
   function computeHomography(W, H, P0, P1, P2, P3) {
@@ -65,7 +96,11 @@
     var refH = desktop ? REF_H : REF_H_MOBILE;
     var scale = Math.max(contW / refW, contH / refH);
     var offX = (contW - refW * scale) / 2;
-    var offY = (contH - refH * scale) / 2;
+    // スマホ写真はobject-position:center topのため、はみ出し分は下側だけがクロップされる
+    // （PC写真はcenter centerなので上下均等クロップのまま）。
+    // .heroにmax-height（100svh）を掛けている関係で、縦長写真の場合ここが0にならない
+    // ケースがあるため、object-positionと不一致が起きないよう分岐する
+    var offY = desktop ? (contH - refH * scale) / 2 : 0;
     return { scale: scale, offX: offX, offY: offY };
   }
 
@@ -74,15 +109,29 @@
     var desktop = isDesktopBreakpoint();
 
     // 手書きコピー（#heroPenSvg）はPC・スマホ共通で常に位置を計算する
-    var penRect = currentTextRect();
+    var penBox = currentPenBoxPx();
     var penSvgEl = document.getElementById('heroPenSvg');
-    penSvgEl.style.left = (s.offX + penRect.left * s.scale) + 'px';
-    penSvgEl.style.top = (s.offY + penRect.top * s.scale) + 'px';
-    penSvgEl.style.width = (penRect.width * s.scale) + 'px';
-    penSvgEl.style.height = (penRect.height * s.scale) + 'px';
+    penSvgEl.style.left = penBox.left + 'px';
+    penSvgEl.style.top = penBox.top + 'px';
+    penSvgEl.style.width = penBox.width + 'px';
+    penSvgEl.style.height = (penBox.width * PEN_VIEWBOX_H / PEN_VIEWBOX_W) + 'px';
 
-    // 見出しSVG・ノートPC画面の射影変換はPC版のみ（スマホでは要素自体が非表示のため計算しない）
-    if (!desktop) return;
+    // 見出しSVG・ノートPC画面の射影変換：見出しはPC版のみ、ノートPC画面ははめ込み先の
+    // 4隅座標が違うだけでPC・スマホ共通の仕組み（射影変換）を使う
+    if (!desktop) {
+      function toRealMobile(pt) { return [s.offX + pt[0] * s.scale, s.offY + pt[1] * s.scale]; }
+      var mP0 = toRealMobile(laptopCornersMobile.tl), mP1 = toRealMobile(laptopCornersMobile.tr);
+      var mP2 = toRealMobile(laptopCornersMobile.br), mP3 = toRealMobile(laptopCornersMobile.bl);
+      var mm = computeHomography(laptopLocalWMobile, laptopLocalHMobile, mP0, mP1, mP2, mP3);
+      var mMatrix3d = 'matrix3d(' +
+        mm.a + ',' + mm.d + ',0,' + mm.g + ',' +
+        mm.b + ',' + mm.e + ',0,' + mm.h + ',' +
+        '0,0,1,0,' +
+        mm.c + ',' + mm.f + ',0,1)';
+      var mobileMaskEl = document.getElementById('heroLaptopMaskMobile');
+      if (mobileMaskEl) mobileMaskEl.style.transform = mMatrix3d;
+      return;
+    }
 
     var headlineRect = heroRects.heroHeadlineSvg;
     var headlineEl = document.getElementById('heroHeadlineSvg');
@@ -104,7 +153,21 @@
     document.getElementById('heroLaptopMask').style.transform = matrix3d;
   }
   positionHeroOverlays();
-  window.addEventListener('resize', positionHeroOverlays);
+  // スマホはスクロール中にアドレスバーの表示/非表示で画面の実高さが変わり、その都度resizeが
+  // 短時間に何度も連続発火する。毎回同期的に再計算すると、レイアウトが完全に落ち着く前の
+  // 過渡的な値を拾ってしまい、ノートPC画面の射影変換が一瞬崩れて消えたように見えることがあった
+  // （PCは通常スクロール中に画面サイズが変わらないため、この問題自体が起きない）。
+  // resizeイベントを1フレームに1回へ間引き、常にその時点の最新値だけで計算し直すことで、
+  // 過渡的な崩れた見た目が描画されないようにする
+  var repositionRaf = null;
+  function scheduleReposition() {
+    if (repositionRaf) return;
+    repositionRaf = requestAnimationFrame(function () {
+      repositionRaf = null;
+      positionHeroOverlays();
+    });
+  }
+  window.addEventListener('resize', scheduleReposition);
 
   // イントロ表示中はjs/intro.jsがdocument.body.style.overflowを'hidden'にしてスクロールバーを消しており、
   // その分レイアウト幅が一時的に広がっている（スクロールバー分の増減はresizeイベントが発火しない）。
@@ -118,6 +181,12 @@
     positionHeroOverlays();
     var shotImg = document.querySelector('.hero__laptop-mask img');
     if (shotImg) shotImg.style.animationPlayState = 'running';
+    var shotImgMobile = document.querySelector('.hero__laptop-mask-mobile img');
+    if (shotImgMobile) shotImgMobile.style.animationPlayState = 'running';
+    // スマホ専用カーテンも同じ理由（visibility:hidden中に裏でアニメーションが進んでしまう問題）で
+    // pausedにしてあるため、ここで一緒にrunningへ切り替える
+    var curtainImgMobile = document.querySelector('.hero__curtain-mobile img');
+    if (curtainImgMobile) curtainImgMobile.style.animationPlayState = 'running';
   }
   if (window.__introReady) {
     startLaptopScroll();
@@ -128,7 +197,7 @@
   // js/hero-position-debug.js（?heropos=1のときだけ動く位置調整ツール）から、
   // 手書き風コピー（#heroPenSvg）の位置を直接動かして再配置できるようにするための最小限の窓口
   window.__heroDebugAPI = {
-    heroRectsMobile: heroRectsMobile,
+    mobilePenGap: mobilePenGap,
     currentScale: currentScale,
     reposition: positionHeroOverlays
   };
@@ -136,38 +205,50 @@
   // ---------- ノートPC画面の4隅を調整するキャリブレーションモード ----------
   // 通常は一切動かない（コスト・見た目とも影響なし）。URLに ?calibrate を付けて開いた時だけ有効になる
   // 例：index.html?calibrate
-  // 画面はめ込みの4隅（laptopCorners）に赤い丸のハンドルが表示されるので、ドラッグしてPC画面の
-  // 実際の角に合わせる。右下のパネルに、その場でコピーできる座標（laptopCorners用のコード）が
-  // 表示され続けるので、ズレが直ったらそれをコピーしてこのファイルの laptopCorners に貼り替える
+  // 開いた時の画面幅（768px未満かどうか）で、PC版（laptopCorners）とスマホ版（laptopCornersMobile）の
+  // どちらを編集するか自動的に切り替わる。画面はめ込みの4隅に赤い丸のハンドルが表示されるので、
+  // ドラッグして実際のノートPC画面の角に合わせる。右下のパネルに、その場でコピーできる座標コードが
+  // 表示され続けるので、ズレが直ったらそれをコピーしてこのファイルの該当する変数に貼り替える
   if (/[?&]calibrate\b/.test(location.search)) {
     (function initLaptopCalibration() {
       var container = heroPhoto.parentElement; // #hero（position:relativeなので、これを基準に座標が取れる）
       var order = ['tl', 'tr', 'br', 'bl'];
       var labels = { tl: '左上', tr: '右上', br: '右下', bl: '左下' };
 
+      // 開いた時点の画面幅で対象を固定する（ドラッグ中に途中で対象が入れ替わって混乱しないように）
+      var targetIsDesktop = isDesktopBreakpoint();
+      var corners = targetIsDesktop ? laptopCorners : laptopCornersMobile;
+      var varName = targetIsDesktop ? 'laptopCorners' : 'laptopCornersMobile';
+
       var panel = document.createElement('div');
       panel.style.cssText = 'position:fixed;bottom:12px;right:12px;z-index:99999;background:rgba(20,30,35,0.9);' +
         'color:#8ef2c8;font:12px/1.5 monospace;padding:12px 14px;border-radius:10px;max-width:300px;' +
         'white-space:pre-wrap;box-shadow:0 4px 16px rgba(0,0,0,0.35);';
       var title = document.createElement('div');
-      title.textContent = 'PC画面キャリブレーション（角をドラッグ）';
+      title.textContent = (targetIsDesktop ? 'PC版' : 'スマホ版') + 'ノートPC画面キャリブレーション（角をドラッグ）';
       title.style.cssText = 'color:#fff;font-weight:bold;margin-bottom:6px;';
+      var note = document.createElement('div');
+      note.textContent = targetIsDesktop
+        ? '767px以下（スマホ幅）で開き直すとスマホ版の調整に切り替わります。'
+        : '768px以上（PC幅）で開き直すとPC版の調整に切り替わります。';
+      note.style.cssText = 'color:#cbd5df;margin-bottom:6px;font-size:11px;';
       var pre = document.createElement('div');
       var copyBtn = document.createElement('button');
       copyBtn.textContent = 'コードをコピー';
       copyBtn.style.cssText = 'display:block;margin-top:8px;padding:6px 12px;border:none;border-radius:6px;' +
         'background:#2f9e93;color:#fff;font-weight:bold;cursor:pointer;';
       panel.appendChild(title);
+      panel.appendChild(note);
       panel.appendChild(pre);
       panel.appendChild(copyBtn);
       document.body.appendChild(panel);
 
       function cornerCode() {
-        return 'var laptopCorners = {\n' +
-          '  tl: [' + Math.round(laptopCorners.tl[0]) + ', ' + Math.round(laptopCorners.tl[1]) + '],\n' +
-          '  tr: [' + Math.round(laptopCorners.tr[0]) + ', ' + Math.round(laptopCorners.tr[1]) + '],\n' +
-          '  br: [' + Math.round(laptopCorners.br[0]) + ', ' + Math.round(laptopCorners.br[1]) + '],\n' +
-          '  bl: [' + Math.round(laptopCorners.bl[0]) + ', ' + Math.round(laptopCorners.bl[1]) + ']\n' +
+        return 'var ' + varName + ' = {\n' +
+          '  tl: [' + Math.round(corners.tl[0]) + ', ' + Math.round(corners.tl[1]) + '],\n' +
+          '  tr: [' + Math.round(corners.tr[0]) + ', ' + Math.round(corners.tr[1]) + '],\n' +
+          '  br: [' + Math.round(corners.br[0]) + ', ' + Math.round(corners.br[1]) + '],\n' +
+          '  bl: [' + Math.round(corners.bl[0]) + ', ' + Math.round(corners.bl[1]) + ']\n' +
           '};';
       }
 
@@ -194,7 +275,7 @@
       function updateHandles() {
         var s = currentScale();
         order.forEach(function (key) {
-          var pt = laptopCorners[key];
+          var pt = corners[key];
           handles[key].style.left = (s.offX + pt[0] * s.scale) + 'px';
           handles[key].style.top = (s.offY + pt[1] * s.scale) + 'px';
         });
@@ -229,7 +310,7 @@
         var s = currentScale();
         var photoX = (p.x - rect.left - s.offX) / s.scale;
         var photoY = (p.y - rect.top - s.offY) / s.scale;
-        laptopCorners[draggingKey] = [photoX, photoY];
+        corners[draggingKey] = [photoX, photoY];
         refresh();
       }
 
@@ -263,9 +344,8 @@
     var CYCLE_MS = DELAY + DRAW_MS + FADE_MS + HOLD_MS + RESET_MS;
     var guideLen = guidePath.getTotalLength();
     var PEN_W = 132.3, PEN_H = 55, TIP_X = 3.15, TIP_Y = 38.72;
-    // ガイドパスの座標系はSVGのviewBox基準（0-685）。表示箱の実際の幅はcurrentTextRect().widthで
-    // viewBoxの685とは異なるため、写真の拡大率(s.scale)だけでなくこの縮小比も掛け合わせて実座標に変換する
-    var PEN_VIEWBOX_W = 685;
+    // ガイドパスの座標系はSVGのviewBox基準（0-685）。表示箱の実際の幅はcurrentPenBoxPx().widthで
+    // viewBoxの685とは異なるため、拡大率だけでなくこの縮小比も掛け合わせて実座標に変換する
 
     if (reduceMotion) {
       penText.style.opacity = '1';
@@ -277,11 +357,10 @@
     function easeInOutCubic(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
 
     function placePenAt(len) {
-      var s = currentScale();
-      var textRect = currentTextRect();
-      var svgLeftPx = s.offX + textRect.left * s.scale;
-      var svgTopPx = s.offY + textRect.top * s.scale;
-      var penScale = (textRect.width * s.scale) / PEN_VIEWBOX_W;
+      var box = currentPenBoxPx();
+      var svgLeftPx = box.left;
+      var svgTopPx = box.top;
+      var penScale = box.width / PEN_VIEWBOX_W;
       var clampedLen = Math.max(0, Math.min(guideLen, len));
       var p = guidePath.getPointAtLength(clampedLen);
       var p2 = guidePath.getPointAtLength(Math.max(0, Math.min(guideLen, clampedLen + 2)));

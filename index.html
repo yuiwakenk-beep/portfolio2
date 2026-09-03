@@ -120,8 +120,8 @@
   <section class="hero" id="hero">
     <!-- 背景写真：海を望むデスクでのワークシーン（人物なし）。動画演出は廃止し、静止画1枚のみ -->
     <img id="heroPhoto" class="hero__photo hero__photo--desktop" src="sozai/hero-desktop-base.png" alt="">
-    <!-- スマホ専用の縦長写真。767px以下でのみ表示する（css/responsive.css） -->
-    <img class="hero__photo hero__photo--mobile" src="sozai/hero-mobile.png" alt="">
+    <!-- スマホ専用の縦長写真（カーテンなしの土台）。767px以下でのみ表示する（css/responsive.css） -->
+    <img class="hero__photo hero__photo--mobile" src="sozai/hero-mobile-base.png" alt="">
 
     <!-- 右側カーテンの試作（PC版のみ）。カーテンを除いたベース写真の上に透過PNGを重ね、
          ごく弱い揺れをCSSアニメーションだけで表現する。767px以下ではcss/responsive.cssで非表示にする -->
@@ -129,8 +129,23 @@
       <img src="sozai/hero-desktop-curtain.png" alt="">
     </div>
 
+    <!-- スマホ専用カーテン（軽量版）。PC版とは別素材・別レイヤーで、ベース写真(hero-mobile-base.png)と
+         同じ画角のカーテンのみの透過PNGを、同じobject-fit:cover設定で重ねてぴったり一致させる。
+         767px以下でのみ表示する（css/responsive.css） -->
+    <div class="hero__curtain-mobile" aria-hidden="true">
+      <img src="sozai/hero-mobile-curtain.png" alt="">
+    </div>
+
     <!-- 写真内のノートPC画面に実績スクリーンショットを射影変換で嵌め込む（js/hero.jsが位置を計算） -->
     <div id="heroLaptopMask" class="hero__laptop-mask" aria-hidden="true">
+      <img src="sozai/lp_full_desktop.png" alt="制作実績サイトのスクリーンショット">
+      <div class="hero__laptop-glare"></div>
+    </div>
+
+    <!-- スマホ専用写真にもノートPCが写っているため、同じ仕組み（射影変換）で画面に実績スクリーンショットを
+         はめ込む。767px以下でのみ表示し、PC版のノートPC画面（#heroLaptopMask）とは独立させてある
+         （js/hero.jsが専用の4隅座標で位置を計算する） -->
+    <div id="heroLaptopMaskMobile" class="hero__laptop-mask-mobile" aria-hidden="true">
       <img src="sozai/lp_full_desktop.png" alt="制作実績サイトのスクリーンショット">
       <div class="hero__laptop-glare"></div>
     </div>
@@ -210,11 +225,13 @@
       <defs>
         <!-- gradientUnitsをuserSpaceOnUse＋viewBoxに合わせたy座標にして、境界ボックスのずれによる
              グラデーション基準のブレをなくしている（念のための補強。下記の波の谷が主因） -->
+        <!-- 色は--hero-seam-color（style.css）を参照。PCはsea-deep、スマホは写真の下端に合わせた
+             サンドベージュに切り替わる（css/animation.css側の@media (max-width:767px)） -->
         <linearGradient id="heroSeamGradient" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="200">
-          <stop offset="0%" style="stop-color: var(--color-sea-deep); stop-opacity: 1;" />
-          <stop offset="45%" style="stop-color: var(--color-sea-deep); stop-opacity: 0.9;" />
-          <stop offset="70%" style="stop-color: var(--color-sea-deep); stop-opacity: 0.45;" />
-          <stop offset="100%" style="stop-color: var(--color-sea-deep); stop-opacity: 0;" />
+          <stop offset="0%" style="stop-color: var(--hero-seam-color); stop-opacity: 1;" />
+          <stop offset="45%" style="stop-color: var(--hero-seam-color); stop-opacity: 0.9;" />
+          <stop offset="70%" style="stop-color: var(--hero-seam-color); stop-opacity: 0.45;" />
+          <stop offset="100%" style="stop-color: var(--hero-seam-color); stop-opacity: 0;" />
         </linearGradient>
       </defs>
       <!-- 波の振幅（谷の深さ）をCTAとの間の限られた重なり量（css/animation.cssの.hero-seam-fadeのtop）に
@@ -314,7 +331,7 @@
         <div class="skill-card skill-card--primary reveal">
           <div class="skill-card__icon"><img src="sozai/icon-lp.png" alt="" aria-hidden="true"></div>
           <div class="skill-card__body">
-            <p class="skill-card__title">LP・ホームページ制作</p>
+            <p class="skill-card__title">LP・HP制作</p>
           </div>
         </div>
         <div class="skill-card reveal">
@@ -356,7 +373,7 @@
         <div class="skill-card reveal">
           <div class="skill-card__icon"><img src="sozai/icon-hearing.png" alt="" aria-hidden="true"></div>
           <div class="skill-card__body">
-            <p class="skill-card__title">ヒアリング・構成整理</p>
+            <p class="skill-card__title">ヒアリング</p>
           </div>
         </div>
       </div>
@@ -418,23 +435,20 @@
 
       <div class="works-overview-grid">
 
-        <!-- WORK 01（概要カード：主役カード）※中身はWORK03だった仮プレースホルダーに差し替え -->
+        <!-- WORK 01（概要カード：主役カード） -->
         <article class="work-card-mini work-card-mini--featured reveal">
-          <a href="works.html#work-03" class="work-card-mini__media">
-            <div class="img-placeholder work-card-mini__shot">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 20h8M12 18v2"/></svg>
-              <span class="img-placeholder__label">画面（差し替え予定）</span>
-            </div>
+          <a href="works.html#work-01" class="work-card-mini__media">
+            <img class="work-card-mini__shot" src="sozai/work-umikaze-travel-fv-pc.png" alt="うみかぜトラベル サイトのファーストビュー" loading="lazy">
           </a>
           <div class="work-card-mini__body">
-            <p class="work-card-mini__number">WORK 03</p>
-            <h3 class="work-card-mini__title">[作品名]</h3>
+            <p class="work-card-mini__number">WORK 01</p>
+            <h3 class="work-card-mini__title">うみかぜトラベル</h3>
             <div class="work-card-mini__tags">
-              <span>[LP / HP]</span>
-              <span>[業種]</span>
+              <span>LP</span>
+              <span>旅行会社・トラベル代理店</span>
             </div>
-            <span class="work-card-mini__highlight">[一言アピール例：問い合わせ導線を改善]</span>
-            <a href="works.html#work-03" class="work-card-mini__link">詳しく見る <span class="work-card-mini__arrow">&rarr;</span></a>
+            <span class="work-card-mini__highlight">はじめてのひとり旅を後押しする沖縄旅行LP</span>
+            <a href="works.html#work-01" class="work-card-mini__link">詳しく見る <span class="work-card-mini__arrow">&rarr;</span></a>
           </div>
         </article>
 
@@ -450,28 +464,28 @@
               <p class="work-card-mini__number">WORK 02</p>
               <h3 class="work-card-mini__title">hanami flower</h3>
               <div class="work-card-mini__tags">
-                <span>[LP / HP]</span>
-                <span>[業種]</span>
+                <span>LP / ホームページ</span>
+                <span>花屋・フラワーショップ</span>
               </div>
-              <span class="work-card-mini__highlight">[一言アピール例：デザイン〜実装まで対応]</span>
+              <span class="work-card-mini__highlight">予算や贈る相手に合わせて選べる花束サイト</span>
               <a href="works.html#work-02" class="work-card-mini__link">詳しく見る <span class="work-card-mini__arrow">&rarr;</span></a>
             </div>
           </article>
 
-          <!-- WORK 01（概要カード）※hygge coffeeをこちらの枠に移行 -->
+          <!-- WORK 03（hygge coffee） -->
           <article class="work-card-mini reveal">
-            <a href="works.html#work-01" class="work-card-mini__media">
+            <a href="works.html#work-03" class="work-card-mini__media">
               <img class="work-card-mini__shot" src="sozai/work-01-hygge-coffee-fv.png" alt="hygge coffee サイトのファーストビュー" loading="lazy">
             </a>
             <div class="work-card-mini__body">
-              <p class="work-card-mini__number">WORK 01</p>
+              <p class="work-card-mini__number">WORK 03</p>
               <h3 class="work-card-mini__title">hygge coffee</h3>
               <div class="work-card-mini__tags">
-                <span>[LP / HP]</span>
-                <span>[業種]</span>
+                <span>LP</span>
+                <span>カフェ</span>
               </div>
-              <span class="work-card-mini__highlight">[一言アピール例：制作期間2週間・スマホ対応]</span>
-              <a href="works.html#work-01" class="work-card-mini__link">詳しく見る <span class="work-card-mini__arrow">&rarr;</span></a>
+              <span class="work-card-mini__highlight">「ひとりでも落ち着ける」を伝えるカフェLP</span>
+              <a href="works.html#work-03" class="work-card-mini__link">詳しく見る <span class="work-card-mini__arrow">&rarr;</span></a>
             </div>
           </article>
 
@@ -516,7 +530,7 @@
         </ol>
       </div>
 
-      <p class="flow__note">※ 案件内容によって工程は変わります。デザインのみのご依頼の場合、実装工程を省略することも可能です。</p>
+      <p class="flow__note">※ 案件内容によって工程は変わります。<br>デザインのみのご依頼の場合、実装工程を省略することも可能です。</p>
     </div>
   </section>
 
@@ -530,7 +544,9 @@
         <span class="section-heading__en">Contact</span>
         <h2 class="section-heading__jp">お問い合わせ</h2>
       </div>
-      <p class="contact__message reveal">「こんなサイトを作りたい」「何から始めればよいか分からない」など、<br>どんな小さなことでもお気軽にご相談ください。</p>
+      <!-- <br>はPC版の折返し位置を指定するための改行。スマホでは幅が狭く不自然な折返しになるため、
+           css/responsive.cssでこの<br>だけ非表示にし、自然な折返しに任せる -->
+      <p class="contact__message reveal">「こんなサイトを作りたい」「何から始めればよいか分からない」など、<br class="contact__message-break">どんな小さなことでもお気軽にご相談ください。</p>
 
       <div class="contact__card cloud-card cloud-card--panel reveal">
         <!-- 【要確認】送信先が決まり次第、action属性とmethodをここに設定してください。現状は見た目のみの実装です -->

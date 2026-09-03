@@ -75,11 +75,15 @@
   var LEFT_RANGE_MAX_PCT = 33; // 横方向の発生範囲（#hero幅に対する%）
 
   // ---------- モバイルは4つの文字あり水玉が重ならないよう固定スロットに配置 ----------
+  // 【スマホ再ブラッシュアップ】xFrac 0.56/0.58だった右側2枠が、スマホ写真内のノートPC画面
+  // （laptopCornersMobile、写真の中央〜右寄りに位置）と実測で重なっていたため、
+  // PC版が水しぶきの発生範囲をhero幅の左33%に絞っている（LEFT_RANGE_MAX_PCT）のと同じ考え方で、
+  // 4枠とも「できること」水玉がノートPC画面より確実に左側（xFracはおおよそ0.35以下）に収まるよう変更した
   var MOBILE_REVEAL_SLOTS = [
-    { xFrac: 0.08, yFrac: 0.10 },
-    { xFrac: 0.56, yFrac: 0.04 },
-    { xFrac: 0.04, yFrac: 0.58 },
-    { xFrac: 0.58, yFrac: 0.54 }
+    { xFrac: 0.02, yFrac: 0.05 },
+    { xFrac: 0.18, yFrac: 0.15 },
+    { xFrac: 0.04, yFrac: 0.55 },
+    { xFrac: 0.16, yFrac: 0.68 }
   ];
   var MOBILE_REVEALED_SIZE = 80; // 重なり防止のためモバイルは固定サイズにする（デスクトップはランダム86〜116のまま）
 

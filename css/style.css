@@ -50,6 +50,12 @@ ul {
   --cloud-bg-soft: rgba(255, 255, 255, 0.62);
   --color-sand: #f7f3e9;
   --color-sand-beige: #ddc9aa;
+
+  /* Hero下端の継ぎ目波（.hero-seam-fade、index.html側のSVG）の色。
+     PC写真は下端が海色のためsea-deepのままでよいが、スマホ写真（hero-mobile.png）は
+     下端がデスク・ノートの暖色（サンドベージュ）のため、そのままだと波の直上で
+     暖色→寒色の硬い境界線が見えてしまう。767px以下だけ写真の実際の下端色に合わせる */
+  --hero-seam-color: var(--color-sea-deep);
   --color-sunset-pink: #e8c6be;
   --color-text: #3f4b50;
   --color-text-sub: #66777d;
@@ -66,7 +72,10 @@ ul {
 
   /* 余白（モバイル基準） */
   --section-pad-y: 72px;
-  --section-pad-x: 18px;
+  /* 【ブラッシュアップ】各セクションが画面幅いっぱいに詰まって見える指摘を受け、
+     18px→24pxへ拡大。左右の余白を少し足すことで、コンパクトで整った印象にする。
+     この値は全セクション共通のトークンのため、実機で見て狭い/広いと感じた場合はここだけ調整すればよい */
+  --section-pad-x: 24px;
 
   /* フォント：見出し=Shippori Mincho、本文・UI・タグ=Noto Sans JPの2種類に統一。
      font-ui/font-en/font-logoは旧フォント（Klee One/Cormorant Garamond）の名残りだが、
@@ -651,10 +660,19 @@ html.intro-pending #main {
     object-position: center 42%;
   }
 
-  /* スマホはPCより見える横幅の比率が変わるため、オーバースキャンをやや大きめに取る */
+  /* スマホはPCより見える横幅の比率が変わるため、オーバースキャンを大きめに取る。
+     波の素材端・切れ目が画面内に入り込む余地をなくすため、常に画面より一回り大きく配置する
+     （object-fit:coverの土台自体は動かさず、transform:scaleで均等に拡大するこれまでの方式を維持。
+     width/leftでボックス自体を非対称に広げる方式は、object-fit:coverの計算基準が変わって
+     波の上下位置がズレる不具合が過去にあったため採用しない）。
+     --foam-shift-yは、?posdebug=1の調整パネルでYuiさんが実機を見ながら決めた値
+     （瓶の中央あたりに波が来る位置）。object-fit:coverの計算に影響しないtransformベースの
+     シフトのため、上のoverscanとは独立して安全に上下移動できる */
   .intro-scene {
-    --foam-overscan: 1.24;
+    --foam-overscan: 1.34;
+    --foam-shift-y: -19vh;
   }
+
 }
 
 /* 文字色・書体は「open」のペーパータグ（.intro-bottle__opentag-text）と揃え、
@@ -738,10 +756,12 @@ html.intro-pending #main {
   }
 }
 
-/* スマホ：アーチはごく浅く。可読性を最優先 */
+/* スマホ：【ブラッシュアップ】アーチ窓演出は幅が狭く効果が出ないため、ここでは完全にカットしフラットな角にする。
+   #main側のアーチ窓演出（内縁ハイライト・壁のマウス追従光など）は元々767px以下で非表示済みのため、
+   Hero自体もそれに合わせてborder-radius: 0にし、演出の有無をPC/スマホで揃える */
 @media (max-width: 767px) {
   .hero {
-    border-radius: 50% 50% 0 0 / 34px 34px 0 0;
+    border-radius: 0;
   }
 }
 
@@ -879,6 +899,74 @@ html.intro-pending #main {
   }
 }
 
+/* ---------- スマホ専用カーテン（軽量版） ----------
+   PC版カーテンとは別の、スマホ写真(hero-mobile-base.png)専用の透過PNG。
+   キャンバス全体（写真と同じ941x1672）に対してカーテン部分だけが描かれた素材のため、
+   「一部だけ切り出した小さな布」としてではなく、写真そのものと全く同じ
+   object-fit:cover / object-position設定で重ねることで、どの画面幅でも
+   写真とカーテンの位置が完全に一致するようにしている（既定では非表示、
+   767px以下でのみcss/responsive.cssから表示する） */
+.hero__curtain-mobile {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.hero__curtain-mobile img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  transform-origin: top right;
+  animation: heroCurtainMobileBreeze 18s ease-in-out infinite;
+  /* イントロ表示中は再生を止めておく（visibility:hiddenの間も裏でアニメーションが進んでしまい、
+     本編が見えた瞬間に「いきなり大きく動いている」状態になるのを防ぐ）。
+     js/hero.jsのstartLaptopScroll()が、イントロ完全終了（intro:ready）と同時にrunningへ切り替える */
+  animation-play-state: paused;
+  will-change: transform;
+  backface-visibility: hidden;
+}
+
+/* PCのそよ風（heroCurtainSoftBreeze）よりさらに弱く、かつ不規則なキーフレームにし、
+   「カーテンが動いている」ではなく「風でほんの少したわんでいる」程度に留める。
+   0〜12%・90〜100%はほぼ静止させ、動きの大部分を中間（28〜76%）に集める */
+@keyframes heroCurtainMobileBreeze {
+  0%,
+  100% {
+    transform: perspective(1300px) rotateY(0deg) translateX(0px) scaleX(1) scaleY(1);
+  }
+  12% {
+    transform: perspective(1300px) rotateY(-0.3deg) translateX(-0.3px) scaleX(1.003) scaleY(1.001);
+  }
+  28% {
+    transform: perspective(1300px) rotateY(-0.5deg) translateX(-0.5px) scaleX(1.006) scaleY(1.002);
+  }
+  43% {
+    transform: perspective(1300px) rotateY(0.1deg) translateX(0.2px) scaleX(1.009) scaleY(1.001);
+  }
+  61% {
+    transform: perspective(1300px) rotateY(0.6deg) translateX(1px) scaleX(1.012) scaleY(1);
+  }
+  76% {
+    transform: perspective(1300px) rotateY(0.2deg) translateX(0.4px) scaleX(1.006) scaleY(1.001);
+  }
+  90% {
+    transform: perspective(1300px) rotateY(0deg) translateX(0px) scaleX(1.001) scaleY(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__curtain-mobile img {
+    animation: none;
+    transform: none;
+  }
+}
+
 /* ヒーロー見出し（js/hero.js が写真に合わせて位置を制御） */
 .hero__headline-svg {
   position: absolute;
@@ -977,6 +1065,36 @@ html.intro-pending #main {
     rgba(255, 255, 255, 0.04) 100%
   );
   mix-blend-mode: screen;
+}
+
+/* スマホ専用写真（hero-mobile.png, 853x1844）にもノートPCが写っているため、同じ射影変換の
+   仕組みでスクリーンショットをはめ込む。基本はPC版の.hero__laptop-maskと同じ構造だが、
+   767px以下でのみ使う専用クラスにしてある（PC版は既存のresponsive.cssで.hero__laptop-mask自体を
+   display:none !importantにしているため、クラス名を分けないとそちらに巻き込まれて消えてしまう）。
+   デフォルトでは非表示にしておき、767px以下のときだけcss/responsive.cssでblockに戻す */
+.hero__laptop-mask-mobile {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 340px;
+  height: 282px;
+  overflow: hidden;
+  transform-origin: 0 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* PC版と同じスクロール演出（heroLaptopScroll）・ハイライト演出をそのまま流用する */
+.hero__laptop-mask-mobile img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  display: block;
+  animation: heroLaptopScroll 26s ease-in-out infinite;
+  animation-play-state: paused;
 }
 
 .hero__copy {
@@ -1356,7 +1474,10 @@ html.intro-pending #main {
   flex-direction: column;
   gap: 16px;
   max-width: 520px;
-  color: var(--color-text-sub);
+  /* 本文はサイト共通の薄いサブカラー（--color-text-sub）だと読みづらいとのご指摘のため、
+     この本文だけメインの文字色（--color-text）に濃くする。他の--color-text-sub使用箇所
+     （タグ・meta情報など）には影響しないよう、共通変数自体は変更せずここだけ上書きする */
+  color: var(--color-text);
   font-size: 14px;
   line-height: 1.95;
 }
@@ -1689,6 +1810,21 @@ html.intro-pending #main {
 .work-item__mobile-group .work-item__shot--mobile {
   flex: 1 1 0;
   min-width: 0;
+}
+
+/* 差し替え待ちのプレースホルダー（.img-placeholder、div）だけ実画像（img）より横幅が広くなり、
+   3枚の大きさが揃わない不具合があった。原因は2つ重なっていた：
+   ①.img-placeholder{display:flex}が、同じ詳細度の.work-item__shot{display:block}に
+     CSS読み込み順で打ち消され、内部（アイコン＋ラベル）がブロック要素として積み上がっていた。
+   ②.img-placeholder{padding:20px}（border-box）が、flex-basis:0の計算上「実画像にはない
+     40px分の床（padding分だけ最低でも確保される分）」として働き、flex-growで等分した後も
+     実画像よりちょうどpadding分だけ横幅が広くなってしまっていた。
+   クラスを3つ重ねて詳細度を上げ、display:flexを確実に効かせたうえで、
+   このコンテキストだけpaddingを0にして実画像と同じ土俵でflex-basis:0を計算させる */
+.work-item__mobile-group .img-placeholder.work-item__shot--mobile {
+  display: flex;
+  aspect-ratio: auto;
+  padding: 0;
 }
 
 .work-item__number {

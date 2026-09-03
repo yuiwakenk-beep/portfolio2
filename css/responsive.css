@@ -303,13 +303,53 @@
 /* ---------- スマホ（767px以下）：Hero専用レイアウト ---------- */
 @media (max-width: 767px) {
   .hero {
-    /* スマホ専用写真(hero-mobile.png, 853x1844)の実寸比率に完全一致させ、
-       object-fit:coverでのクロップが一切発生しないようにする（＝写真が欠けず全部映る） */
-    aspect-ratio: 853 / 1844;
+    /* スマホ専用写真(hero-mobile-base.png, 941x1672。カーテンは.hero__curtain-mobileの
+       別レイヤーで重ねる)の実寸比率に完全一致させ、object-fit:coverでのクロップが
+       一切発生しないようにする（＝写真が欠けず全部映る） */
+    aspect-ratio: 941 / 1672;
     /* デスクトップ側の.heroにはブレークポイント無指定のmax-height:92vhが効いているため、
        ここで打ち消さないとaspect-ratioで伸びた高さが92vhで再びクリップされ、
-       結局写真の下のほうが見えなくなってしまう */
-    max-height: none;
+       結局写真の下のほうが見えなくなってしまう。
+       ただし上限を完全に外すと、画面幅が広いスマホ・タブレット寄りの端末でHeroだけで
+       画面2〜3画面分の高さになり本編までのスクロールが長くなるため、
+       動的ビューポート高さ（アドレスバー等の増減を考慮したsvh）で緩やかに上限を掛ける */
+    max-height: 100svh;
+  }
+
+  /* PC版の写真は下端がもともと海色のため、Hero下端に重ねる波（.hero-seam-fade、青系）と
+     自然に馴染んで境界線が見えない。スマホ写真は下端がデスクのサンドベージュ色のため、
+     同じ青い波をそのまま重ねると色の境目がくっきり見えてしまう。
+     ここでHero写真自体の下端だけを波の色（sea-deep）へ先にフェードさせておくことで、
+     「波が始まる前からすでに海色」というPCと同じ状態を作り、境界線を見えなくする。
+     .hero-seam-fadeのSVG波は、波の谷（クレスト）から上の部分は塗りが無い透明な領域のため、
+     Heroの最後の約34px（top:-34pxの重なり量）はこの透明領域を通してHero自身の色がそのまま見える。
+     そのため単純なtransparent→sea-deepの直線グラデーションだと、この34px区間の途中はまだ
+     半透明にしか青くなっておらず、写真側の明るい部分（ノート・ノートPC縁の白）が青みがかった
+     薄い水色として透けて見えてしまっていた。34px手前で完全に不透明な青に達するよう、
+     グラデーションの終端を前倒しして早めに塗りつぶす */
+  /* 【薄い水色ライン調査】.hero自体（css/style.css）が持つ、写真読み込み前の
+     フォールバック背景（sky→sea-light→sea、下端は--color-sea=#63bcd0という薄い水色）が、
+     写真とhero::after/.hero-seam-fadeの間の理論上のごくわずかな隙間から透けて見えると、
+     境界の色（--hero-seam-color=sea-deep=#287d9b）と明らかに違う薄い水色の線として
+     視認されてしまう。スマホでは下端の色を境界と同じsea-deepに揃え、
+     万一隙間から見えても色の差自体が発生しないようにする */
+  .hero {
+    background: linear-gradient(180deg, var(--color-sky) 0%, var(--color-sea-light) 55%, var(--hero-seam-color) 100%);
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 70px;
+    /* 【スマホ再ブラッシュアップ】.hero-seam-fadeの重なり量を44pxへ増やした分、
+       波の谷（未塗りの透明領域）がここに重なる範囲も広がったため、完全不透明に達する
+       位置を45%→38%（26.6px地点）に前倒しし、確実に覆えるようにした */
+    background: linear-gradient(to bottom, transparent 0%, var(--color-sea-deep) 38%, var(--color-sea-deep) 100%);
+    z-index: 1;
+    pointer-events: none;
   }
 
   /* 写真をスマホ専用に差し替え */
@@ -317,6 +357,12 @@
   .hero__photo--mobile {
     display: block;
     object-position: center top;
+    /* 【薄い水色ライン調査】.hero{aspect-ratio}由来の高さがサブピクセル値になり、
+       写真の下端とコンテナ（#hero）の下端の間に理論上ごくわずかな隙間ができ得る。
+       この隙間から.heroの背景フォールバック（下記で修正）が透けて見える可能性を
+       構造的につぶすため、写真自体を下方向にごくわずかに大きく表示し、
+       確実にコンテナ下端まで覆う（#hero自体がoverflow:hiddenのためはみ出し分は見えない） */
+    bottom: -2px;
   }
 
   /* 見出しSVG・ノートPC画面差し込みはスマホ写真の構図に合わないため非表示のまま。
@@ -325,6 +371,16 @@
   .hero__headline-svg,
   .hero__laptop-mask {
     display: none !important;
+  }
+
+  /* スマホ専用写真のノートPC画面に実績スクリーンショットをはめ込む（js/hero.jsが位置を計算） */
+  .hero__laptop-mask-mobile {
+    display: block;
+  }
+
+  /* スマホ専用カーテン（軽量版）を表示 */
+  .hero__curtain-mobile {
+    display: block;
   }
 
   /* 見出しブロック：写真上部の空（何もない部分）に配置 */
@@ -371,7 +427,14 @@
   /* JS不通時などの静的フォールバック（.hero-splash-fallback）はデスクトップ同様、
      通常時は非表示のままでよい（既存のCSSに従う） */
 
-  /* ---------- 使用ツール（6-6）：スマホは2列×4行のグリッド表示 ---------- */
+  /* ---------- 使用ツール（6-6）：スマホは2列×4行のグリッド表示 ----------
+     Toolsはカードセクションより軽く見せたいセクションのため、左右の余白を
+     他セクション（基準24px）より広めに取り、チップ自体の存在感を抑える */
+  /* 【スマホ再ブラッシュアップ】28pxは通常セクション基準（20〜24px）より広すぎたため22pxへ調整 */
+  .tools .section-inner {
+    padding-inline: 22px;
+  }
+
   .tools__list {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -429,15 +492,17 @@
     animation: aboutCloudFloat 9s ease-in-out infinite -4s;
   }
   .about__cloud-content {
-    /* 本文がはみ出しても良い前提で、雲の輪郭に収めるための余白を削って詰める */
-    padding: 34px 20px;
+    /* 本文がはみ出しても良い前提で、雲の輪郭に収めるための余白を削って詰める。
+       【スマホ再ブラッシュアップ】タグ直後の余白を詰めるため、下だけ34px→18pxに変更 */
+    padding: 34px 20px 18px;
   }
   /* スマホは「写真→名前→役割→本文」の縦積みを優先する */
   .about__body {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    margin-bottom: 14px;
+    /* 【スマホ再ブラッシュアップ】本文とタグの間が詰まりすぎていたため14px→20pxへ */
+    margin-bottom: 20px;
     gap: 14px;
   }
   /* 写真：PC版の余白を前提にした大きさ・はみ出しマージンだと本文が入り切らないため、
@@ -483,45 +548,67 @@
     padding: 9% 14%;
   }
   /* .concept-about-rowはスマホ幅ではgridを使わない通常のブロックのためgapは効かない。
-     余白の正体はAbout/Conceptそれぞれの.section-inner上下パディングなので、こちらを詰める */
+     余白の正体はAbout/Conceptそれぞれの.section-inner上下パディングなので、こちらを詰める。
+     左右は他セクション（基準24px）よりわずかに広めにし、雲パネルが画面いっぱいに
+     広がらず、左右に海・空の背景が見える「やや狭め」の印象にする */
+  /* 【スマホ再ブラッシュアップ】左右28pxは通常セクション基準（20〜24px）より広すぎたため22pxへ調整 */
   .about .section-inner,
   .concept .section-inner {
     padding-top: 28px;
     padding-bottom: 28px;
+    padding-inline: 22px;
   }
 
-  /* ---------- 対応できること（Skills）：使用ツールと同じ2列のコンパクトなカードに ---------- */
+  /* 【スマホ再ブラッシュアップ】自己紹介（About）だけ、タグの直後にできていた
+     意味のない大きな空白（雲パネルのpadding-bottom 34px + section-innerのpadding-bottom 28px = 62px）
+     を詰める。Conceptは対象外のため触れない */
+  .about .section-inner {
+    padding-bottom: 18px;
+  }
+
+  /* ---------- 対応できること（Skills）：使用ツールと同じ2列のコンパクトなカードに ----------
+     【ブラッシュアップ】以前はアイコン→文字の縦積みにしていたため、2列の狭い幅では
+     「LP・ホームページ制作」等の長い項目名が折り返してしまっていた。
+     PC/タブレット版と同じ「アイコン｜文字」の横並び（style.css側の.skill-card基本形）に戻し、
+     カード自体のpadding・アイコンサイズを絞ることで文字側の横幅を広く確保し、1行に収める */
   .skills__grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 10px;
   }
   .skill-card {
-    flex-direction: column;
-    align-items: flex-start;
     gap: 8px;
-    padding: 20px 18px;
-    border-radius: 20px;
+    padding: 16px 10px;
+    border-radius: 18px;
+    /* white-space:nowrapの文字はgridアイテムの最小幅（min-content）を押し広げてしまい、
+       それがそのまま2列グリッド全体を画面幅より広くしてしまう（横スクロールが出る不具合）。
+       グリッドアイテムのデフォルトmin-width:autoを0にし、1fr（＝グリッドが決めた幅）まで
+       確実に縮められるようにする */
+    min-width: 0;
   }
   .skill-card__icon {
-    width: 44px;
-    height: 44px;
+    width: 30px;
+    height: 30px;
   }
   .skill-card__title {
-    font-size: 12.5px;
-    line-height: 1.4;
+    font-size: 11.5px;
+    line-height: 1.3;
+    /* 【スマホ再ブラッシュアップ】「HTML / CSS実装」「レスポンシブ対応」「AIを活用した制作」が
+       「…」で見切れていたため、省略せず自然な折返しに任せる方針に変更 */
+    white-space: normal;
   }
 
   /* スマホでは主力2カードだけ不自然に大きくならないよう、通常カードと同じ寸法に戻す */
   .skill-card--primary {
-    padding: 20px 18px;
+    padding: 16px 10px;
   }
   .skill-card--primary .skill-card__icon {
-    width: 44px;
-    height: 44px;
+    width: 30px;
+    height: 30px;
   }
   .skill-card--primary .skill-card__title {
-    font-size: 12.5px;
+    font-size: 12px;
     font-weight: 600;
+    white-space: nowrap;
   }
 
   /* ---------- 制作の流れ（Flow）：後ろの波線をやめて縦のタイムライン形式に ---------- */
@@ -559,7 +646,13 @@
   }
 
   /* ---------- 制作実績（Works）：スマホは全カード1列。台紙の余白を少しだけ詰め、
-     背面アクリルプレートのズレとWORK02/03の傾きも弱めて、複雑に見えないようにする ---------- */
+     背面アクリルプレートのズレとWORK02/03の傾きも弱めて、複雑に見えないようにする。
+     作品写真を大きく見せたいセクションのため、左右の余白は他セクション（基準24px）より
+     少し狭め（＝カードは少し広め）にする。ただし画面端からは最低限空ける */
+  .works .section-inner {
+    padding-inline: 18px;
+  }
+
   .work-card-mini {
     padding: 12px 12px 18px;
   }
@@ -582,8 +675,122 @@
     transform: translateY(-2px);
   }
 
-  /* ---------- お問い合わせ（Contact）：アーチをさらに浅く、タップしやすい送信ボタンに ---------- */
+  /* ---------- 制作実績一覧ページ（works.html）：詰まった一覧から余白のあるギャラリーへ ----------
+     body.works-list-pageで works.html だけに絞って上書きする（index.html側の
+     Works プレビュー（.work-card-mini）や.works .section-innerの共通値には影響させない） */
+  body.works-list-page .works .section-inner {
+    padding-inline: 22px;
+  }
+
+  /* 作品ブロック自体：区切り線をやめ、余白だけで1点ずつ独立して見せる。
+     最後の作品の下に余計な余白ができないよう、gapではなく:not(:last-child)のmargin-bottomで
+     作品「間」だけに余白を作る */
+  body.works-list-page .work-item {
+    padding: 0;
+    border-bottom: none;
+  }
+
+  body.works-list-page .work-item:not(:last-child) {
+    margin-bottom: 72px;
+  }
+
+  /* 作品写真（マット紙カード）：角を少し柔らかく、影をかなり弱める。
+     マット紙の余白（padding）も詰めすぎない範囲で少し絞り、写真自体は大きいまま見せる */
+  body.works-list-page .work-item__media {
+    padding: 10px 10px 20px;
+    border-radius: 20px;
+    box-shadow: 0 12px 30px rgba(70, 95, 105, 0.06);
+  }
+
+  body.works-list-page .work-item__shot {
+    border-radius: 14px;
+  }
+
+  /* 制作情報：これまで背景を持たない生のテキストだったため、乳白色・半透明のやわらかいカードに包み、
+     写真カードと同じ「外側→作品→内部情報」の余白階層を作る */
+  body.works-list-page .work-item__info {
+    background: rgba(255, 255, 255, 0.62);
+    border-radius: 20px;
+    padding: 22px 20px;
+    box-shadow: 0 12px 30px rgba(70, 95, 105, 0.06);
+  }
+
+  /* WORK番号は情報表に埋め込まず、作品の小さなアイキャッチとして少し強調する */
+  body.works-list-page .work-item__number {
+    font-size: 13px;
+    letter-spacing: 0.06em;
+    margin-bottom: 8px;
+  }
+
+  body.works-list-page .work-item__title {
+    margin: 0 0 18px;
+  }
+
+  /* メタ情報：dt:ddを横並びの表組みで見せていたのをやめ、ラベル（小）→値（少し大きい）の
+     縦積みブロックを2列に並べる「小さな情報ブロック」の見せ方に変更する。
+     区切り線は行ごとには引かず、タイトルとの間に1本だけ薄く入れる */
+  body.works-list-page .work-item__meta {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+    border-top: 1px solid rgba(70, 95, 105, 0.12);
+    padding-top: 16px;
+  }
+
+  body.works-list-page .work-item__meta div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  body.works-list-page .work-item__meta dt {
+    font-size: 10.5px;
+    letter-spacing: 0.03em;
+    opacity: 0.75;
+  }
+
+  body.works-list-page .work-item__meta dd {
+    font-size: 13.5px;
+    color: var(--color-text);
+  }
+
+  /* ---------- お問い合わせ（Contact）：アーチをさらに浅く、タップしやすい送信ボタンに ----------
+     フォームは操作性を優先し、他セクション（基準24px）より少し広め（＝余白は狭め）にする。
+     ただし画面端からは最低限（18〜22px程度）は必ず空ける */
+  .contact .section-inner {
+    padding-inline: 20px;
+  }
+
   .contact-form__submit {
     width: 100%;
+  }
+
+  /* PC版の折返し位置指定用<br>はスマホの狭い幅では不自然な改行になるため非表示にし、自然な折返しに任せる */
+  .contact__message-break {
+    display: none;
+  }
+}
+
+/* ---------- イントロ：巻き紙の筆記体位置（767px以下） ----------
+   巻き紙の筆記体「Welcome to my portfolio」：紐が紙面を斜めに横切っているため、
+   PC向けの位置（top:44% left:60% + 傾き-15deg、css/animation.css）のままだと、
+   紙が小さくなるスマホでは文字が紐と重なったり、紙の端にはみ出してしまう。
+   スマホでは傾きを付けず、紙の書き込み可能領域（紐がかからない中央やや下寄り）の中央へ
+   水平に配置し直し、widthで幅を制限してtext-alignで中央寄せにする。
+   font-sizeは紙自体のサイズ（width:min(64%,420px)）にほぼ比例して変わるvw基準のclampにし、
+   どの画面幅でも紙に対する文字の相対サイズが大きくなりすぎないようにする。
+   （css読み込み順はstyle.css→animation.css→responsive.cssのため、animation.css内の
+   基本ルールを上書きするには、より詳細度を上げるか、こうして読み込み順が最後になる
+   responsive.cssに書く必要がある） */
+@media (max-width: 600px) {
+  .intro-letter-paper__text {
+    top: 43%;
+    left: 54%;
+    width: 68%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    font-size: clamp(15px, 4.4vw, 19px);
+    line-height: 1.3;
   }
 }
