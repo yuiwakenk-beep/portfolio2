@@ -1717,8 +1717,9 @@ html.intro-pending #main {
   color: var(--color-text-sub);
 }
 
-/* ---------- 制作実績（6-7）：「海辺の静かなギャラリー」----------
-   1枚の巨大な白いカードで作品を囲わず、①見出し（番号＋タイトル）②作品写真（マット紙）
+/* ---------- 制作実績（6-7）：「静かな海辺のアーカイブ」----------
+   トップページの海・空・水色を直接繰り返さず、砂・グレージュ寄りの無彩色に近いパレットで、
+   作品画像そのものを主役にする。①見出し（番号＋タイトル）②作品写真（マット紙）
    ③制作情報（背景を持たないテキスト）の3つを、余白だけで区切って展示する構成。
    PC/スマホ共通のグリッド領域名（heading/media/info）で組み、並び順の入れ替え（reverse）や
    列数の切り替えはresponsive.css側でgrid-template-areas/columnsを変えるだけで対応する */
@@ -1742,28 +1743,45 @@ html.intro-pending #main {
 .work-item__number {
   display: block;
   font-family: var(--font-en);
-  font-size: 13px;
+  font-size: 12px;
+  font-weight: 500;
   letter-spacing: 0.18em;
-  color: color-mix(in srgb, var(--color-sea-deep) 55%, var(--color-text-sub) 45%);
-  margin-bottom: 6px;
+  color: var(--archive-text-sub);
+  margin-bottom: 8px;
 }
 
 .work-item__title {
-  font-size: 21px;
-  font-weight: 700;
+  font-size: clamp(24px, 6vw, 36px);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--archive-text);
 }
 
-/* 作品写真：白フチのカードではなく、乳白色の半透明なマット紙。
+/* 種別・業種：メタ表に埋め込まず、作品名直下に「LP｜業種」の1行テキストで見せる
+   （タグ・カプセル化しない） */
+.work-item__type-industry {
+  display: block;
+  font-size: 13px;
+  color: var(--archive-text-sub);
+  margin-top: 10px;
+}
+
+.work-item__type-industry-sep {
+  margin: 0 8px;
+  opacity: 0.5;
+}
+
+/* 作品写真：白フチのカードではなく、淡いグレージュのマット紙。
    object-fit:containで重要部分を一切トリミングせず、写真全体をそのまま見せる */
 .work-item__media {
   grid-area: media;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  background: rgba(255, 252, 246, 0.88);
-  padding: 14px;
-  border-radius: 18px;
-  box-shadow: 0 18px 45px rgba(70, 95, 105, 0.07);
+  gap: 10px;
+  background: var(--archive-panel);
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 14px 34px rgba(60, 70, 70, 0.06);
 }
 
 .work-item__shot {
@@ -1772,7 +1790,7 @@ html.intro-pending #main {
   max-height: 560px;
   object-fit: contain;
   display: block;
-  border-radius: 10px;
+  border-radius: 8px;
 }
 
 /* 画像の縦横比がマットと合わない写真用（hanami flowerのFV画像など）。
@@ -1785,7 +1803,7 @@ html.intro-pending #main {
   max-width: 160px;
   aspect-ratio: 9 / 16;
   object-fit: contain;
-  background: rgba(70, 95, 105, 0.05);
+  background: rgba(70, 85, 85, 0.05);
 }
 
 /* スマホ画面を複数カット並べて見せる用（WORK 02など） */
@@ -1827,7 +1845,7 @@ html.intro-pending #main {
   font-size: 12.5px;
   margin-bottom: 26px;
   padding-top: 18px;
-  border-top: 1px solid rgba(70, 95, 105, 0.12);
+  border-top: 1px solid var(--archive-line);
 }
 
 .work-item__meta div {
@@ -1840,12 +1858,18 @@ html.intro-pending #main {
   font-family: var(--font-ui);
   font-size: 11px;
   letter-spacing: 0.02em;
-  color: var(--color-text-sub);
-  opacity: 0.85;
+  color: var(--archive-text-sub);
 }
 
 .work-item__meta dd {
-  color: var(--color-text);
+  color: var(--archive-text);
+}
+
+/* 種別・業種は上の.work-item__type-industryに一本化するため、メタ表からは非表示にする。
+   .work-item__meta div{display:flex}より詳細度を上げる必要があるため、親を含めたセレクタにする */
+.work-item__meta .work-item__meta-row--type,
+.work-item__meta .work-item__meta-row--industry {
+  display: none;
 }
 
 /* 制作目的・工夫したポイントを、長文のまま続けず小さな2つの章に分ける */
@@ -1865,18 +1889,18 @@ html.intro-pending #main {
   font-style: italic;
   font-size: 12.5px;
   letter-spacing: 0.04em;
-  color: var(--color-sea-deep);
+  color: var(--archive-accent);
 }
 
 .work-item__section-jp {
   font-size: 11.5px;
-  color: var(--color-text-sub);
+  color: var(--archive-text-sub);
 }
 
 .work-item__section-body {
   font-size: 13px;
   line-height: 1.85;
-  color: var(--color-text-sub);
+  color: var(--archive-text-sub);
 }
 
 .work-item__actions {
@@ -1886,28 +1910,27 @@ html.intro-pending #main {
   margin-top: 22px;
 }
 
-/* サイトを見る／詳しく見る：強いCTAではなく、ギャラリーの案内板程度の控えめなボタン */
+/* サイトを見る：強いCTAではなく、細いoutlineの控えめなボタン（pill型にしない） */
 .work-item__link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   min-height: 42px;
   padding: 10px 24px;
-  border-radius: 999px;
+  border-radius: 10px;
   font-family: var(--font-ui);
   font-weight: 600;
   font-size: 13px;
   text-decoration: none;
-  color: var(--color-sea-deep);
-  background: rgba(255, 255, 255, 0.5);
-  border: 1px solid rgba(99, 188, 208, 0.35);
-  box-shadow: 0 8px 20px rgba(70, 95, 105, 0.05);
+  color: var(--archive-text);
+  background: transparent;
+  border: 1px solid rgba(70, 85, 85, 0.3);
   transition: background 0.25s ease, border-color 0.25s ease;
 }
 
 .work-item__link:hover {
-  background: rgba(255, 255, 255, 0.78);
-  border-color: rgba(99, 188, 208, 0.6);
+  background: rgba(70, 85, 85, 0.05);
+  border-color: rgba(70, 85, 85, 0.5);
 }
 
 /* Works独自の砂質感オーバーレイ（::before）は、セクション境界に横一直線の色差を作ってしまうため撤去した。
@@ -3103,78 +3126,86 @@ img.work-card-mini__shot {
   box-shadow: 0 12px 28px rgba(70, 95, 105, 0.08);
 }
 
-/* ---------- 制作実績一覧ページ（works.html）：「海辺の静かなギャラリー」 ----------
-   ヒーロー〜作品一覧〜Contact導線までを真っ白にしないよう、既存の世界観（海・空・アイボリー）の
-   縦グラデーションで通しにする。1枚の写真をbackground-size:coverで敷くと、作品数によって
-   ページの長さが変わるたびに写真の見え方（どこまでが海でどこから砂地か）が変わってしまうため、
-   写真そのものは短く高さが安定しているヒーローだけに使い、それ以外は色のグラデーションで
-   同じ世界観をゆるく保つ */
+/* ---------- 制作実績一覧ページ（works.html）：「静かな海辺のアーカイブ」 ----------
+   トップページの海・空・水色を直接繰り返さず、砂・グレージュ寄りの無彩色に近いパレットで、
+   作品画像そのものを主役にする。背景画像は使わず、CSSカラーのみで構成する。
+   このページだけで使う色は、既存のサイト全体カラー変数と混ざらないよう
+   --archive-*という専用のカスタムプロパティにまとめている */
 .works-page-flow {
   position: relative;
-  background: linear-gradient(
-    180deg,
-    var(--color-sky) 0%,
-    var(--color-sea-light) 30%,
-    color-mix(in srgb, var(--color-sea-light) 55%, var(--color-sand) 45%) 75%,
-    var(--color-sand) 100%
-  );
+  background: #EEEAE2;
+  --archive-bg: #EEEAE2;
+  --archive-panel: #F7F4EE;
+  --archive-text: #3F4A4D;
+  --archive-text-sub: #7C888A;
+  --archive-accent: #6F8F91;
+  --archive-line: rgba(70, 85, 85, 0.12);
 }
 
-/* ヒーロー：Works / 制作実績 + 短い導入文のみ。高さを抑え、強い新規装飾は追加しない。
-   背景は.section-photo-flowと同じ海・空の写真（高さが安定しているのでcoverでも破綻しない） */
+/* ヒーロー：Works / 制作実績 + 短い導入文のみ。背景画像なし、余白だけで静かな導入を作る */
 .works-page-header {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 240px;
+  min-height: 200px;
   text-align: center;
-  padding: 96px 20px 32px;
+  padding: 88px 20px 28px;
   position: relative;
-  --bg-photo-flow-image: url('../sozai/haikei2.png');
-  background-image: linear-gradient(var(--bg-photo-tint), var(--bg-photo-tint)), var(--bg-photo-flow-image);
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: top center;
 }
 
 .works-page-header__en {
   display: block;
   font-family: var(--font-en);
   font-style: italic;
-  font-size: 15px;
-  color: var(--color-sea-deep);
+  font-size: 14px;
+  color: var(--archive-accent);
 }
 
 .works-page-header__jp {
-  font-size: 28px;
-  font-weight: 700;
+  font-size: 26px;
+  font-weight: 600;
   margin-top: 8px;
+  color: var(--archive-text);
 }
 
 .works-page-header__lead {
   max-width: 560px;
-  margin: 16px auto 0;
+  margin: 14px auto 0;
   font-size: 14px;
   line-height: 1.9;
-  color: var(--color-text-sub);
+  color: var(--archive-text-sub);
 }
 
+/* 「トップページへ戻る」：迷わず見つけられるよう、中央寄せの本文の流れから外して
+   ページ左上に固定する。PC/スマホ共通仕様（大きなボタンにはせずテキストリンクのまま） */
 .works-back {
+  position: absolute;
+  top: 68px;
+  left: 20px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-top: 18px;
   font-size: 13px;
-  color: var(--color-sea-deep);
+  font-weight: 500;
+  color: var(--archive-accent);
   text-decoration: none;
+  z-index: 1;
 }
 
 .works-back:hover {
-  color: var(--color-accent);
+  opacity: 0.75;
 }
 
-/* ページ下部のContact導線：大きな営業CTAにせず、ギャラリーの案内程度に控えめにする */
+.works-back__arrow {
+  transition: transform 0.25s ease;
+}
+
+.works-back:hover .works-back__arrow {
+  transform: translateX(-3px);
+}
+
+/* ページ下部のContact導線：大きな営業CTAにせず、アーカイブの案内程度に控えめにする */
 .works-list-cta {
   text-align: center;
   padding: 56px 20px 88px;
@@ -3182,7 +3213,7 @@ img.work-card-mini__shot {
 
 .works-list-cta__lead {
   font-size: 14px;
-  color: var(--color-text-sub);
+  color: var(--archive-text-sub);
   margin-bottom: 14px;
 }
 
@@ -3193,16 +3224,16 @@ img.work-card-mini__shot {
   font-family: var(--font-ui);
   font-weight: 600;
   font-size: 14px;
-  color: var(--color-sea-deep);
+  color: var(--archive-accent);
   text-decoration: none;
-  border-bottom: 1px solid rgba(99, 188, 208, 0.4);
+  border-bottom: 1px solid var(--archive-accent);
   padding-bottom: 2px;
   transition: color 0.25s ease, border-color 0.25s ease;
 }
 
 .works-list-cta__link:hover {
-  color: var(--color-accent);
-  border-color: var(--color-accent);
+  color: var(--archive-text);
+  border-color: var(--archive-text);
 }
 
 .works-list-cta__arrow {
@@ -3212,3 +3243,4 @@ img.work-card-mini__shot {
 .works-list-cta__link:hover .works-list-cta__arrow {
   transform: translateX(3px);
 }
+

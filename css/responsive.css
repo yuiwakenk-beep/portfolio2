@@ -49,10 +49,16 @@
     margin-bottom: 120px;
   }
 
-  /* ヒーロー高さ（PC：300〜420px） */
+  /* ヒーロー高さ（PC：240〜320px） */
   .works-page-header {
-    min-height: 340px;
-    padding: 150px 32px 40px;
+    min-height: 280px;
+    padding: 110px 32px 32px;
+  }
+
+  /* 「トップページへ戻る」：PCではヘッダー直下・左上に配置 */
+  .works-back {
+    top: 96px;
+    left: 32px;
   }
 
   .flow__steps {
@@ -215,9 +221,9 @@
     margin-top: -70px;
   }
 
-  /* ---------- 8-2. PC版：ファーストビュー以外の背景をhaikei.pngに差し替え ---------- */
-  .section-photo-flow,
-  .works-page-header {
+  /* ---------- 8-2. PC版：ファーストビュー以外の背景をhaikei.pngに差し替え ----------
+     works.htmlの.works-page-headerは「静かな海辺のアーカイブ」化に伴い背景画像を廃止したため対象外 */
+  .section-photo-flow {
     --bg-photo-flow-image: url('../sozai/haikei.png');
   }
 
@@ -668,21 +674,22 @@
     transform: translateY(-2px);
   }
 
-  /* ---------- 制作実績一覧ページ（works.html）：「海辺の静かなギャラリー」（スマホ） ----------
+  /* ---------- 制作実績一覧ページ（works.html）：「静かな海辺のアーカイブ」（スマホ） ----------
      body.works-list-pageで works.html だけに絞って上書きする（index.html側の
      Works プレビュー（.work-card-mini）や.works .section-innerの共通値には影響させない）。
-     カード化・マット紙・区切り線などの基本デザインはcss/style.css側の共通ルールに統一したため、
-     ここでは左右余白・作品間の余白・メタ情報の列数など、画面幅特有の値だけを上書きする */
+     配色・マット紙・番号・タイトル・ボタン等の基本デザインはcss/style.css側の共通ルールに
+     統一したため、ここでは左右余白・作品間の余白・メタ情報の列数など、
+     画面幅特有の値だけを上書きする */
   body.works-list-page .works .section-inner {
     padding-inline: 22px;
   }
 
-  /* 作品と作品の間：72〜96pxの範囲で、背景の海・空がしっかり見える余白を確保する */
+  /* 作品と作品の間：72〜96pxの範囲で、十分な余白を確保する */
   body.works-list-page .work-item:not(:last-child) {
     margin-bottom: 80px;
   }
 
-  /* メタ情報はスマホでは2列（種別・案件区分などが短い値のため2列でも窮屈にならない） */
+  /* メタ情報はスマホでは2列（値が短いため2列でも窮屈にならない） */
   body.works-list-page .work-item__meta {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -705,11 +712,10 @@
 }
 
 /* ---------- イントロ：巻き紙の筆記体位置（767px以下） ----------
-   巻き紙の筆記体「Welcome to my portfolio」：紐が紙面を斜めに横切っているため、
-   PC向けの位置（top:44% left:60% + 傾き-15deg、css/animation.css）のままだと、
-   紙が小さくなるスマホでは文字が紐と重なったり、紙の端にはみ出してしまう。
-   スマホでは傾きを付けず、紙の書き込み可能領域（紐がかからない中央やや下寄り）の中央へ
-   水平に配置し直し、widthで幅を制限してtext-alignで中央寄せにする。
+   巻き紙の筆記体「Welcome to my portfolio」：紙が小さくなるスマホ向けに位置・幅・文字サイズを
+   個別調整しているが、傾き（-15deg）はPC版（css/animation.css）と同じ仕様に統一する。
+   紐が紙面中央〜下寄りをループしているため、top/leftは紐の輪より上（紙の書き込み可能領域の
+   上寄り）に合わせ、文字が紐と重ならないようにしている。
    font-sizeは紙自体のサイズ（width:min(64%,420px)）にほぼ比例して変わるvw基準のclampにし、
    どの画面幅でも紙に対する文字の相対サイズが大きくなりすぎないようにする。
    （css読み込み順はstyle.css→animation.css→responsive.cssのため、animation.css内の
@@ -717,10 +723,10 @@
    responsive.cssに書く必要がある） */
 @media (max-width: 600px) {
   .intro-letter-paper__text {
-    top: 43%;
-    left: 54%;
+    top: 29%;
+    left: 60%;
     width: 68%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) rotate(-15deg);
     text-align: center;
     font-size: clamp(15px, 4.4vw, 19px);
     line-height: 1.3;
