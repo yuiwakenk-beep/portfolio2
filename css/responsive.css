@@ -714,8 +714,10 @@
 /* ---------- イントロ：巻き紙の筆記体位置（767px以下） ----------
    巻き紙の筆記体「Welcome to my portfolio」：紙が小さくなるスマホ向けに位置・幅・文字サイズを
    個別調整しているが、傾き（-15deg）はPC版（css/animation.css）と同じ仕様に統一する。
-   紐が紙面中央〜下寄りをループしているため、top/leftは紐の輪より上（紙の書き込み可能領域の
-   上寄り）に合わせ、文字が紐と重ならないようにしている。
+   topは紙の書き込み可能領域（上下の巻き部分に挟まれた平らな面）の縦中央に合わせている。
+   以前は紐を避けて上寄り（29%）にしていたが、文字が上に偏って見えたため中央へ移した。
+   中央に置くと紙の左側を通る紐に文字の左端が重なるため、文字をやや小さめにし、
+   leftを右寄り（64%）にして紐と紙の右端の両方にかからないよう調整している。
    font-sizeは紙自体のサイズ（width:min(64%,420px)）にほぼ比例して変わるvw基準のclampにし、
    どの画面幅でも紙に対する文字の相対サイズが大きくなりすぎないようにする。
    （css読み込み順はstyle.css→animation.css→responsive.cssのため、animation.css内の
@@ -723,12 +725,12 @@
    responsive.cssに書く必要がある） */
 @media (max-width: 600px) {
   .intro-letter-paper__text {
-    top: 29%;
-    left: 60%;
+    top: 48%;
+    left: 64%;
     width: 68%;
     transform: translate(-50%, -50%) rotate(-15deg);
     text-align: center;
-    font-size: clamp(15px, 4.4vw, 19px);
+    font-size: clamp(13px, 3.6vw, 16px);
     line-height: 1.3;
   }
 }

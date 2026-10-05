@@ -1085,7 +1085,10 @@ html.intro-pending #main {
   pointer-events: none;
 }
 
-/* PC版と同じスクロール演出（heroLaptopScroll）・ハイライト演出をそのまま流用する */
+/* PC版と同じ動き方（上で停止→下までスクロール→停止→上へ戻る）だが、移動量だけスマホ専用にする。
+   PC版のheroLaptopScroll（-2315px）は画面幅495px用の値で、幅340pxのスマホ版では
+   スクリーンショットの高さ（340×7783/1440≒1838px）を超えてしまい、
+   スクロールの下端付近で下にある元の写真の画面が見えてしまっていたため */
 .hero__laptop-mask-mobile img {
   position: absolute;
   top: 0;
@@ -1093,8 +1096,26 @@ html.intro-pending #main {
   width: 100%;
   height: auto;
   display: block;
-  animation: heroLaptopScroll 26s ease-in-out infinite;
+  animation: heroLaptopScrollMobile 26s ease-in-out infinite;
   animation-play-state: paused;
+}
+
+/* 移動量 = スクリーンショットの表示高さ（約1838px） - 画面枠の高さ（282px）≒ 1556px。
+   これでスクリーンショットの最下部がちょうど画面枠の下端に来る。
+   .hero__laptop-mask-mobileのwidth/heightやスクリーンショット画像を変えた場合はここも計算し直すこと */
+@keyframes heroLaptopScrollMobile {
+  0%,
+  8% {
+    transform: translateY(0);
+  }
+  42%,
+  58% {
+    transform: translateY(-1556px);
+  }
+  92%,
+  100% {
+    transform: translateY(0);
+  }
 }
 
 .hero__copy {

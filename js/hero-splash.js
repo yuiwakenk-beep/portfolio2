@@ -75,25 +75,28 @@
   var LEFT_RANGE_MAX_PCT = 33; // 横方向の発生範囲（#hero幅に対する%）
 
   // ---------- モバイルは4つの文字あり水玉が重ならないよう固定スロットに配置 ----------
-  // 【スマホ再ブラッシュアップ】xFrac 0.56/0.58だった右側2枠が、スマホ写真内のノートPC画面
-  // （laptopCornersMobile、写真の中央〜右寄りに位置）と実測で重なっていたため、
-  // PC版が水しぶきの発生範囲をhero幅の左33%に絞っている（LEFT_RANGE_MAX_PCT）のと同じ考え方で、
-  // 4枠とも「できること」水玉がノートPC画面より確実に左側（xFracはおおよそ0.35以下）に収まるよう変更した
-  var MOBILE_REVEAL_SLOTS = [
-    { xFrac: 0.02, yFrac: 0.05 },
-    { xFrac: 0.18, yFrac: 0.15 },
-    { xFrac: 0.04, yFrac: 0.55 },
-    { xFrac: 0.16, yFrac: 0.68 }
-  ];
+  // 水玉はノートPC画面（写真の中央〜右寄り）に重ならないよう、画面の左側に寄せて配置する
+  // 【スマホ修正】割合固定のスロットでは、幅390pxの実機で上2つ（横46px・縦20pxしか離れない）と
+  // 下2つが大きく重なり、文字が隠れていたため、左・右・左・右のジグザグ配置に変更した。
+  // 縦は手書きコピーの下〜CTAの上の範囲いっぱいを4等分し、横のずらし幅は
+  // 「隣り合う水玉の中心間の距離がMOBILE_MIN_CENTER_DIST以上」になるよう画面サイズから毎回計算する
+  var MOBILE_REVEAL_COUNT = 4;
   var MOBILE_REVEALED_SIZE = 80; // 重なり防止のためモバイルは固定サイズにする（デスクトップはランダム86〜116のまま）
+  var MOBILE_MIN_CENTER_DIST = MOBILE_REVEALED_SIZE + 8; // 隣り合う水玉の中心間の最小距離(px)。水玉の直径＋すき間
+  var MOBILE_FADE_RISE_PX = 16; // スマホの文字入り水玉が消えるときの上昇量(px)。大きく上がると上の水玉に追いつき重なるため、ごく小さくする
 
   function pickMobileSlot(heroRect, bounds, index) {
-    var slot = MOBILE_REVEAL_SLOTS[index % MOBILE_REVEAL_SLOTS.length];
+    var i = index % MOBILE_REVEAL_COUNT;
     var size = MOBILE_REVEALED_SIZE;
     var widthSpan = Math.max(heroRect.width - EDGE_MARGIN * 2 - size, 40);
     var heightSpan = Math.max(bounds.gateTop - bounds.upperBound - size, 40);
-    var left = EDGE_MARGIN + widthSpan * slot.xFrac;
-    var top = bounds.upperBound + heightSpan * slot.yFrac;
+    var stepY = heightSpan / (MOBILE_REVEAL_COUNT - 1);
+    // 下の水玉は先に水玉化して先に消え始めるため、消える際の上昇量ぶん縦の間隔が縮む前提で計算する
+    var effectiveY = Math.max(stepY - MOBILE_FADE_RISE_PX, 0);
+    var shiftX = Math.sqrt(Math.max(MOBILE_MIN_CENTER_DIST * MOBILE_MIN_CENTER_DIST - effectiveY * effectiveY, 0));
+    shiftX = Math.min(shiftX, widthSpan);
+    var left = EDGE_MARGIN + (i % 2 === 0 ? 0 : shiftX);
+    var top = bounds.upperBound + stepY * i;
     return { targetTop: top, size: size, left: left };
   }
 
@@ -300,6 +303,8 @@
       // 水玉化後、見出し・手書きコピーの手前（topLimit）を意識してさらに上昇してからフェードアウトする
       var remaining = Math.max(targetTop - topLimit, MIN_VISIBLE_RISE_PX);
       var risePx = remaining * (0.35 + Math.random() * 0.3); // 0.35〜0.65（topLimitを超えない）
+      // スマホのジグザグ配置の水玉は、ほぼその場で消えるようにして隣の水玉と重ならないようにする
+      if (el.dataset.mobileSlot === '1') risePx = MOBILE_FADE_RISE_PX;
       var phase2Duration = Math.max((risePx / (RISE_SPEED_PX_PER_SEC * speedVariance)) * 1000, 500);
       var phase2 = el.animate(
         [
@@ -382,12 +387,13 @@
       var isReal = el.tagName === 'BUTTON';
       var delay = isReal ? Math.random() * 150 : Math.random() * FAKE_STAGGER_MS;
       // 「できること」4つの水玉化する目標の高さ・左右位置・サイズを決める。
-      // モバイルは重なり防止のため固定スロット（MOBILE_REVEAL_SLOTS）を使い、
+      // モバイルは重なり防止のため固定スロット（pickMobileSlot()のジグザグ配置）を使い、
       // PCは従来通りランダムな位置・サイズのまま
       var revealTarget = null;
       if (isReal && useMobileSlots) {
         var slotTarget = pickMobileSlot(heroRect, bounds, i);
         leftPx = slotTarget.left;
+        el.dataset.mobileSlot = '1';
         revealTarget = { targetTop: slotTarget.targetTop, size: slotTarget.size };
       } else if (isReal) {
         revealTarget = pickRevealTarget(heroRect, bounds);

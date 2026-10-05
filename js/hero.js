@@ -356,6 +356,27 @@
 
     function easeInOutCubic(t) { return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2; }
 
+    // 文字を見せる幅（viewBox基準の0〜REVEAL_W）を反映する。
+    // PCは従来通りSVG内の<clipPath>の矩形幅を変える。スマホはiPhone Safariでこの方式の再描画が追いつかず、
+    // 前の周回で書き終えた文字の下半分が「まだ書いていない部分」に残って見える不具合が出たため、
+    // SVG要素そのものにCSSのclip-path: inset()をかける方式に切り替えている（Safariでも安定して動く）。
+    // insetの上下・左を負の値にしているのは、overflow:visibleで箱の外にはみ出す筆記体の飾りを切らないため
+    var penSvgEl = document.getElementById('heroPenSvg');
+    function setRevealWidth(w) {
+      if (isDesktopBreakpoint()) {
+        penSvgEl.style.clipPath = '';
+        penSvgEl.style.webkitClipPath = '';
+        revealRect.setAttribute('width', String(w));
+        return;
+      }
+      revealRect.setAttribute('width', String(REVEAL_W));
+      var boxW = penSvgEl.getBoundingClientRect().width;
+      var rightPx = Math.max(0, boxW * (1 - w / PEN_VIEWBOX_W));
+      var inset = 'inset(-40% ' + rightPx + 'px -40% -20px)';
+      penSvgEl.style.clipPath = inset;
+      penSvgEl.style.webkitClipPath = inset;
+    }
+
     function placePenAt(len) {
       var box = currentPenBoxPx();
       var svgLeftPx = box.left;
@@ -390,7 +411,7 @@
       if (drawElapsed <= DRAW_MS) {
         penText.style.opacity = '1';
         var progress = easeInOutCubic(Math.min(1, drawElapsed / DRAW_MS));
-        revealRect.setAttribute('width', String(progress * REVEAL_W));
+        setRevealWidth(progress * REVEAL_W);
         penIcon.style.opacity = '1';
         placePenAt(progress * guideLen);
         requestAnimationFrame(tick);
@@ -398,14 +419,14 @@
       }
       var fadeElapsed = drawElapsed - DRAW_MS;
       if (fadeElapsed <= FADE_MS) {
-        revealRect.setAttribute('width', String(REVEAL_W));
+        setRevealWidth(REVEAL_W);
         penIcon.style.opacity = String(1 - Math.min(1, fadeElapsed / FADE_MS));
         requestAnimationFrame(tick);
         return;
       }
       var holdElapsed = fadeElapsed - FADE_MS;
       if (holdElapsed <= HOLD_MS) {
-        revealRect.setAttribute('width', String(REVEAL_W));
+        setRevealWidth(REVEAL_W);
         penIcon.style.opacity = '0';
         requestAnimationFrame(tick);
         return;
