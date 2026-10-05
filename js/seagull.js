@@ -103,11 +103,12 @@
   }
 
   // 横方向優先の緩いS字カーブ（進行方向に対して垂直に、控えめな振れ幅でオフセット）
-  function buildCurvePath(dx, dy) {
+  // maxWig：S字の振れ幅の上限(px)。省略時は60。狭い余白帯を飛ぶシーンでは小さくする
+  function buildCurvePath(dx, dy, maxWig) {
     var nx = -dy;
     var ny = dx;
     var len = Math.sqrt(nx * nx + ny * ny) || 1;
-    var wig = Math.min(60, len * 0.14);
+    var wig = Math.min(maxWig || 60, len * 0.14);
     var offX = (nx / len) * wig;
     var offY = (ny / len) * wig;
     var p1x = dx * 0.33 + offX;
@@ -121,12 +122,26 @@
     );
   }
 
+  // 飛行後のフェードアウト。次の飛行（特にFooterのエンディング）がこのフェードの途中で始まると、
+  // 新しい海鳥まで透明にされ、is-activeも外されて見えなくなるため、
+  // tweenを保持しておき、新しく飛ばす前にstopHide()で必ず止める
+  var hideTween = null;
+
+  function stopHide() {
+    if (hideTween) {
+      hideTween.kill();
+      hideTween = null;
+    }
+  }
+
   function hideSeagull() {
-    gsap.to(seagull, {
+    stopHide();
+    hideTween = gsap.to(seagull, {
       opacity: 0,
       duration: 1.2,
       delay: 0.4,
       onComplete: function () {
+        hideTween = null;
         seagull.classList.remove('is-active');
         gsap.set(seagull, { willChange: 'auto' });
       }
@@ -134,15 +149,35 @@
   }
 
   // ---------- シーン定義（各セクション内で完結する短い飛行） ----------
-  // dx: 横移動量（500〜900px目安）/ dy: 縦移動量（50〜180px目安、真下移動は作らない）
+  // 各シーンは「飛ぶ高さ（ドキュメント座標のy）」と進行方向だけを決める。
+  // 横方向は画面幅に合わせて「画面の端から端まで横切る」ようflyScene()側で計算するため、
+  // PC・スマホとも同じシーン定義を使う（スマホもPCと同じ位置・同じ飛び方）。
+  // dy: 縦移動量（真下移動は作らない。控えめな値にする）
   function aboutConfig() {
+    // 【スマホのみ】FV（#hero）の下端から「About Me / 自己紹介」見出しの上端までの空間（縦約120px）の
+    // 縦中央を飛ばす。PCと同じ位置だとスマホではプロフィール写真にかかるため。
+    // 空間が狭いので縦移動なし・S字の振れ幅も小さくし、見出しやFVに入り込まないようにしている。
+    // .seagullは高さ0の箱で、海鳥の画像（正方形）は箱の上端から下へ描かれ、拡大縮小も上端基準になるため、
+    // 表示サイズの半分だけ上にずらして、海鳥の中心を空間の縦中央に合わせる
+    if (!desktopMql.matches) {
+      var hero = document.querySelector('#hero');
+      var heading = document.querySelector('#about .section-heading');
+      if (hero && heading) {
+        var mid = (docRect(hero).bottom + docRect(heading).top) / 2;
+        return {
+          y: mid - (SEAGULL_W * MOBILE_SIZE_RATIO * 0.9) / 2,
+          dy: 0,
+          maxWig: 20,
+          scaleFrom: 0.85, scaleMid: 0.95, scaleTo: 0.85
+        };
+      }
+    }
     var row = document.querySelector('.concept-about-row') || document.querySelector('#about');
     if (!row) return null;
     var r = docRect(row);
     return {
-      start: { x: r.left - 30, y: r.top + r.height * 0.1 },
-      dx: 780, dy: 70,
-      duration: 5,
+      y: r.top + r.height * 0.1,
+      dy: 70,
       scaleFrom: 0.78, scaleMid: 0.98, scaleTo: 0.8
     };
   }
@@ -150,19 +185,16 @@
   // 「対応できること」のカード群末尾と「使用ツール」の見出しの間にできる余白帯
   // （それぞれのsection-innerのpadding-bottom/padding-top分の空き）だけを飛行帯にする。
   // カード・チップ・見出し文字のどれにも被らない。
-  // このシーンだけ右端から出現して左へ飛ばしたいため、開始位置を右側に、
-  // dxを負値にして進行方向を反転し、左向きフレーム（reversed）を使う
+  // このシーンだけ右から出現して左へ飛ばしたいため、reversedにして左向きフレームを使う
   function skillsToolsGapConfig() {
     var skillsGrid = document.querySelector('#skills .skills__grid');
     var toolsHeading = document.querySelector('#tools .section-heading');
     if (!skillsGrid || !toolsHeading) return null;
     var gRect = docRect(skillsGrid);
     var hRect = docRect(toolsHeading);
-    var y = (gRect.bottom + hRect.top) / 2;
     return {
-      start: { x: gRect.right + 30, y: y },
-      dx: -780, dy: 24,
-      duration: 5,
+      y: (gRect.bottom + hRect.top) / 2,
+      dy: 24,
       scaleFrom: 0.78, scaleMid: 0.96, scaleTo: 0.8,
       reversed: true
     };
@@ -175,105 +207,114 @@
     if (!note) return null;
     var r = docRect(note);
     return {
-      start: { x: r.left - 30, y: r.bottom + 30 },
-      dx: 720, dy: 40,
-      duration: 5,
+      y: r.bottom + 30,
+      dy: 40,
       scaleFrom: 0.78, scaleMid: 0.96, scaleTo: 0.78
     };
   }
 
   // Heroはあえてシーンを作らない（指示により飛ばさない・海鳥がいない時間を作る）
-  // 3シーンとも「セクションに到達した瞬間」に発火させたいため、しきい値を低くしている
-  // （#toolsだけでなくabout/flowも少し入った時点で発火。一度離れて戻ってくれば何度でも再発火する。
-  //   IntersectionObserverはunobserveしていないため、再訪のたびに毎回発火する仕様のまま）
+  // 一度飛行帯が画面中央から離れて戻ってくれば、何度でも再発火する
   var scenes = [
-    { key: 'about', trigger: '#about', threshold: 0.1, build: aboutConfig, mobileEl: '#about .section-heading__jp' },
-    { key: 'skills-tools', trigger: '#tools', threshold: 0, build: skillsToolsGapConfig, mobileEl: '#tools .section-heading__jp', reversed: true },
-    { key: 'flow', trigger: '#flow', threshold: 0.1, build: flowConfig, mobileEl: '#flow .section-heading__jp' }
+    { key: 'about', build: aboutConfig },
+    { key: 'skills-tools', build: skillsToolsGapConfig },
+    { key: 'flow', build: flowConfig }
   ];
 
-  // PC/タブレット：1セクション内で完結する短い滑空（登場→滑空→少しカーブ→退場）
+  // ---------- 飛行時間・大きさ（PC/スマホ） ----------
+  // 以前はPCが780px固定の移動量・5秒で、広い画面では途中で消えて見える範囲が短かったため、
+  // 画面の端から端まで横切る移動量にし、時間も延ばした。
+  // スマホは画面幅が狭いぶん移動距離が短いので、PCより短い時間でも同じくらいゆっくり見える
+  var DESKTOP_DURATION = 8; // 秒
+  var MOBILE_DURATION = 6; // 秒
+  var MOBILE_SIZE_RATIO = 0.66; // スマホは海鳥を小さくする（.seagullの幅150px × 0.66 ≒ 100px）
+  var SEAGULL_W = 150; // css/animation.cssの .seagull { width: 150px; } と一致させる
+  var EDGE_GAP = 8; // 画面右端との最小のすき間(px)
+
+  // 1セクション内で完結する滑空（登場→画面を横切る→少しカーブ→退場）。PC・スマホ共通
+  // 左側は画面の外から現れ／外へ抜ける。
+  // 右側は画面の外に出すと、スマホ（特にiPhone Safari）で横スクロールが発生する恐れがあるため、
+  // 画面右端の内側で「ふわっと現れる」「ふわっと消える」ようにしている
   function flyScene(cfg) {
     if (!cfg) return;
     if (flightTimeline && flightTimeline.isActive()) return;
+    stopHide();
 
     var reversed = !!cfg.reversed;
+    var isDesktop = desktopMql.matches;
+    var duration = isDesktop ? DESKTOP_DURATION : MOBILE_DURATION;
+    var sizeRatio = isDesktop ? 1 : MOBILE_SIZE_RATIO;
+    var vw = document.documentElement.clientWidth;
+    var leftOutX = window.scrollX - SEAGULL_W - 10; // 画面の左外
+    var rightInX = window.scrollX + vw - SEAGULL_W - EDGE_GAP; // 画面右端の内側
+    var startX = reversed ? rightInX : leftOutX;
+    var endX = reversed ? leftOutX : rightInX;
 
-    setBasePosition(cfg.start.x, cfg.start.y);
-    gsap.set(seagull, { scale: cfg.scaleFrom, opacity: 1, willChange: 'transform' });
+    setBasePosition(startX, cfg.y);
+    gsap.set(seagull, {
+      scale: cfg.scaleFrom * sizeRatio,
+      opacity: reversed ? 0 : 1, // 右から登場するときは、画面右端の内側でふわっと現れる
+      willChange: 'transform'
+    });
     seagull.classList.add('is-active');
     setGlide(reversed);
 
-    var path = buildCurvePath(cfg.dx, cfg.dy);
-    var ease = 'sine.inOut';
+    var path = buildCurvePath(endX - startX, cfg.dy, cfg.maxWig);
 
     flightTimeline = gsap.timeline({ onComplete: hideSeagull });
     flightTimeline.call(function () { flapBurst(4, reversed); }, null, 0);
+    flightTimeline
+      .to(seagull, { motionPath: { path: path, curviness: 1.2 }, duration: duration, ease: 'sine.inOut' }, 0)
+      .call(function () { flapBurst(2, reversed); }, null, duration * 0.5);
 
-    if (cfg.slowMidRatio) {
-      // パスを3分割し、中間区間だけ時間配分を増やして「少しだけ」速度を落とす。
-      // 区間の継ぎ目でsine.inOutを重ねると速度がゼロまで落ちてから再加速する「継ぎ目」が
-      // 生まれてカクついて見えるため、前後の速度が繋がるsine.out→（中間）→sine.inの組にする。
-      var segA = 0.38, segB = 0.62;
-      var midRatio = cfg.slowMidRatio;
-      var d2 = cfg.duration * midRatio;
-      var dRest = cfg.duration - d2;
-      var d1 = dRest * (segA / (segA + (1 - segB)));
-      var d3 = dRest - d1;
-
-      flightTimeline
-        .to(seagull, { motionPath: { path: path, start: 0, end: segA, curviness: 1.2 }, duration: d1, ease: 'sine.out' }, 0)
-        .call(function () { flapBurst(2, reversed); })
-        .to(seagull, { motionPath: { path: path, start: segA, end: segB, curviness: 1.2 }, duration: d2, ease: 'none' }, '>')
-        .to(seagull, { motionPath: { path: path, start: segB, end: 1, curviness: 1.2 }, duration: d3, ease: 'sine.in' }, '>');
+    // 画面右端の内側で現れる／消えるぶんのフェード
+    if (reversed) {
+      flightTimeline.to(seagull, { opacity: 1, duration: duration * 0.15, ease: 'sine.out' }, 0);
     } else {
-      flightTimeline
-        .to(seagull, { motionPath: { path: path, curviness: 1.2 }, duration: cfg.duration, ease: ease }, 0)
-        .call(function () { flapBurst(2, reversed); }, null, cfg.duration * 0.5);
+      flightTimeline.to(seagull, { opacity: 0, duration: duration * 0.18, ease: 'sine.in' }, duration * 0.82);
     }
 
     // 奥行き（scale）：前半sine.out（中間へ滑らかに減速して到達）→後半sine.in（中間から滑らかに加速して離れる）
     // にすることで、中間地点で速度が繋がり「止まって再加速」する継ぎ目をなくす
-    flightTimeline.to(seagull, { scale: cfg.scaleMid, duration: cfg.duration * 0.5, ease: 'sine.out' }, 0);
-    flightTimeline.to(seagull, { scale: cfg.scaleTo, duration: cfg.duration * 0.5, ease: 'sine.in' }, cfg.duration * 0.5);
+    flightTimeline.to(seagull, { scale: cfg.scaleMid * sizeRatio, duration: duration * 0.5, ease: 'sine.out' }, 0);
+    flightTimeline.to(seagull, { scale: cfg.scaleTo * sizeRatio, duration: duration * 0.5, ease: 'sine.in' }, duration * 0.5);
   }
 
-  // スマホ：飛行はさせず、見出し付近にふわっと現れてしばらくしてから消える簡略版
-  function flashNear(scene) {
-    var el = document.querySelector(scene.mobileEl) || document.querySelector(scene.trigger);
-    if (!el) return;
-    var r = docRect(el);
-    setBasePosition(r.left + r.width * 0.6, r.top - 30);
-    gsap.set(seagull, { scale: 0.9, opacity: 1 });
-    seagull.classList.add('is-active');
-    setGlide(!!scene.reversed);
-    hideSeagull();
-  }
+  // ---------- 飛び始めるタイミング ----------
+  // 以前はセクションが画面下に少し入った時点（IntersectionObserver）で飛ばしていたため、
+  // 海鳥が画面の下のほうを飛び、スクロールするとすぐ画面外に出てしまっていた。
+  // 飛行帯（各シーンのy）が画面の縦30〜70%の範囲に入った瞬間に飛ばし、しばらく画面内で見えるようにする
+  var BAND_TOP = 0.3;
+  var BAND_BOTTOM = 0.7;
+  var sceneInBand = {};
+  var scenesStarted = false;
+  var checkQueued = false;
 
-  var observers = [];
-  function initScenes() {
-    observers.forEach(function (o) { o.disconnect(); });
-    observers = [];
-
+  function checkScenes() {
+    checkQueued = false;
+    var vh = window.innerHeight;
     scenes.forEach(function (scene) {
-      var target = document.querySelector(scene.trigger);
-      if (!target) return;
-      var io = new IntersectionObserver(
-        function (entries) {
-          entries.forEach(function (entry) {
-            if (!entry.isIntersecting) return;
-            if (desktopMql.matches) {
-              flyScene(scene.build());
-            } else {
-              flashNear(scene);
-            }
-          });
-        },
-        { threshold: scene.threshold != null ? scene.threshold : 0.35 }
-      );
-      io.observe(target);
-      observers.push(io);
+      var cfg = scene.build();
+      if (!cfg) return;
+      var viewY = cfg.y - window.scrollY;
+      var inBand = viewY > vh * BAND_TOP && viewY < vh * BAND_BOTTOM;
+      if (inBand && !sceneInBand[scene.key]) flyScene(cfg);
+      sceneInBand[scene.key] = inBand;
     });
+  }
+
+  function queueCheck() {
+    if (checkQueued) return;
+    checkQueued = true;
+    requestAnimationFrame(checkScenes);
+  }
+
+  function initScenes() {
+    if (scenesStarted) return; // js/intro.jsから二重に呼ばれてもリスナーを重複登録しない
+    scenesStarted = true;
+    window.addEventListener('scroll', queueCheck, { passive: true });
+    window.addEventListener('resize', queueCheck);
+    queueCheck();
   }
 
   desktopMql.addEventListener('change', function () {
@@ -298,6 +339,7 @@
     var dx = 620, dy = -190; // 右方向へ大きく、上方向へゆるやかに（下に落ちて見えないよう必ず負のdy）
     var duration = 4;
 
+    stopHide(); // 直前のシーンのフェードアウトがエンディングの海鳥を消さないよう止める
     setBasePosition(start.x, start.y);
     gsap.set(seagull, { rotation: 0, scale: 0.85, opacity: 1, willChange: 'transform' });
     seagull.classList.add('is-active');
@@ -321,6 +363,7 @@
     var start = { x: footerRect.left + footerRect.width * 0.55, y: footerRect.top - 10 };
     var duration = 2.2;
 
+    stopHide(); // 直前のシーンのフェードアウトがエンディングの海鳥を消さないよう止める
     setBasePosition(start.x, start.y);
     gsap.set(seagull, { rotation: 0, scale: 0.55, opacity: 1, willChange: 'transform' });
     seagull.classList.add('is-active');

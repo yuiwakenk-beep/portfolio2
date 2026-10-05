@@ -34,9 +34,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Parisienne&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/animation.css">
-<link rel="stylesheet" href="css/responsive.css">
+<!-- CSS/JSの末尾の「?v=日付」は、サーバー（Xサーバーのブラウザキャッシュ設定で7日間保存）やスマホに古いファイルが残らないようにするための番号です。
+     CSS/JSを更新してアップするときは、index.html・works.htmlの両方でこの日付をまとめて書き換えてください -->
+<link rel="stylesheet" href="css/style.css?v=20261005">
+<link rel="stylesheet" href="css/animation.css?v=20261005">
+<link rel="stylesheet" href="css/responsive.css?v=20261005">
 </head>
 <body>
 
@@ -269,7 +271,7 @@
               <p class="about__role">Web Creator</p>
               <div class="about__text">
                 <p><strong>LP・ホームページ制作</strong>を中心に、デザインからHTML/CSS実装、画像制作、公開まで一貫して対応しています。</p>
-                <p class="about__text-detail">はじめまして🌻埼玉県出身、学生時代は東京、沖縄で３か月のリゾートアルバイト、大阪に住んでみたいという気持ちだけで引っ越しをし約一年半ほど生活。自由に歩んできたYUIです！雑貨販売やカフェ、リゾートアルバイト、テレビ業界…さまざまな現場で過ごしてきて、これまで感じてきた「伝わる」「使いやすい」「心地いい」体験をWebの世界でお届けするべく、制作の道に進みました。初めての方もどうぞ安心してご相談ください。</p>
+                <p class="about__text-detail">はじめまして🌻 Yuiです。雑貨販売やカフェ、沖縄でのリゾートバイト、テレビ・イベント業界。さらに「大阪に住んでみたい」という気持ちだけで引っ越し、約1年半を過ごしたことも。これまで、心の向くままに歩んできました。さまざまな現場で人と接するなかで、ずっと大切にしてきたのが「伝わる」「使いやすい」「心地いい」という感覚です。その体験を今度はWebを通してお届けしたいと思い、制作の道に進みました。はじめての方も、どうぞ安心してご相談ください。</p>
               </div>
             </div>
           </div>
@@ -627,29 +629,29 @@
   <img class="seagull__frame seagull__frame--flap-rev" src="sozai/seagull-flap-rev.png" alt="">
 </div>
 
-<script src="js/main.js" defer></script>
-<script src="js/animation.js" defer></script>
-<script src="js/hero.js" defer></script>
+<script src="js/main.js?v=20261005" defer></script>
+<script src="js/animation.js?v=20261005" defer></script>
+<script src="js/hero.js?v=20261005" defer></script>
 <!-- 海鳥の飛行ルート（MotionPath）用。海鳥の演出のみで使用し、他の演出は引き続きvanilla JS/CSS -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/MotionPathPlugin.min.js" defer></script>
-<script src="js/seagull.js" defer></script>
-<script src="js/intro.js" defer></script>
-<script src="js/water-fx.js" defer></script>
-<script src="js/cta-splash.js" defer></script>
-<script src="js/hero-splash.js" defer></script>
+<script src="js/seagull.js?v=20261005-3" defer></script>
+<script src="js/intro.js?v=20261005" defer></script>
+<script src="js/water-fx.js?v=20261005" defer></script>
+<script src="js/cta-splash.js?v=20261005" defer></script>
+<script src="js/hero-splash.js?v=20261005" defer></script>
 <!-- 開発用：?heropos=1のときだけ動作するスマホ版ヒーロー見出しの位置調整パネル。納品版でも常時読み込まれるが、
      クエリ無しでは即returnして何もしないためPEフォールバック同様に無害 -->
-<script src="js/hero-position-debug.js" defer></script>
+<script src="js/hero-position-debug.js?v=20261005" defer></script>
 <!-- 夜の海Footerの水面演出（STEP2：マウス追従の波紋／STEP3：クリック・タップ位置の水しぶき）。
      海鳥のエンディング退場（STEP4）はjs/seagull.js側で実装している -->
-<script src="js/footer-night.js" defer></script>
+<script src="js/footer-night.js?v=20261005" defer></script>
 <!-- アーチ壁（#main左右のsand色の壁）に、マウスのX位置に応じてごく薄い自然光を反応させる演出。
      PC（hover:hover かつ pointer:fine かつ1025px以上）・prefers-reduced-motion未希望の場合のみ動作する -->
-<script src="js/wall-light.js" defer></script>
+<script src="js/wall-light.js?v=20261005" defer></script>
 <!-- 開発用：?posdebug=1のときだけ動作するイントロ画像位置調整パネル。納品版でも常時読み込まれるが、
      クエリ無しでは即returnして何もしないためPEフォールバック同様に無害 -->
-<script src="js/intro-position-debug.js" defer></script>
+<script src="js/intro-position-debug.js?v=20261005" defer></script>
 </body>
 </html>
