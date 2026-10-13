@@ -23,6 +23,15 @@
   }
 })();
 </script>
+<!-- Google Tag Manager
+     アクセス解析（GA4）はGTMの管理画面側で設定する。HTMLにはGTMのコードだけを置き、gtag.jsは直接書かない（二重計測防止）。
+     コンテナIDを変える場合は、index.html・works.htmlの各2か所（headのここと、body直後のnoscript）をまとめて書き換えること -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-KNXKQ9SF');</script>
+<!-- End Google Tag Manager -->
 <!-- 【要確認】title・descriptionは指示書の仮案です。確定後に差し替えてください -->
 <title>Yui Portfolio | Web Design & Development</title>
 <meta name="description" content="LP・ホームページのデザイン、HTML/CSS実装、画像制作、文章改善、サーバー公開まで対応するYuiのポートフォリオです。">
@@ -41,6 +50,10 @@
 <link rel="stylesheet" href="css/responsive.css?v=20261005">
 </head>
 <body>
+<!-- Google Tag Manager (noscript)：JavaScript無効の環境向け。IDはheadのGTMコードと同じものにする -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-KNXKQ9SF"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
 
 <!-- 読み込み時イントロ：波に流されて瓶に入った手紙が砂浜に流れ着き、開封すると本編が現れる。
      JS/GSAP不通・prefers-reduced-motion・2回目以降の訪問（sessionStorage）では
