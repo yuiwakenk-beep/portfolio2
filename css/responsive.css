@@ -287,13 +287,23 @@
     margin-top: 64px;
   }
 
-  /* ---------- 使用ツール（6-6）：PC版は横スクロールをやめ、8個を1列に収める ---------- */
+  /* ---------- 使用ツール（6-6）：PC版は横スクロールをやめ、中央そろえで並べる ----------
+     チップが10個に増え1列では画面からはみ出すため、収まらない分は2段目へ折り返す */
   .tools__list {
     overflow-x: visible;
     cursor: default;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     justify-content: center;
     gap: clamp(8px, 1.2vw, 20px);
+    /* 改行用の要素（.tools__break）の上下にも行間が入るため、行間は横の間隔の半分にして2段の間を揃える */
+    row-gap: clamp(4px, 0.6vw, 10px);
+  }
+
+  /* 6個目のあとで必ず2段目に送る改行用の要素（index.htmlの.tools__break） */
+  .tools__break {
+    display: block;
+    flex-basis: 100%;
+    height: 0;
   }
 
   .tool-chip {
@@ -457,9 +467,10 @@
     cursor: default;
   }
 
+  /* チップは文字のみになったため、2列グリッドの中で文字を中央寄せにする */
   .tool-chip {
     width: 100%;
-    justify-content: flex-start;
+    justify-content: center;
   }
 
   /* ---------- ファーストビュー CTA：二つを横並びに ---------- */

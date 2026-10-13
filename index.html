@@ -45,9 +45,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Parisienne&display=swap" rel="stylesheet">
 <!-- CSS/JSの末尾の「?v=日付」は、サーバー（Xサーバーのブラウザキャッシュ設定で7日間保存）やスマホに古いファイルが残らないようにするための番号です。
      CSS/JSを更新してアップするときは、index.html・works.html・privacy.html・thanks.htmlの4つでこの日付をまとめて書き換えてください -->
-<link rel="stylesheet" href="css/style.css?v=20261013">
-<link rel="stylesheet" href="css/animation.css?v=20261013">
-<link rel="stylesheet" href="css/responsive.css?v=20261013">
+<link rel="stylesheet" href="css/style.css?v=20261013-3">
+<link rel="stylesheet" href="css/animation.css?v=20261013-3">
+<link rel="stylesheet" href="css/responsive.css?v=20261013-3">
 </head>
 <body>
 <!-- Google Tag Manager (noscript)：JavaScript無効の環境向け。IDはheadのGTMコードと同じものにする -->
@@ -411,30 +411,42 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <h2 class="section-heading__jp">使用ツール・制作環境</h2>
       </div>
 
+      <!-- チップはすべて文字のみ（アイコン画像は使わない）。PCでは「制作・公開の道具」6個／「デザイン・集客・解析の道具」5個の2段に並べる -->
       <div class="tools__list reveal-group">
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-html.png" alt=""><span>HTML</span></span>
+          <span class="tool-chip seaglass-hover"><span>HTML</span></span>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-css.png" alt=""><span>CSS</span></span>
+          <span class="tool-chip seaglass-hover"><span>CSS</span></span>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-claude-code.png" alt=""><span>Claude Code</span></span>
+          <span class="tool-chip seaglass-hover"><span>Git</span></span>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-chatgpt.png" alt=""><span>ChatGPT</span></span>
+          <span class="tool-chip seaglass-hover"><span>GitHub</span></span>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-canva.png" alt=""><span>Canva</span></span>
+          <span class="tool-chip seaglass-hover"><span>Xserver</span></span>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-git.png" alt=""><span>Git</span></span>
+          <span class="tool-chip seaglass-hover"><span>Claude Code</span></span>
+        </div>
+        <!-- PCで2段目に送るための改行用の要素（画面には見えない）。スマホ・タブレットでは非表示（css/responsive.css） -->
+        <span class="tools__break" aria-hidden="true"></span>
+        <div class="tool-chip-wrap reveal">
+          <span class="tool-chip seaglass-hover"><span>ChatGPT</span></span>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-github.png" alt=""><span>GitHub</span></span>
+          <span class="tool-chip seaglass-hover"><span>Canva</span></span>
         </div>
         <div class="tool-chip-wrap reveal">
-          <span class="tool-chip seaglass-hover"><img class="tool-chip__icon" src="sozai/tool-xserver.png" alt=""><span>Xserver</span></span>
+          <span class="tool-chip seaglass-hover"><span>Google Analytics</span></span>
+        </div>
+        <div class="tool-chip-wrap reveal">
+          <span class="tool-chip seaglass-hover"><span>Google Tag Manager</span></span>
+        </div>
+        <div class="tool-chip-wrap reveal">
+          <span class="tool-chip seaglass-hover"><span>MEO</span></span>
         </div>
       </div>
     </div>
@@ -660,29 +672,29 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- お問い合わせフォームの迷惑メール対策（reCAPTCHA v2）。hl=jaでチェックボックスの文言を日本語にする -->
 <script src="https://www.google.com/recaptcha/api.js?hl=ja" async defer></script>
-<script src="js/main.js?v=20261013" defer></script>
-<script src="js/animation.js?v=20261013" defer></script>
-<script src="js/hero.js?v=20261013" defer></script>
+<script src="js/main.js?v=20261013-3" defer></script>
+<script src="js/animation.js?v=20261013-3" defer></script>
+<script src="js/hero.js?v=20261013-3" defer></script>
 <!-- 海鳥の飛行ルート（MotionPath）用。海鳥の演出のみで使用し、他の演出は引き続きvanilla JS/CSS -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/MotionPathPlugin.min.js" defer></script>
-<script src="js/seagull.js?v=20261013" defer></script>
-<script src="js/intro.js?v=20261013" defer></script>
-<script src="js/water-fx.js?v=20261013" defer></script>
-<script src="js/cta-splash.js?v=20261013" defer></script>
-<script src="js/hero-splash.js?v=20261013" defer></script>
+<script src="js/seagull.js?v=20261013-3" defer></script>
+<script src="js/intro.js?v=20261013-3" defer></script>
+<script src="js/water-fx.js?v=20261013-3" defer></script>
+<script src="js/cta-splash.js?v=20261013-3" defer></script>
+<script src="js/hero-splash.js?v=20261013-3" defer></script>
 <!-- 開発用：?heropos=1のときだけ動作するスマホ版ヒーロー見出しの位置調整パネル。納品版でも常時読み込まれるが、
      クエリ無しでは即returnして何もしないためPEフォールバック同様に無害 -->
-<script src="js/hero-position-debug.js?v=20261013" defer></script>
+<script src="js/hero-position-debug.js?v=20261013-3" defer></script>
 <!-- 夜の海Footerの水面演出（STEP2：マウス追従の波紋／STEP3：クリック・タップ位置の水しぶき）。
      海鳥のエンディング退場（STEP4）はjs/seagull.js側で実装している -->
-<script src="js/footer-night.js?v=20261013" defer></script>
+<script src="js/footer-night.js?v=20261013-3" defer></script>
 <!-- アーチ壁（#main左右のsand色の壁）に、マウスのX位置に応じてごく薄い自然光を反応させる演出。
      PC（hover:hover かつ pointer:fine かつ1025px以上）・prefers-reduced-motion未希望の場合のみ動作する -->
-<script src="js/wall-light.js?v=20261013" defer></script>
+<script src="js/wall-light.js?v=20261013-3" defer></script>
 <!-- 開発用：?posdebug=1のときだけ動作するイントロ画像位置調整パネル。納品版でも常時読み込まれるが、
      クエリ無しでは即returnして何もしないためPEフォールバック同様に無害 -->
-<script src="js/intro-position-debug.js?v=20261013" defer></script>
+<script src="js/intro-position-debug.js?v=20261013-3" defer></script>
 </body>
 </html>

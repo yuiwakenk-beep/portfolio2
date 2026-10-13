@@ -1711,6 +1711,11 @@ html.intro-pending #main {
   background-position: -150% -150%;
 }
 
+/* PCで2段目に送るための改行用の要素。スマホ・タブレットでは使わない（PCの表示はresponsive.cssで指定） */
+.tools__break {
+  display: none;
+}
+
 .tool-chip__icon {
   width: 22px;
   height: 22px;
