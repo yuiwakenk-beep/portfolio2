@@ -61,6 +61,21 @@
     left: 32px;
   }
 
+  /* お問い合わせフォームのreCAPTCHA：タブレット以上は幅に余裕があるので等倍に戻す */
+  .contact-form__captcha .g-recaptcha {
+    transform: none;
+  }
+
+  /* プライバシーポリシー本文（privacy.html）：PCでは左右の余白と文字を少し広げる */
+  .privacy-policy {
+    padding: 16px 32px 120px;
+    font-size: 15px;
+  }
+
+  .privacy-policy__heading {
+    font-size: 19px;
+  }
+
   .flow__steps {
     grid-template-columns: repeat(4, 1fr);
   }

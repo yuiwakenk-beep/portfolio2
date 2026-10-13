@@ -25,7 +25,7 @@
 </script>
 <!-- Google Tag Manager
      アクセス解析（GA4）はGTMの管理画面側で設定する。HTMLにはGTMのコードだけを置き、gtag.jsは直接書かない（二重計測防止）。
-     コンテナIDを変える場合は、index.html・works.htmlの各2か所（headのここと、body直後のnoscript）をまとめて書き換えること -->
+     コンテナIDを変える場合は、index.html・works.html・privacy.html・thanks.htmlの各2か所（headのここと、body直後のnoscript）をまとめて書き換えること -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
 new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
 j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
@@ -44,10 +44,10 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Parisienne&display=swap" rel="stylesheet">
 <!-- CSS/JSの末尾の「?v=日付」は、サーバー（Xサーバーのブラウザキャッシュ設定で7日間保存）やスマホに古いファイルが残らないようにするための番号です。
-     CSS/JSを更新してアップするときは、index.html・works.htmlの両方でこの日付をまとめて書き換えてください -->
-<link rel="stylesheet" href="css/style.css?v=20261005">
-<link rel="stylesheet" href="css/animation.css?v=20261005">
-<link rel="stylesheet" href="css/responsive.css?v=20261005">
+     CSS/JSを更新してアップするときは、index.html・works.html・privacy.html・thanks.htmlの4つでこの日付をまとめて書き換えてください -->
+<link rel="stylesheet" href="css/style.css?v=20261013">
+<link rel="stylesheet" href="css/animation.css?v=20261013">
+<link rel="stylesheet" href="css/responsive.css?v=20261013">
 </head>
 <body>
 <!-- Google Tag Manager (noscript)：JavaScript無効の環境向け。IDはheadのGTMコードと同じものにする -->
@@ -564,28 +564,43 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <p class="contact__message reveal">「こんなサイトを作りたい」「何から始めればよいか分からない」など、<br class="contact__message-break">どんな小さなことでもお気軽にご相談ください。</p>
 
       <div class="contact__card cloud-card cloud-card--panel reveal">
-        <!-- 【要確認】送信先が決まり次第、action属性とmethodをここに設定してください。現状は見た目のみの実装です -->
-        <form class="contact-form" id="contactForm" action="#">
+        <!-- 送信先はSSGform（https://ssgform.com/）。送信内容は管理画面で設定した通知先メールアドレスに届き、
+             送信後は管理画面の「送信後転送URL」に設定したthanks.htmlへ移動する。
+             name属性の値がそのまま通知メールの項目名になるため、日本語の項目名にしている。
+             メールアドレス欄のnameは「メールアドレス」のままにする（SSGformが返信先(Reply-to)として使うため） -->
+        <form class="contact-form" id="contactForm" action="https://ssgform.com/s/4omn4O1GBP2q" method="post">
           <div class="contact-form__field">
             <label class="contact-form__label" for="contactName">お名前<span class="contact-form__required">必須</span></label>
-            <input class="contact-form__input" type="text" id="contactName" name="name" autocomplete="name" required>
+            <input class="contact-form__input" type="text" id="contactName" name="お名前" autocomplete="name" required>
           </div>
           <div class="contact-form__field">
             <label class="contact-form__label" for="contactEmail">メールアドレス<span class="contact-form__required">必須</span></label>
-            <input class="contact-form__input" type="email" id="contactEmail" name="email" autocomplete="email" required>
+            <input class="contact-form__input" type="email" id="contactEmail" name="メールアドレス" autocomplete="email" required>
           </div>
           <div class="contact-form__field">
             <label class="contact-form__label" for="contactType">ご相談の種類</label>
-            <select class="contact-form__select" id="contactType" name="inquiry_type">
+            <select class="contact-form__select" id="contactType" name="ご相談の種類">
               <option value="">選択してください</option>
-              <option value="lp">LP制作について</option>
-              <option value="hp">HP制作について</option>
-              <option value="other">その他</option>
+              <option value="LP制作について">LP制作について</option>
+              <option value="HP制作について">HP制作について</option>
+              <option value="その他">その他</option>
             </select>
           </div>
           <div class="contact-form__field">
             <label class="contact-form__label" for="contactMessage">お問い合わせ内容<span class="contact-form__required">必須</span></label>
-            <textarea class="contact-form__textarea" id="contactMessage" name="message" rows="6" required></textarea>
+            <textarea class="contact-form__textarea" id="contactMessage" name="お問い合わせ内容" rows="6" required></textarea>
+          </div>
+          <!-- 迷惑メール対策（SSGform公式の「wana」欄）：人には見えない入力欄。ロボットが入力すると送信が弾かれる。
+               画面からもキーボード操作からも読み上げからも外している -->
+          <div class="contact-form__trap" aria-hidden="true">
+            <label for="contactTrap">この欄は入力しないでください</label>
+            <input type="text" id="contactTrap" name="wana" tabindex="-1" autocomplete="off">
+          </div>
+          <p class="contact-form__privacy">送信前に<a href="privacy.html">プライバシーポリシー</a>をご確認ください。</p>
+          <!-- 迷惑メール対策（reCAPTCHA v2）。data-sitekeyはreCAPTCHA管理画面（ラベル：portfolio2）のサイトキー
+               （サイトキーは公開用の値。シークレットキーはSSGformの管理画面にだけ入力し、ここには絶対に書かない） -->
+          <div class="contact-form__captcha">
+            <div class="g-recaptcha" data-sitekey="6LezQe0tAAAAAAOYQ0GEz7LJ4GiZQ51HctiloiCs"></div>
           </div>
           <button type="submit" class="btn btn--primary contact-form__submit">送信する</button>
         </form>
@@ -625,6 +640,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="#works">Works</a>
     <a href="#flow">Flow</a>
     <a href="#contact">Contact</a>
+    <a href="privacy.html">Privacy Policy</a>
   </nav>
   <p class="site-footer__copyright">&copy; 2026 Yui. All Rights Reserved.</p>
 </footer>
@@ -642,29 +658,31 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <img class="seagull__frame seagull__frame--flap-rev" src="sozai/seagull-flap-rev.png" alt="">
 </div>
 
-<script src="js/main.js?v=20261005" defer></script>
-<script src="js/animation.js?v=20261005" defer></script>
-<script src="js/hero.js?v=20261005" defer></script>
+<!-- お問い合わせフォームの迷惑メール対策（reCAPTCHA v2）。hl=jaでチェックボックスの文言を日本語にする -->
+<script src="https://www.google.com/recaptcha/api.js?hl=ja" async defer></script>
+<script src="js/main.js?v=20261013" defer></script>
+<script src="js/animation.js?v=20261013" defer></script>
+<script src="js/hero.js?v=20261013" defer></script>
 <!-- 海鳥の飛行ルート（MotionPath）用。海鳥の演出のみで使用し、他の演出は引き続きvanilla JS/CSS -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/MotionPathPlugin.min.js" defer></script>
-<script src="js/seagull.js?v=20261005-3" defer></script>
-<script src="js/intro.js?v=20261005" defer></script>
-<script src="js/water-fx.js?v=20261005" defer></script>
-<script src="js/cta-splash.js?v=20261005" defer></script>
-<script src="js/hero-splash.js?v=20261005" defer></script>
+<script src="js/seagull.js?v=20261013" defer></script>
+<script src="js/intro.js?v=20261013" defer></script>
+<script src="js/water-fx.js?v=20261013" defer></script>
+<script src="js/cta-splash.js?v=20261013" defer></script>
+<script src="js/hero-splash.js?v=20261013" defer></script>
 <!-- 開発用：?heropos=1のときだけ動作するスマホ版ヒーロー見出しの位置調整パネル。納品版でも常時読み込まれるが、
      クエリ無しでは即returnして何もしないためPEフォールバック同様に無害 -->
-<script src="js/hero-position-debug.js?v=20261005" defer></script>
+<script src="js/hero-position-debug.js?v=20261013" defer></script>
 <!-- 夜の海Footerの水面演出（STEP2：マウス追従の波紋／STEP3：クリック・タップ位置の水しぶき）。
      海鳥のエンディング退場（STEP4）はjs/seagull.js側で実装している -->
-<script src="js/footer-night.js?v=20261005" defer></script>
+<script src="js/footer-night.js?v=20261013" defer></script>
 <!-- アーチ壁（#main左右のsand色の壁）に、マウスのX位置に応じてごく薄い自然光を反応させる演出。
      PC（hover:hover かつ pointer:fine かつ1025px以上）・prefers-reduced-motion未希望の場合のみ動作する -->
-<script src="js/wall-light.js?v=20261005" defer></script>
+<script src="js/wall-light.js?v=20261013" defer></script>
 <!-- 開発用：?posdebug=1のときだけ動作するイントロ画像位置調整パネル。納品版でも常時読み込まれるが、
      クエリ無しでは即returnして何もしないためPEフォールバック同様に無害 -->
-<script src="js/intro-position-debug.js?v=20261005" defer></script>
+<script src="js/intro-position-debug.js?v=20261013" defer></script>
 </body>
 </html>
