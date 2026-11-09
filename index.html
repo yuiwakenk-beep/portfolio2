@@ -45,9 +45,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Parisienne&display=swap" rel="stylesheet">
 <!-- CSS/JSの末尾の「?v=日付」は、サーバー（Xサーバーのブラウザキャッシュ設定で7日間保存）やスマホに古いファイルが残らないようにするための番号です。
      CSS/JSを更新してアップするときは、index.html・works.html・privacy.html・thanks.htmlの4つでこの日付をまとめて書き換えてください -->
-<link rel="stylesheet" href="css/style.css?v=20261013-3">
-<link rel="stylesheet" href="css/animation.css?v=20261013-3">
-<link rel="stylesheet" href="css/responsive.css?v=20261013-3">
+<link rel="stylesheet" href="css/style.css?v=20261109-1">
+<link rel="stylesheet" href="css/animation.css?v=20261109-1">
+<link rel="stylesheet" href="css/responsive.css?v=20261109-1">
 </head>
 <body>
 <!-- Google Tag Manager (noscript)：JavaScript無効の環境向け。IDはheadのGTMコードと同じものにする -->
@@ -109,6 +109,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="#about">About</a>
     <a href="#skills">Skills</a>
     <a href="#works">Works</a>
+    <a href="#design">Design</a>
     <a href="#flow">Flow</a>
     <a href="#contact">Contact</a>
   </nav>
@@ -125,6 +126,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <a href="#about">About</a>
   <a href="#skills">Skills</a>
   <a href="#works">Works</a>
+  <a href="#design">Design</a>
   <a href="#flow">Flow</a>
   <a href="#contact">Contact</a>
 </nav>
@@ -527,6 +529,57 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
   </section>
 
+  <!-- ========== SNS・広告デザイン（Design Works） ==========
+       LP・HP以外の画像制作（Instagramカルーセル・広告バナー）の実績。
+       画像をクリックすると拡大表示（js/lightbox.js）。data-lightbox-groupの単位で前後に切り替えられる -->
+  <section class="design-works" id="design">
+    <div class="section-inner">
+      <div class="section-heading reveal">
+        <span class="section-heading__en">Design Works</span>
+        <h2 class="section-heading__jp">SNS・広告デザイン</h2>
+      </div>
+
+      <article class="design-card reveal">
+        <div class="design-card__head">
+          <p class="design-card__number">DESIGN 01</p>
+          <h3 class="design-card__title">muku botanical</h3>
+          <div class="design-card__tags">
+            <span>Instagramカルーセル / 広告バナー</span>
+            <span>自然派スキンケア</span>
+          </div>
+          <p class="design-card__lead">新商品のフェイスオイルの発売告知として、Instagram投稿5枚と広告バナー2種を制作しました。</p>
+        </div>
+
+        <!-- Instagramカルーセル（1080×1350）：スマホは横スワイプ、768px以上は5枚を横一列に並べる -->
+        <div class="design-gallery">
+          <h4 class="design-gallery__label">Instagram カルーセル<span>5枚</span></h4>
+          <p class="design-gallery__hint">横にスワイプしてご覧ください</p>
+          <ul class="design-gallery__carousel" data-lightbox-group="muku-carousel-top">
+            <li><button type="button" class="design-gallery__item" data-lightbox-src="sozai/graphic-muku-carousel-01.webp"><img src="sozai/graphic-muku-carousel-01.webp" alt="1枚目：新商品フェイスオイルの紹介「うるおいを、毎日の小さな習慣に。」" width="1080" height="1350" loading="lazy"></button></li>
+            <li><button type="button" class="design-gallery__item" data-lightbox-src="sozai/graphic-muku-carousel-02.webp"><img src="sozai/graphic-muku-carousel-02.webp" alt="2枚目：毎日に寄り添う3つのポイント" width="1080" height="1350" loading="lazy"></button></li>
+            <li><button type="button" class="design-gallery__item" data-lightbox-src="sozai/graphic-muku-carousel-03.webp"><img src="sozai/graphic-muku-carousel-03.webp" alt="3枚目：使い方「いつものケアに、1〜2滴。」" width="1080" height="1350" loading="lazy"></button></li>
+            <li><button type="button" class="design-gallery__item" data-lightbox-src="sozai/graphic-muku-carousel-04.webp"><img src="sozai/graphic-muku-carousel-04.webp" alt="4枚目：使う場面「忙しい日も、肌をいたわる時間を。」" width="1080" height="1350" loading="lazy"></button></li>
+            <li><button type="button" class="design-gallery__item" data-lightbox-src="sozai/graphic-muku-carousel-05.webp"><img src="sozai/graphic-muku-carousel-05.webp" alt="5枚目：発売日と初回購入特典、購入案内" width="1080" height="1350" loading="lazy"></button></li>
+          </ul>
+        </div>
+
+        <!-- 広告バナー：横長（4:1）と正方形（1:1）の2サイズ -->
+        <div class="design-gallery">
+          <h4 class="design-gallery__label">広告バナー<span>2サイズ</span></h4>
+          <ul class="design-gallery__banners" data-lightbox-group="muku-banner-top">
+            <li class="design-gallery__banner--wide"><button type="button" class="design-gallery__item" data-lightbox-src="sozai/graphic-muku-banner-wide.webp"><img src="sozai/graphic-muku-banner-wide.webp" alt="横長バナー：商品ページへ誘導する広告「肌に、うるおいのひとしずく。」" width="1584" height="396" loading="lazy"></button></li>
+            <li class="design-gallery__banner--square"><button type="button" class="design-gallery__item" data-lightbox-src="sozai/graphic-muku-banner-square.webp"><img src="sozai/graphic-muku-banner-square.webp" alt="正方形バナー：新商品の広告「肌に、うるおいのひとしずく。」" width="1080" height="1080" loading="lazy"></button></li>
+          </ul>
+        </div>
+
+        <p class="design-card__note">※架空のブランドを想定した自主制作です。商品・価格・発売日はすべて架空の設定です。</p>
+
+        <a href="works.html?genre=design#work-06" class="design-card__link">制作のポイントを詳しく見る <span class="design-card__arrow">&rarr;</span></a>
+      </article>
+
+    </div>
+  </section>
+
   <!-- ========== 制作の流れ（6-8） ========== -->
   <section class="flow" id="flow">
     <div class="section-inner">
@@ -650,6 +703,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="#about">About</a>
     <a href="#skills">Skills</a>
     <a href="#works">Works</a>
+    <a href="#design">Design</a>
     <a href="#flow">Flow</a>
     <a href="#contact">Contact</a>
     <a href="privacy.html">Privacy Policy</a>
@@ -672,29 +726,31 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- お問い合わせフォームの迷惑メール対策（reCAPTCHA v2）。hl=jaでチェックボックスの文言を日本語にする -->
 <script src="https://www.google.com/recaptcha/api.js?hl=ja" async defer></script>
-<script src="js/main.js?v=20261013-3" defer></script>
-<script src="js/animation.js?v=20261013-3" defer></script>
-<script src="js/hero.js?v=20261013-3" defer></script>
+<script src="js/main.js?v=20261109-1" defer></script>
+<script src="js/animation.js?v=20261109-1" defer></script>
+<script src="js/hero.js?v=20261109-1" defer></script>
 <!-- 海鳥の飛行ルート（MotionPath）用。海鳥の演出のみで使用し、他の演出は引き続きvanilla JS/CSS -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/MotionPathPlugin.min.js" defer></script>
-<script src="js/seagull.js?v=20261013-3" defer></script>
-<script src="js/intro.js?v=20261013-3" defer></script>
-<script src="js/water-fx.js?v=20261013-3" defer></script>
-<script src="js/cta-splash.js?v=20261013-3" defer></script>
-<script src="js/hero-splash.js?v=20261013-3" defer></script>
+<script src="js/seagull.js?v=20261109-1" defer></script>
+<script src="js/intro.js?v=20261109-1" defer></script>
+<script src="js/water-fx.js?v=20261109-1" defer></script>
+<script src="js/cta-splash.js?v=20261109-1" defer></script>
+<!-- SNS・広告デザイン（#design）の画像をクリックで拡大表示 -->
+<script src="js/lightbox.js?v=20261109-1" defer></script>
+<script src="js/hero-splash.js?v=20261109-1" defer></script>
 <!-- 開発用：?heropos=1のときだけ動作するスマホ版ヒーロー見出しの位置調整パネル。納品版でも常時読み込まれるが、
      クエリ無しでは即returnして何もしないためPEフォールバック同様に無害 -->
-<script src="js/hero-position-debug.js?v=20261013-3" defer></script>
+<script src="js/hero-position-debug.js?v=20261109-1" defer></script>
 <!-- 夜の海Footerの水面演出（STEP2：マウス追従の波紋／STEP3：クリック・タップ位置の水しぶき）。
      海鳥のエンディング退場（STEP4）はjs/seagull.js側で実装している -->
-<script src="js/footer-night.js?v=20261013-3" defer></script>
+<script src="js/footer-night.js?v=20261109-1" defer></script>
 <!-- アーチ壁（#main左右のsand色の壁）に、マウスのX位置に応じてごく薄い自然光を反応させる演出。
      PC（hover:hover かつ pointer:fine かつ1025px以上）・prefers-reduced-motion未希望の場合のみ動作する -->
-<script src="js/wall-light.js?v=20261013-3" defer></script>
+<script src="js/wall-light.js?v=20261109-1" defer></script>
 <!-- 開発用：?posdebug=1のときだけ動作するイントロ画像位置調整パネル。納品版でも常時読み込まれるが、
      クエリ無しでは即returnして何もしないためPEフォールバック同様に無害 -->
-<script src="js/intro-position-debug.js?v=20261013-3" defer></script>
+<script src="js/intro-position-debug.js?v=20261109-1" defer></script>
 </body>
 </html>

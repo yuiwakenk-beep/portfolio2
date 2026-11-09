@@ -760,3 +760,83 @@
     line-height: 1.3;
   }
 }
+
+/* =====================================================================
+   SNS・広告デザイン（index.html #design ／ works.html WORK 06）のタブレット・PC向け上書き
+   基本形（スマホ）はcss/style.cssの末尾
+   ===================================================================== */
+@media (min-width: 768px) {
+  .design-card {
+    padding: 28px 28px 30px;
+  }
+
+  .design-card__title {
+    font-size: 24px;
+  }
+
+  /* 768px以上はカルーセル5枚が横一列に収まるので、スワイプのヒントは出さない */
+  .design-gallery__hint {
+    display: none;
+  }
+
+  .design-gallery__carousel {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+    overflow: visible;
+    padding-bottom: 0;
+  }
+
+  /* バナー：横長（4:1）と正方形（1:1）を横に並べ、下端をそろえる */
+  .design-gallery__banners {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 1fr);
+    align-items: end;
+    gap: 16px;
+  }
+
+  /* 拡大表示の前後ボタンを画面の左右中央へ */
+  .lightbox__nav {
+    top: 50%;
+    bottom: auto;
+    transform: translateY(-50%);
+  }
+
+  .lightbox__nav--prev {
+    left: 20px;
+  }
+
+  .lightbox__nav--next {
+    right: 20px;
+  }
+
+  .lightbox__figure {
+    padding: 56px 88px 32px;
+  }
+
+  .lightbox__image {
+    max-height: calc(100dvh - 130px);
+  }
+}
+
+@media (min-width: 1024px) {
+  .design-card {
+    padding: 36px 40px 38px;
+  }
+
+  .design-gallery__carousel {
+    gap: 16px;
+  }
+
+  .design-gallery__banners {
+    gap: 20px;
+  }
+}
+
+/* 動きを減らす設定の方には、画像のホバー時の浮き上がりを止める */
+@media (prefers-reduced-motion: reduce) {
+  .design-gallery__item,
+  .design-gallery__item:hover {
+    transition: none;
+    transform: none;
+  }
+}

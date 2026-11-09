@@ -3395,3 +3395,385 @@ img.work-card-mini__shot {
 .thanks-message .btn {
   margin-top: 36px;
 }
+
+/* =====================================================================
+   SNS・広告デザイン（index.html #design ／ works.html WORK 06）
+   LP・HP以外の画像制作（Instagramカルーセル・広告バナー）を見せるためのスタイル。
+   モバイルファースト：ここはスマホの基本形。768px以上の上書きはcss/responsive.cssの末尾
+   ===================================================================== */
+
+/* ---------- トップページのセクション ---------- */
+/* 制作実績（.works）と同じく、背景はセクション共通の写真に任せて独自の背景は持たない */
+.design-works .section-heading {
+  margin-bottom: 48px;
+}
+
+/* 作品を展示する台紙：制作実績のカード（.work-card-mini）と同じマット紙の質感に揃える */
+.design-card {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 18px 14px 22px;
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 252, 246, 0.96) 0%,
+    rgba(255, 252, 246, 0.94) 75%,
+    rgba(245, 249, 250, 0.92) 100%
+  );
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 14px;
+  box-shadow: 0 16px 36px rgba(70, 95, 105, 0.08);
+}
+
+.design-card__head {
+  margin-bottom: 22px;
+}
+
+.design-card__number {
+  display: block;
+  font-family: var(--font-en);
+  font-style: italic;
+  color: var(--color-text-sub);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+}
+
+.design-card__title {
+  font-size: 21px;
+  font-weight: 600;
+  margin: 8px 0 5px;
+}
+
+/* タグは制作実績カードと同じ「区切り線だけ」の表記 */
+.design-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  row-gap: 4px;
+  margin-bottom: 10px;
+  font-size: 11px;
+  color: var(--color-text-sub);
+}
+
+.design-card__tags span {
+  padding-right: 10px;
+  margin-right: 10px;
+  border-right: 1px solid rgba(150, 165, 175, 0.35);
+  line-height: 1.4;
+}
+
+.design-card__tags span:last-child {
+  padding-right: 0;
+  margin-right: 0;
+  border-right: none;
+}
+
+.design-card__lead {
+  font-size: 13px;
+  line-height: 1.7;
+  color: var(--color-text-sub);
+  border-left: 2px solid rgba(150, 175, 185, 0.5);
+  padding-left: 12px;
+}
+
+/* 架空ブランドである旨の注記：価格・発売日が実在の商品と誤解されないよう、必ず画像の近くに置く */
+.design-card__note,
+.work-item__note {
+  font-size: 11.5px;
+  line-height: 1.7;
+  color: var(--color-text-sub);
+}
+
+.design-card__note {
+  margin-top: 18px;
+}
+
+.work-item__note {
+  margin-top: 4px;
+}
+
+/* 一覧ページへのリンク：制作実績カードの「詳しく見る」と同じ下線アニメーション */
+.design-card__link {
+  position: relative;
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-sea-deep);
+  text-decoration: none;
+}
+
+.design-card__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -3px;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease;
+}
+
+.design-card__arrow {
+  display: inline-block;
+  transition: transform 0.25s ease;
+}
+
+.design-card__link:hover {
+  color: var(--color-accent);
+}
+
+.design-card__link:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+.design-card__link:hover .design-card__arrow {
+  transform: translateX(3px);
+}
+
+/* ---------- 画像ギャラリー（トップ・一覧ページ共通） ---------- */
+.design-gallery + .design-gallery {
+  margin-top: 26px;
+}
+
+/* 「Instagram カルーセル 5枚」などの小見出し */
+.design-gallery__label {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-bottom: 10px;
+}
+
+.design-gallery__label span {
+  margin-left: 8px;
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--color-text-sub);
+}
+
+/* スマホだけ出す操作のヒント（768px以上は横一列に全部見えるため非表示） */
+.design-gallery__hint {
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--color-text-sub);
+  margin: -4px 0 8px;
+}
+
+/* カルーセル：スマホはInstagramと同じ感覚で横スワイプ（JSなし、scroll-snapで1枚ずつ止まる）。
+   次の画像が少し見えるよう、1枚の幅を画面の7割程度にしている */
+.design-gallery__carousel {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
+  scrollbar-width: thin;
+}
+
+.design-gallery__carousel li {
+  flex: 0 0 70%;
+  scroll-snap-align: start;
+}
+
+/* バナー：スマホは縦に並べる */
+.design-gallery__banners {
+  display: grid;
+  gap: 12px;
+}
+
+/* 画像そのものを押すと拡大表示（js/lightbox.js）。キーボードでも操作できるようbuttonにしている */
+.design-gallery__item {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: zoom-in;
+  box-shadow: 0 6px 16px rgba(70, 85, 85, 0.1);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.design-gallery__item img {
+  width: 100%;
+  height: auto;
+}
+
+.design-gallery__item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 22px rgba(70, 85, 85, 0.14);
+}
+
+/* 一覧ページ（works.html）のマット紙の中で使うときの余白・注記 */
+.work-item--design .work-item__media {
+  gap: 0;
+  padding: 14px 12px;
+}
+
+.design-gallery__tap-note {
+  margin-top: 14px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--archive-text-sub, var(--color-text-sub));
+}
+
+/* ---------- 一覧ページ（works.html）のジャンル切り替え ---------- */
+/* .work-itemはdisplay:gridを持つため、hidden属性だけでは消えない。明示的に非表示にする */
+.work-item[hidden] {
+  display: none;
+}
+
+.works-filter {
+  margin-bottom: 56px;
+  text-align: center;
+}
+
+.works-filter[hidden] {
+  display: none;
+}
+
+.works-filter__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* 一覧ページの落ち着いたグレージュに合わせた、細い枠線のボタン。選択中だけ塗りつぶす */
+.works-filter__button {
+  min-height: 42px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(70, 85, 85, 0.25);
+  background: transparent;
+  color: var(--archive-text, var(--color-text));
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.works-filter__button:hover {
+  background: rgba(70, 85, 85, 0.06);
+}
+
+.works-filter__button[aria-pressed="true"] {
+  background: var(--archive-text, var(--color-text));
+  border-color: var(--archive-text, var(--color-text));
+  color: #fff;
+}
+
+.works-filter__status {
+  margin-top: 12px;
+  font-size: 11.5px;
+  color: var(--archive-text-sub, var(--color-text-sub));
+}
+
+/* ---------- 拡大表示（js/lightbox.js が作る<dialog>） ---------- */
+/* 開いている間は背景のページをスクロールさせない */
+html.is-lightbox-open {
+  overflow: hidden;
+}
+
+.lightbox {
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: #fff;
+}
+
+.lightbox[open] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox::backdrop {
+  background: rgba(22, 32, 35, 0.86);
+}
+
+/* 画像の外側の余白をクリックしたら閉じるよう、figureはクリックを素通りさせ、画像だけ受け取る */
+.lightbox__figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 64px 16px 72px;
+  pointer-events: none;
+}
+
+.lightbox__image {
+  max-width: min(92vw, 1080px);
+  max-height: calc(100dvh - 190px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  pointer-events: auto;
+}
+
+.lightbox__caption {
+  max-width: 92vw;
+  font-size: 12px;
+  line-height: 1.6;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.lightbox__close,
+.lightbox__nav {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  transition: background 0.2s ease;
+}
+
+.lightbox__close:hover,
+.lightbox__nav:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.lightbox__close {
+  top: 14px;
+  right: 14px;
+}
+
+/* 前後ボタン：スマホは画像に重ならないよう下端に、768px以上は左右中央に置く（responsive.css） */
+.lightbox__nav {
+  bottom: 14px;
+}
+
+.lightbox__nav--prev {
+  left: calc(50% - 56px);
+}
+
+.lightbox__nav--next {
+  right: calc(50% - 56px);
+}
+
+.lightbox__nav[hidden] {
+  display: none;
+}
+
+.lightbox__close:focus-visible,
+.lightbox__nav:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 3px;
+}

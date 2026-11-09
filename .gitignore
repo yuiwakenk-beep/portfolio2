@@ -1,2 +1,5 @@
 # Windowsフォルダ設定ファイル
 desktop.ini
+
+# 納品素材の元データ（zip）はリポジトリに含めない
+*.zip

@@ -21,9 +21,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&family=Parisienne&display=swap" rel="stylesheet">
 <!-- CSS/JSの末尾の「?v=日付」は、サーバー（Xサーバーのブラウザキャッシュ設定で7日間保存）やスマホに古いファイルが残らないようにするための番号です。
      CSS/JSを更新してアップするときは、index.html・works.html・privacy.html・thanks.htmlの4つでこの日付をまとめて書き換えてください -->
-<link rel="stylesheet" href="css/style.css?v=20261013-3">
-<link rel="stylesheet" href="css/animation.css?v=20261013-3">
-<link rel="stylesheet" href="css/responsive.css?v=20261013-3">
+<link rel="stylesheet" href="css/style.css?v=20261109-1">
+<link rel="stylesheet" href="css/animation.css?v=20261109-1">
+<link rel="stylesheet" href="css/responsive.css?v=20261109-1">
 </head>
 <body class="works-list-page">
 <!-- Google Tag Manager (noscript)：JavaScript無効の環境向け。IDはheadのGTMコードと同じものにする -->
@@ -40,6 +40,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="index.html#about">About</a>
     <a href="index.html#skills">Skills</a>
     <a href="index.html#works">Works</a>
+    <a href="index.html#design">Design</a>
     <a href="index.html#flow">Flow</a>
     <a href="index.html#contact">Contact</a>
   </nav>
@@ -56,6 +57,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <a href="index.html#about">About</a>
   <a href="index.html#skills">Skills</a>
   <a href="index.html#works">Works</a>
+  <a href="index.html#design">Design</a>
   <a href="index.html#flow">Flow</a>
   <a href="index.html#contact">Contact</a>
 </nav>
@@ -68,15 +70,27 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="works-page-header reveal">
     <span class="works-page-header__en">Works</span>
     <h1 class="works-page-header__jp">制作実績</h1>
-    <p class="works-page-header__lead">これまで制作したLP・ホームページをご紹介します。目的やターゲットに合わせて、伝わりやすさと心地よさを大切に制作しています。</p>
+    <p class="works-page-header__lead">これまで制作したLP・ホームページと、SNS投稿・広告バナーなどの画像をご紹介します。目的やターゲットに合わせて、伝わりやすさと心地よさを大切に制作しています。</p>
     <a href="index.html#hero" class="works-back"><span class="works-back__arrow">&larr;</span> トップページへ戻る</a>
   </div>
 
   <section class="works" id="works">
     <div class="section-inner">
 
+      <!-- ジャンル切り替え（js/works-filter.js）。JSが動かない環境では切り替えられないため、
+           hidden属性で非表示にしておき、JS側で表示する（その場合は全作品がそのまま並ぶ）。
+           各作品の data-genre（web＝LP・HP／design＝SNS・広告デザイン）で絞り込む -->
+      <div class="works-filter" id="worksFilter" hidden>
+        <div class="works-filter__buttons" role="group" aria-label="ジャンルで絞り込む">
+          <button type="button" class="works-filter__button" data-filter="all" aria-pressed="true">すべて</button>
+          <button type="button" class="works-filter__button" data-filter="web" aria-pressed="false">LP・HP</button>
+          <button type="button" class="works-filter__button" data-filter="design" aria-pressed="false">SNS・広告デザイン</button>
+        </div>
+        <p class="works-filter__status" id="worksFilterStatus" aria-live="polite"></p>
+      </div>
+
       <!-- WORK 01（うみかぜトラベル。制作目的・工夫したポイントは画像から起こした下書きのため要確認） -->
-      <article class="work-item reveal" id="work-01">
+      <article class="work-item reveal" id="work-01" data-genre="web">
         <div class="work-item__heading">
           <p class="work-item__number">WORK 01</p>
           <h2 class="work-item__title">うみかぜトラベル</h2>
@@ -115,7 +129,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </article>
 
       <!-- WORK 02（PCでは画像・情報を左右反転） -->
-      <article class="work-item reveal" id="work-02" data-align="reverse">
+      <article class="work-item reveal" id="work-02" data-genre="web" data-align="reverse">
         <div class="work-item__heading">
           <p class="work-item__number">WORK 02</p>
           <h2 class="work-item__title">hanami flower</h2>
@@ -154,7 +168,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </article>
 
       <!-- WORK 03（LIVRA ESTATE。WordPressで制作した不動産会社LP） -->
-      <article class="work-item reveal" id="work-03">
+      <article class="work-item reveal" id="work-03" data-genre="web">
         <div class="work-item__heading">
           <p class="work-item__number">WORK 03</p>
           <h2 class="work-item__title">LIVRA ESTATE</h2>
@@ -194,7 +208,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </article>
 
       <!-- WORK 04（hygge coffee。一覧ページのみに掲載。PCでは画像・情報を左右反転） -->
-      <article class="work-item reveal" id="work-04" data-align="reverse">
+      <article class="work-item reveal" id="work-04" data-genre="web" data-align="reverse">
         <div class="work-item__heading">
           <p class="work-item__number">WORK 04</p>
           <h2 class="work-item__title">hygge coffee</h2>
@@ -233,7 +247,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </article>
 
       <!-- WORK 05（Lune hair & relaxation。WordPressで制作した美容室LP。一覧ページのみに掲載） -->
-      <article class="work-item reveal" id="work-05">
+      <article class="work-item reveal" id="work-05" data-genre="web">
         <div class="work-item__heading">
           <p class="work-item__number">WORK 05</p>
           <h2 class="work-item__title">Lune hair &amp; relaxation</h2>
@@ -272,7 +286,60 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
       </article>
 
-      <!-- 今後作品が増えたら、この位置にWORK 06, 07...とカードを追加していく -->
+      <!-- WORK 06（muku botanical：SNS・広告デザイン。自主制作の架空ブランド）
+           LP・HPと違いサイトURLがないため「サイトを見る」ボタンは置かず、画像クリックの拡大表示（js/lightbox.js）で見せる -->
+      <article class="work-item work-item--design reveal" id="work-06" data-genre="design" data-align="reverse">
+        <div class="work-item__heading">
+          <p class="work-item__number">WORK 06</p>
+          <h2 class="work-item__title">muku botanical</h2>
+          <p class="work-item__type-industry">Instagramカルーセル / 広告バナー<span class="work-item__type-industry-sep">｜</span>自然派スキンケアブランド</p>
+        </div>
+        <div class="work-item__media">
+          <div class="design-gallery">
+            <h3 class="design-gallery__label">Instagram カルーセル<span>5枚</span></h3>
+            <p class="design-gallery__hint">横にスワイプしてご覧ください</p>
+            <ul class="design-gallery__carousel" data-lightbox-group="muku-carousel">
+              <li><button type="button" class="design-gallery__item" data-lightbox-src="sozai/graphic-muku-carousel-01.webp"><img src="sozai/graphic-muku-carousel-01.webp" alt="1枚目：新商品フェイスオイルの紹介「うるおいを、毎日の小さな習慣に。」" width="1080" height="1350" loading="lazy"></button></li>
+              <li><button type="button" class="design-gallery__item" data-lightbox-src="sozai/graphic-muku-carousel-02.webp"><img src="sozai/graphic-muku-carousel-02.webp" alt="2枚目：毎日に寄り添う3つのポイント" width="1080" height="1350" loading="lazy"></button></li>
+              <li><button type="button" class="design-gallery__item" data-lightbox-src="sozai/graphic-muku-carousel-03.webp"><img src="sozai/graphic-muku-carousel-03.webp" alt="3枚目：使い方「いつものケアに、1〜2滴。」" width="1080" height="1350" loading="lazy"></button></li>
+              <li><button type="button" class="design-gallery__item" data-lightbox-src="sozai/graphic-muku-carousel-04.webp"><img src="sozai/graphic-muku-carousel-04.webp" alt="4枚目：使う場面「忙しい日も、肌をいたわる時間を。」" width="1080" height="1350" loading="lazy"></button></li>
+              <li><button type="button" class="design-gallery__item" data-lightbox-src="sozai/graphic-muku-carousel-05.webp"><img src="sozai/graphic-muku-carousel-05.webp" alt="5枚目：発売日と初回購入特典、購入案内" width="1080" height="1350" loading="lazy"></button></li>
+            </ul>
+          </div>
+          <div class="design-gallery">
+            <h3 class="design-gallery__label">広告バナー<span>2サイズ</span></h3>
+            <ul class="design-gallery__banners" data-lightbox-group="muku-banner">
+              <li class="design-gallery__banner--wide"><button type="button" class="design-gallery__item" data-lightbox-src="sozai/graphic-muku-banner-wide.webp"><img src="sozai/graphic-muku-banner-wide.webp" alt="横長バナー：商品ページへ誘導する広告「肌に、うるおいのひとしずく。」" width="1584" height="396" loading="lazy"></button></li>
+              <li class="design-gallery__banner--square"><button type="button" class="design-gallery__item" data-lightbox-src="sozai/graphic-muku-banner-square.webp"><img src="sozai/graphic-muku-banner-square.webp" alt="正方形バナー：新商品の広告「肌に、うるおいのひとしずく。」" width="1080" height="1080" loading="lazy"></button></li>
+            </ul>
+          </div>
+          <p class="design-gallery__tap-note">画像をタップ（クリック）すると拡大して見られます</p>
+        </div>
+        <div class="work-item__info">
+          <dl class="work-item__meta">
+            <div class="work-item__meta-row work-item__meta-row--type"><dt>種別</dt><dd>Instagramカルーセル / 広告バナー</dd></div>
+            <div><dt>案件区分</dt><dd>自主制作（架空ブランド）</dd></div>
+            <div class="work-item__meta-row work-item__meta-row--industry"><dt>業種</dt><dd>自然派スキンケアブランド</dd></div>
+            <div><dt>ターゲット</dt><dd>乾燥が気になる、ナチュラル志向の20〜30代女性</dd></div>
+            <div><dt>制作物</dt><dd>Instagramカルーセル 5枚（1080×1350）/ 広告バナー 2種（横長・正方形）</dd></div>
+            <div><dt>担当範囲</dt><dd>構成設計 / デザイン / コピー作成 / 画像制作</dd></div>
+            <div><dt>使用ツール</dt><dd>Canva / ChatGPT</dd></div>
+            <div><dt>制作期間</dt><dd>約1時間</dd></div>
+          </dl>
+          <div class="work-item__section">
+            <h3 class="work-item__section-heading"><span class="work-item__section-en">Purpose</span><span class="work-item__section-jp">制作目的</span></h3>
+            <p class="work-item__section-body">新商品のフェイスオイルの発売に合わせて、Instagramで商品を知ってもらい、プロフィールのリンクから商品ページへ進んでもらうことを目指しました。広告バナーは、SNS広告やWebサイトに載せて商品ページへ案内する想定です。</p>
+          </div>
+          <div class="work-item__section">
+            <h3 class="work-item__section-heading"><span class="work-item__section-en">Design Point</span><span class="work-item__section-jp">工夫したポイント</span></h3>
+            <p class="work-item__section-body">生成りとセージグリーンを基調に、明朝体を合わせて、植物由来のやさしい印象にまとめました。カルーセルは「商品の紹介 → 3つのポイント → 使い方 → 使う場面 → 発売・購入案内」の順に並べ、スワイプしながら自然に購入を検討できる流れにしています。バナーは小さく表示されても発売日と初回特典が読み取れるよう、文字の大きさにメリハリをつけました。</p>
+          </div>
+          <p class="work-item__note">※架空のブランドを想定した自主制作です。商品・価格・発売日はすべて架空の設定です。</p>
+        </div>
+      </article>
+
+      <!-- 今後作品が増えたら、この位置にWORK 07, 08...とカードを追加していく。
+           ジャンル切り替えの対象にするため、articleには必ず data-genre（web または design）を付ける -->
 
     </div>
   </section>
@@ -294,6 +361,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="index.html#about">About</a>
     <a href="index.html#skills">Skills</a>
     <a href="index.html#works">Works</a>
+    <a href="index.html#design">Design</a>
     <a href="index.html#flow">Flow</a>
     <a href="index.html#contact">Contact</a>
     <a href="privacy.html">Privacy Policy</a>
@@ -305,9 +373,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
 </a>
 
-<script src="js/main.js?v=20261013-3" defer></script>
-<script src="js/animation.js?v=20261013-3" defer></script>
+<script src="js/main.js?v=20261109-1" defer></script>
+<script src="js/animation.js?v=20261109-1" defer></script>
 <!-- CTAボタン（お問い合わせはこちら）を押すと、ボタンの外へ小さな水しぶきが上がる演出 -->
-<script src="js/cta-splash.js?v=20261013-3" defer></script>
+<script src="js/cta-splash.js?v=20261109-1" defer></script>
+<!-- 制作実績のジャンル切り替え（すべて／LP・HP／SNS・広告デザイン） -->
+<script src="js/works-filter.js?v=20261109-1" defer></script>
+<!-- SNS・広告デザインの画像をクリックで拡大表示 -->
+<script src="js/lightbox.js?v=20261109-1" defer></script>
 </body>
 </html>
